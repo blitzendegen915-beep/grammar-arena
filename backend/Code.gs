@@ -1400,6 +1400,7 @@ function doPost(e) {
   const action = params.action || 'leaderboard'
   if (action === 'register') return registerPlayer_(params)
   if (action === 'login') return loginPlayer_(params)
+  if (action === 'session') return sessionPlayer_(params)
   if (action === 'answer') return recordAnswer_(params)
   return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, params.callback)
 }
@@ -1495,6 +1496,27 @@ function loginPlayer_(params) {
     players.getRange(playerIndex + 1, 5).setValue(now)
     players.getRange(playerIndex + 1, 7).setValue(tokenHashFor_(token, playerKey))
     return json_(profile_(players, answers, courseProfiles, playerIndex, playerKey, course, token), params.callback)
+  } finally {
+    lock.releaseLock()
+  }
+}
+
+function sessionPlayer_(params) {
+  const name = cleanName_(params.name)
+  const course = cleanCourse_(params.course) || COURSE_NAME
+  const token = String(params.authToken || '')
+  if (!name || !token) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
+
+  const lock = LockService.getScriptLock()
+  lock.waitLock(10000)
+  try {
+    const book = getBook_()
+    const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
+    const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
+    const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
+    const auth = authenticate_(players, name, token)
+    if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
+    return json_(profile_(players, answers, courseProfiles, auth.playerIndex, auth.playerKey, course, token), params.callback)
   } finally {
     lock.releaseLock()
   }

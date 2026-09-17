@@ -617,6 +617,33 @@ function App() {
     if (SCORE_API_URL) refreshLeaderboard()
   }, [modeId])
 
+  useEffect(() => {
+    if (!SCORE_API_URL || !hasSession || !answerSyncIdentity) return undefined
+    const identity = { ...answerSyncIdentity }
+    const controller = typeof AbortController === 'undefined' ? null : new AbortController()
+    requestScoreApi({ action: 'session', course: identity.course, name: identity.name, authToken: identity.authToken }, { signal: controller?.signal })
+      .then((result) => {
+        if (!result.ok || activeRef.current.token !== identity.authToken || activeRef.current.course !== identity.course) return
+        const serverRating = Number(result.rating) || DEFAULT_RATING
+        const syncKey = getSyncKey(identity)
+        setPersisted((current) => {
+          const displayedRating = applyProvisionalRating(serverRating, current.answerSyncQueue, syncKey)
+          const serverAnsweredIds = Array.isArray(result.answeredIds) ? result.answeredIds : []
+          return {
+            ...current,
+            rating: displayedRating,
+            ratingsByCourse: { ...(current.ratingsByCourse || {}), [identity.course]: displayedRating },
+            authoritativeRatingsBySyncKey: { ...(current.authoritativeRatingsBySyncKey || {}), [syncKey]: serverRating },
+            answeredIds: identity.course === 'foundation-course' ? serverAnsweredIds : current.answeredIds,
+            answeredByCourse: { ...(current.answeredByCourse || {}), [identity.course]: serverAnsweredIds },
+            publicLeaderboard: Array.isArray(result.players) ? result.players : current.publicLeaderboard,
+          }
+        })
+      })
+      .catch(() => {})
+    return () => controller?.abort()
+  }, [answerSyncIdentity, hasSession, modeId])
+
   const setSubmittedSync = (questionId, patch) => {
     setSubmitted((current) => current?.questionId === questionId ? { ...current, ...patch } : current)
   }
