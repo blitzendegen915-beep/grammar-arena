@@ -4,6 +4,7 @@ import './styles.css'
 import { FOUNDATION_TRANSLATIONS, GERUND_QUESTIONS, PARTICIPLE_QUESTIONS } from './questionBanks'
 import { REGULAR_QUESTIONS } from './regularQuestions'
 import { isBlankPlaceholder, withBlankCount } from './questionQuality'
+import { getQuestionTranslation } from './questionPresentation'
 import {
   ANSWER_SYNC_MAX_ATTEMPTS,
   ANSWER_SYNC_TIMEOUT_MS,
@@ -959,7 +960,7 @@ function QuestionCard({ question: sourceQuestion, queue, index, submitted, submi
   const questionNumber = String(index + 1).padStart(2, '0')
   return <article className="question-card">
     <div className="question-head"><div><div className="lesson-label">{question.lesson} <span>•</span> {question.topic}</div><div className="question-type">{question.practiceOnly ? 'REVIEW' : 'QUESTION'} {questionNumber}</div></div><div className="progress-block"><span>{index + 1} / {queue.length}</span><div className="progress-track"><span style={{ width: `${((index + 1) / queue.length) * 100}%` }} /></div></div></div>
-    <div className="question-body"><p className="prompt">{question.prompt}</p>{question.type === 'input' && question.translation && <p className="japanese-prompt input-translation"><span>日本語訳</span>{question.translation}</p>}{question.japanese && <p className="japanese-prompt">{question.japanese}</p>}{question.sentence && <p className="sentence">{renderSentence(question.sentence, question.inputPrefix)}</p>}
+    <div className="question-body"><p className="prompt">{question.prompt}</p>{question.type === 'input' && getQuestionTranslation(question) && <p className="japanese-prompt input-translation"><span>日本語訳</span>{getQuestionTranslation(question)}</p>}{question.type !== 'input' && question.japanese && <p className="japanese-prompt">{question.japanese}</p>}{question.sentence && <p className="sentence">{renderSentence(question.sentence, question.inputPrefix)}</p>}
       {question.type === 'choice' && <div className="choices">{question.choices.map((choice, choiceIndex) => <button type="button" key={choice} className={`choice-button ${selected === choice ? 'chosen' : ''} ${submitted && isCorrectAnswer(question, choice) ? 'correct-choice' : ''} ${submitted && selected === choice && !isCorrectAnswer(question, selected) ? 'wrong-choice' : ''}`} onClick={() => !submitted && setSelected(choice)}><span className="choice-letter">{String.fromCharCode(65 + choiceIndex)}</span><span>{choice}</span>{submitted && isCorrectAnswer(question, choice) && <Icon name="check" size={19} />}</button>)}</div>}
       {question.type === 'reorder' && <div className="reorder-area"><div className={`answer-line ${submitted ? (submitted.correct ? 'answer-correct' : 'answer-wrong') : ''}`}>{tokens.length ? tokens.map((token, tokenIndex) => <button type="button" key={`${token}-${tokenIndex}`} className="token selected-token" onClick={() => removeWord(tokenIndex)}>{token}</button>) : <span className="answer-placeholder">ここに語句を並べます</span>}</div><div className="word-bank">{remainingWords.map((word, wordIndex) => <button type="button" key={`${word}-${wordIndex}`} className="token" onClick={() => useWord(word)}>{word}</button>)}</div></div>}
       {question.type === 'input' && <div className={`input-wrap ${submitted ? (submitted.correct ? 'input-correct' : 'input-wrong') : ''}`}><input aria-label="空欄すべての解答" value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') submit() }} placeholder={question.blankCount > 1 ? '空欄すべての語句を入力' : '解答を入力'} disabled={Boolean(submitted)} autoComplete="off" /><span>{(question.accepted?.[0] || question.answer).includes(' ') ? '語句' : '語'}</span></div>}
@@ -989,7 +990,7 @@ function CompleteCard({ score, queue, reviews, course, studentName, ratingStart,
 
 function ReviewItem({ review, index }) {
   const { question } = review
-  const translation = question.translation || question.japanese
+  const translation = getQuestionTranslation(question)
   return <article className={`review-item ${review.correct ? 'review-correct' : 'review-wrong'}`}><div className="review-item-head"><div><span className="review-number">QUESTION {String(index + 1).padStart(2, '0')}</span><strong>{question.lesson} ・ {question.topic}</strong></div><span className="review-result">{review.correct ? '正解' : '不正解'}</span></div><p className="review-prompt">{question.prompt}</p>{question.sentence && <p className="review-sentence">{renderSentence(question.sentence)}</p>}{question.type === 'reorder' && <p className="review-sentence review-reorder">並べ替え：{question.words.join(' / ')}</p>}<div className="review-answers"><div><span>あなたの解答</span><strong>{review.userAnswer || '（未回答）'}</strong></div><div><span>正答</span><strong>{review.correctAnswer}</strong></div></div>{translation && <div className="review-translation"><span>日本語訳</span><p>{translation}</p></div>}<div className="review-explanation"><span>解説</span><p>{question.explanation}</p></div><small>{question.source}</small></article>
 }
 

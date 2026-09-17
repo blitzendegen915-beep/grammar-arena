@@ -11,7 +11,7 @@ const make = (id, lesson, topic, difficulty, type, data) => ({
 })
 
 const choice = (id, lesson, topic, difficulty, sentence, choices, answer, explanation, japanese = '') => make(id, lesson, topic, difficulty, 'choice', { sentence, choices, answer, answerLabel: answer, explanation, japanese, translation: japanese })
-const fill = (id, lesson, topic, difficulty, sentence, answer, explanation, japanese = '', accepted = [answer]) => make(id, lesson, topic, difficulty, 'input', { sentence, answer, accepted, answerLabel: answer, explanation, japanese, translation: japanese })
+const fill = (id, lesson, topic, difficulty, sentence, answer, explanation, japanese = '', accepted = [answer]) => make(id, lesson, topic, difficulty, 'input', { sentence, answer, accepted, answerLabel: answer, explanation, translation: japanese })
 const reorder = (id, lesson, topic, difficulty, japanese, words, answer, explanation) => make(id, lesson, topic, difficulty, 'reorder', { japanese, words, answer, answerLabel: answer, explanation, translation: japanese })
 const translate = (id, lesson, topic, difficulty, sentence, answer, explanation, accepted = [answer]) => make(id, lesson, topic, difficulty, 'input', { prompt: '下線部に注意して、次の英文を日本語に直しなさい。', sentence, answer, accepted, answerLabel: answer, explanation })
 
