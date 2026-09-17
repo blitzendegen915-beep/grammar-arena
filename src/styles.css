@@ -92,6 +92,9 @@ h1 { margin-bottom: 0; color: #14221c; font-size: clamp(25px, 2.2vw, 34px); line
 .correction { display: flex; gap: 13px; align-items: baseline; margin: 14px 0 8px; font-size: 14px; }
 .correction span { color: #78857f; font-size: 12px; }
 .correction strong { color: #123d2e; font: 600 18px Georgia, serif; }
+.translation { margin: 13px 0 10px; padding: 11px 13px; background: rgba(243, 197, 21, .15); border-left: 4px solid var(--blue, #2d6b9f); }
+.translation span { display: block; color: #596a63; font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+.translation p { margin: 4px 0 0; color: #25332d; font-size: 15px; line-height: 1.65; }
 .feedback p { color: #4e5d56; font-size: 13px; line-height: 1.75; margin-bottom: 9px; }
 .feedback small { color: #8c9994; font-size: 10px; }
 .question-actions { padding: 0 29px 29px; display: grid; gap: 10px; }
