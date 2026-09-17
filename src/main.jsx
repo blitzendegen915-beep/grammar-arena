@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './styles.css'
 
 const STORAGE_KEY = 'grammar-arena-v1'
-const SCORE_API_URL = import.meta.env.VITE_SCORE_API_URL || ''
+const SCORE_API_URL = import.meta.env.VITE_SCORE_API_URL || 'https://script.google.com/macros/s/AKfycbw0HAcZcaqv8vRsU4uz02rKB7-jdsWM-xZrNwlHTlEyGOEdCSTWnaDBlqCuCv4Ho8AelQ/exec'
 const DEFAULT_RATING = 1240
 
 const QUESTIONS = [
