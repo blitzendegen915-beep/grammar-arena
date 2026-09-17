@@ -11,7 +11,7 @@ export function getSyncKey({ name = '', authToken = '', course = '' } = {}) {
   return JSON.stringify([normalizedName(name), String(authToken), String(course)])
 }
 
-export function createPendingAnswer({ name, authToken, course, questionId, correct, delta }, now = Date.now()) {
+export function createPendingAnswer({ name, authToken, course, questionId, answer = '', correct, delta }, now = Date.now()) {
   const syncKey = getSyncKey({ name, authToken, course })
   return {
     id: JSON.stringify([syncKey, String(questionId)]),
@@ -20,6 +20,7 @@ export function createPendingAnswer({ name, authToken, course, questionId, corre
     authToken: String(authToken || ''),
     course: String(course || ''),
     questionId: String(questionId || ''),
+    answer: String(answer || ''),
     correct: Boolean(correct),
     delta: Number(delta) || 0,
     status: 'pending',

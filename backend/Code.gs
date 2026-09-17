@@ -1,16 +1,1407 @@
-const COURSE_NAME = 'foundation-infinitive'
+const COURSE_NAME = 'foundation-course'
 const RATING_MIN = 800
 const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash']
 const ANSWER_HEADERS = ['playerKey', 'course', 'questionId', 'correct', 'delta', 'answeredAt']
 const COURSE_PROFILE_HEADERS = ['playerKey', 'course', 'rating', 'answered', 'updatedAt']
+const RATING_POINTS = { starter: 12, standard: 18, advanced: 26 }
+const RATING_LOSS = { starter: 7, standard: 11, advanced: 16 }
+const ALLOWED_COURSES = ['foundation-course', 'regular-english-practice']
+const QUESTION_REGISTRY = {
+  "l13-01": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "Our purpose is to help the poor."
+    ]
+  },
+  "l13-02": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "to talk with"
+    ]
+  },
+  "l13-03": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "食べるものがほしい"
+    ]
+  },
+  "l13-04": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "to help"
+    ]
+  },
+  "l14-01": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "服を買うために原宿へ行った"
+    ]
+  },
+  "l14-02": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "told us to go"
+    ]
+  },
+  "l14-03": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "It is not easy to understand others' feelings."
+    ]
+  },
+  "l14-04": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "not to"
+    ]
+  },
+  "l15-01": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "let"
+    ]
+  },
+  "l15-02": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "say"
+    ]
+  },
+  "l15-03": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "to have left"
+    ]
+  },
+  "l15-04": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "Shinji seems to be playing soccer in the park now."
+    ]
+  },
+  "plus-01": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "To tell"
+    ]
+  },
+  "plus-02": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "The French President is to visit Japan next month."
+    ]
+  },
+  "plus-03": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "easy to find"
+    ]
+  },
+  "plus-04": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "where to"
+    ]
+  },
+  "gerund-01": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "reading"
+    ]
+  },
+  "gerund-02": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "talking"
+    ]
+  },
+  "gerund-03": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "helping"
+    ]
+  },
+  "gerund-04": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "Reading English every day is useful."
+    ]
+  },
+  "gerund-05": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "seeing"
+    ]
+  },
+  "gerund-06": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "closing"
+    ]
+  },
+  "gerund-07": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "running"
+    ]
+  },
+  "gerund-08": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "to drink"
+    ]
+  },
+  "gerund-09": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "seeing"
+    ]
+  },
+  "gerund-10": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "to do"
+    ]
+  },
+  "gerund-11": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "Getting up early is good for your health."
+    ]
+  },
+  "gerund-12": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "reading",
+      "to be read"
+    ]
+  },
+  "participle-01": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "interesting"
+    ]
+  },
+  "participle-02": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "interested"
+    ]
+  },
+  "participle-03": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "falling"
+    ]
+  },
+  "participle-04": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "The broken window needs to be repaired."
+    ]
+  },
+  "participle-05": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "standing"
+    ]
+  },
+  "participle-06": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "written"
+    ]
+  },
+  "participle-07": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "locked"
+    ]
+  },
+  "participle-08": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "surprising"
+    ]
+  },
+  "participle-09": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "surprised"
+    ]
+  },
+  "participle-10": {
+    "course": "foundation-course",
+    "difficulty": "standard",
+    "accepted": [
+      "The man sitting next to me speaks English."
+    ]
+  },
+  "participle-11": {
+    "course": "foundation-course",
+    "difficulty": "starter",
+    "accepted": [
+      "crying"
+    ]
+  },
+  "participle-12": {
+    "course": "foundation-course",
+    "difficulty": "advanced",
+    "accepted": [
+      "written"
+    ]
+  },
+  "reg27-01": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "will be"
+    ]
+  },
+  "reg27-02": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "should"
+    ]
+  },
+  "reg27-03": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "wouldn't"
+    ]
+  },
+  "reg27-04": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "used to"
+    ]
+  },
+  "reg27-05": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "should have"
+    ]
+  },
+  "reg27-06": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "must be"
+    ]
+  },
+  "reg27-07": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Shall we"
+    ]
+  },
+  "reg27-08": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Don't"
+    ]
+  },
+  "reg27-09": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "don't have to",
+      "do not have to"
+    ]
+  },
+  "reg27-10": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Do have to",
+      "Do I have to"
+    ]
+  },
+  "reg27-11": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "shouldn't break"
+    ]
+  },
+  "reg27-12": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "We will be able to meet again."
+    ]
+  },
+  "reg27-13": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "He may well win a medal at the Olympics."
+    ]
+  },
+  "reg27-14": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "I would rather die than steal."
+    ]
+  },
+  "reg27-15": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "It is necessary that you should attend the meeting."
+    ]
+  },
+  "reg27-16": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "would"
+    ]
+  },
+  "reg27-17": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Shall"
+    ]
+  },
+  "reg27-18": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "May"
+    ]
+  },
+  "reg27-19": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "may have"
+    ]
+  },
+  "reg27-20": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "cannot have"
+    ]
+  },
+  "reg27-21": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "would like to"
+    ]
+  },
+  "reg27-22": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "may"
+    ]
+  },
+  "reg27-23": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "should feel"
+    ]
+  },
+  "reg27-24": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "should"
+    ]
+  },
+  "reg27-25": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "must have watched"
+    ]
+  },
+  "reg27-26": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "might as well"
+    ]
+  },
+  "reg27-27": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "can"
+    ]
+  },
+  "reg27-28": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "彼はパーティーで私の姉を負かすことができた。",
+      "彼はパーティーで妹を負かすことができた。"
+    ]
+  },
+  "reg27-29": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "彼女は昨夜とても忙しかったのかもしれない。"
+    ]
+  },
+  "reg27-30": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "私たちは以前、将来の夢についてお互いに話したものだ。"
+    ]
+  },
+  "reg27-31": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "私は彼なしで会議を始めることを提案します。"
+    ]
+  },
+  "reg27-32": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "He had to study hard."
+    ]
+  },
+  "reg27-33": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "She must be worried about me."
+    ]
+  },
+  "reg27-34": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "You need not have gone there.",
+      "You needn't have gone there."
+    ]
+  },
+  "reg27-35": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "It is natural that they should think so.",
+      "It is natural for them to think so."
+    ]
+  },
+  "reg13-01": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Our purpose is to help the poor."
+    ]
+  },
+  "reg13-02": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "We planned to go to Hokkaido by ship."
+    ]
+  },
+  "reg13-03": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "It is very hard to master a foreign language."
+    ]
+  },
+  "reg13-04": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "Tom found it easy to climb the tree."
+    ]
+  },
+  "reg13-05": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to talk with"
+    ]
+  },
+  "reg13-06": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to read"
+    ]
+  },
+  "reg13-07": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to do"
+    ]
+  },
+  "reg13-08": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to live in",
+      "to live in it"
+    ]
+  },
+  "reg13-09": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "彼はうそをつくような人ではありません。"
+    ]
+  },
+  "reg13-10": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "言語を学ぶことは、異なる文化を知ることです。"
+    ]
+  },
+  "reg13-11": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "彼はサッカーチームに入ることを決めました。"
+    ]
+  },
+  "reg13-12": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "私は来週の月曜日に提出する宿題がたくさんあります。"
+    ]
+  },
+  "reg13-13": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "お腹が空きました。何か食べるものが欲しいです。"
+    ]
+  },
+  "reg13-14": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "It is difficult to speak English.",
+      "To speak English is very difficult."
+    ]
+  },
+  "reg14-01": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "私は昨日、服を買うために原宿へ行きました。"
+    ]
+  },
+  "reg14-02": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "彼は成長して弁護士になりました。"
+    ]
+  },
+  "reg14-03": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "彼女は親切にも彼らを助けてあげました。"
+    ]
+  },
+  "reg14-04": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "私はその知らせを聞いて悲しかった。"
+    ]
+  },
+  "reg14-05": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "彼はその仕事を得てとても幸せでした。"
+    ]
+  },
+  "reg14-06": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "want him to take",
+      "want him to play"
+    ]
+  },
+  "reg14-07": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "told us to go"
+    ]
+  },
+  "reg14-08": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "allowed me to use"
+    ]
+  },
+  "reg14-09": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "advised me to do"
+    ]
+  },
+  "reg14-10": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "It was hard for Anne to move the desk."
+    ]
+  },
+  "reg14-11": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "It is not easy to understand others' feelings."
+    ]
+  },
+  "reg14-12": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I was careless to leave the door unlocked."
+    ]
+  },
+  "reg14-13": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "We decided not to take part in the game."
+    ]
+  },
+  "reg14-14": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I asked her to help me with my homework.",
+      "I asked her to help with my homework."
+    ]
+  },
+  "reg15-01": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "have"
+    ]
+  },
+  "reg15-02": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "let"
+    ]
+  },
+  "reg15-03": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "made to go"
+    ]
+  },
+  "reg15-04": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "say"
+    ]
+  },
+  "reg15-05": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "leave"
+    ]
+  },
+  "reg15-06": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "to enter"
+    ]
+  },
+  "reg15-07": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "to be"
+    ]
+  },
+  "reg15-08": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "to be looking"
+    ]
+  },
+  "reg15-09": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "to have left"
+    ]
+  },
+  "reg15-10": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "to have been caught"
+    ]
+  },
+  "reg15-11": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "I heard someone cry out last night."
+    ]
+  },
+  "reg15-12": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I'll have my brother show you the place."
+    ]
+  },
+  "reg15-13": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "I was lucky to have been chosen as their leader."
+    ]
+  },
+  "reg15-14": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "I was sad not to have been invited to the party."
+    ]
+  },
+  "reg15-15": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "Shinji seems to be playing soccer in the park now."
+    ]
+  },
+  "reg15-16": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "My father made me do my homework.",
+      "My father made me study."
+    ]
+  },
+  "regplus-01": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "私たちはたまたま知り合った。",
+      "私たちはたまたまお互いを知っていた。"
+    ]
+  },
+  "regplus-02": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "サトシはローマにいる間に、イタリア文化を理解するようになった。"
+    ]
+  },
+  "regplus-03": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "The French President is to visit Japan next month."
+    ]
+  },
+  "regplus-04": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "Not a cloud was to be seen in the sky."
+    ]
+  },
+  "regplus-05": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "You are to do your homework before you go out."
+    ]
+  },
+  "regplus-06": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "easy to find"
+    ]
+  },
+  "regplus-07": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "where to"
+    ]
+  },
+  "regplus-08": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "too expensive to"
+    ]
+  },
+  "regplus-09": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "to show"
+    ]
+  },
+  "regplus-10": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "enough to"
+    ]
+  },
+  "regplus-11": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "To begin with"
+    ]
+  },
+  "regplus-12": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "want to"
+    ]
+  },
+  "regplus-13": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "as not to"
+    ]
+  },
+  "regplus-14": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "not to"
+    ]
+  },
+  "regplus-15": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "mind"
+    ]
+  },
+  "reg16-01": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "teaching"
+    ]
+  },
+  "reg16-02": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Walking",
+      "Going for a walk"
+    ]
+  },
+  "reg16-03": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "writing"
+    ]
+  },
+  "reg16-04": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "buying"
+    ]
+  },
+  "reg16-05": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "cleaning",
+      "to be cleaned"
+    ]
+  },
+  "reg16-06": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "She likes visiting museums alone."
+    ]
+  },
+  "reg16-07": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "He is proud of his daughter being a singer."
+    ]
+  },
+  "reg16-08": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "Not eating vegetables is bad for your health."
+    ]
+  },
+  "reg16-09": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I can't imagine him wearing a suit."
+    ]
+  },
+  "reg16-10": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "making mistakes",
+      "having made mistakes"
+    ]
+  },
+  "reg16-11": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "being compared",
+      "being compared with"
+    ]
+  },
+  "reg16-12": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "buying",
+      "having bought"
+    ]
+  },
+  "reg16-13": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I enjoyed playing soccer with my friends.",
+      "I had fun playing soccer with my friends."
+    ]
+  },
+  "reg17-01": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "forward to going"
+    ]
+  },
+  "reg17-02": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "me from climbing"
+    ]
+  },
+  "reg17-03": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "feel like reading"
+    ]
+  },
+  "reg17-04": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "mind opening"
+    ]
+  },
+  "reg17-05": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "He is used to using sign language."
+    ]
+  },
+  "reg17-06": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "There is no knowing whether it is true or not."
+    ]
+  },
+  "reg17-07": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "It is no use arguing with him any longer."
+    ]
+  },
+  "reg17-08": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "not to eat"
+    ]
+  },
+  "reg17-09": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "playing"
+    ]
+  },
+  "reg17-10": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "smoking"
+    ]
+  },
+  "reg17-11": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "to be"
+    ]
+  },
+  "reg17-12": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "coming"
+    ]
+  },
+  "reg17-13": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "to call"
+    ]
+  },
+  "reg17-14": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "bringing"
+    ]
+  },
+  "reg17-15": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "shaking"
+    ]
+  },
+  "reg17-16": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "I started playing tennis recently.",
+      "I started learning tennis recently."
+    ]
+  },
+  "regopt4-01": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "fast runner"
+    ]
+  },
+  "regopt4-02": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "your acceptance",
+      "your accepting"
+    ]
+  },
+  "regopt4-03": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "his safety"
+    ]
+  },
+  "regopt4-04": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "made a decision"
+    ]
+  },
+  "regopt4-05": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "late arrival"
+    ]
+  },
+  "regopt4-06": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "The story made her change her way of thinking."
+    ]
+  },
+  "regopt4-07": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "The doctor's advice enabled my grandfather to recover from his illness."
+    ]
+  },
+  "regopt4-08": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "My pride kept me from asking my friends for help."
+    ]
+  },
+  "regopt4-09": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "The accident prevented us from arriving at the station on time."
+    ]
+  },
+  "regopt4-10": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "His letter said that he would visit us in April."
+    ]
+  },
+  "regopt4-11": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "それをちょっと見せてください。"
+    ]
+  },
+  "regopt4-12": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "私の姉は早起きです。",
+      "私の妹は早起きです。"
+    ]
+  },
+  "regopt4-13": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "インターネットのおかげで、私たちは多くの情報を得ることができます。"
+    ]
+  },
+  "regopt4-14": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "台風のため、私たちは海へ釣りに行けませんでした。"
+    ]
+  },
+  "regopt4-15": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "このバスで空港へ行けますか。"
+    ]
+  },
+  "regopt7-01": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "at"
+    ]
+  },
+  "regopt7-02": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "at"
+    ]
+  },
+  "regopt7-03": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "on"
+    ]
+  },
+  "regopt7-04": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "in"
+    ]
+  },
+  "regopt7-05": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "on ... in",
+      "on the wall in"
+    ]
+  },
+  "regopt7-06": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "from ... to"
+    ]
+  },
+  "regopt7-07": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "during"
+    ]
+  },
+  "regopt7-08": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "for"
+    ]
+  },
+  "regopt7-09": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "for ... in"
+    ]
+  },
+  "regopt7-10": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "Do you know the title of her latest album?"
+    ]
+  },
+  "regopt7-11": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "We cleared the schoolyard of snow."
+    ]
+  },
+  "regopt7-12": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "The dog was sitting by the front door."
+    ]
+  },
+  "regopt7-13": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I saw my teacher with his family at the mall yesterday."
+    ]
+  },
+  "regopt7-14": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "by ... until"
+    ]
+  },
+  "regopt7-15": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "with"
+    ]
+  },
+  "regopt7-16": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "by"
+    ]
+  }
+}
 
 function doGet(e) {
+  const params = e && e.parameter ? e.parameter : {}
+  if ((params.action || 'leaderboard') !== 'leaderboard') return json_({ ok: false, reason: 'post-required' }, params.callback)
+  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, params.callback)
+}
+
+function doPost(e) {
   const params = e && e.parameter ? e.parameter : {}
   const action = params.action || 'leaderboard'
   if (action === 'register') return registerPlayer_(params)
   if (action === 'login') return loginPlayer_(params)
   if (action === 'answer') return recordAnswer_(params)
-  return getLeaderboard_(params.course || COURSE_NAME, params.callback)
+  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, params.callback)
 }
 
 function setup() {
@@ -49,7 +1440,7 @@ function registerPlayer_(params) {
   const name = cleanName_(params.name)
   const playerKey = keyFor_(name)
   const pinHash = cleanPinHash_(params.pinHash)
-  const course = params.course || COURSE_NAME
+  const course = cleanCourse_(params.course) || COURSE_NAME
   if (!name || !playerKey || !pinHash) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
 
   const lock = LockService.getScriptLock()
@@ -83,7 +1474,7 @@ function loginPlayer_(params) {
   const name = cleanName_(params.name)
   const playerKey = keyFor_(name)
   const pinHash = cleanPinHash_(params.pinHash)
-  const course = params.course || COURSE_NAME
+  const course = cleanCourse_(params.course) || COURSE_NAME
   if (!name || !playerKey || !pinHash) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
 
   const lock = LockService.getScriptLock()
@@ -155,11 +1546,10 @@ function authenticate_(players, name, token) {
 
 function recordAnswer_(params) {
   const name = cleanName_(params.name)
-  const course = params.course || COURSE_NAME
+  const course = cleanCourse_(params.course)
   const questionId = String(params.questionId || '')
-  const correct = params.correct === 'true'
-  const requestedDelta = Number(params.delta || 0)
-  if (!name || !questionId) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
+  const question = questionFor_(course, questionId)
+  if (!name || !course || !questionId || !question) return json_({ ok: false, reason: 'invalid-question' }, params.callback)
 
   const lock = LockService.getScriptLock()
   lock.waitLock(10000)
@@ -180,14 +1570,21 @@ function recordAnswer_(params) {
     // A retry may follow a lost response. Return the authoritative rating without scoring twice.
     if (duplicate) return json_({ ok: false, reason: 'already-answered', rating: courseProfile.rating, delta: 0 }, params.callback)
     const previousRating = courseProfile.rating
-    const safeDelta = Math.max(-50, Math.min(50, requestedDelta))
+    const submittedAnswer = String(params.answer || '')
+    // New clients send the answer text. Older queued answers only have the
+    // browser's result, so retain a temporary compatibility path for them.
+    const serverValidated = submittedAnswer.length > 0
+    const correct = serverValidated ? isAnswerCorrect_(question, submittedAnswer) : params.legacyCorrect === 'true' || params.correct === 'true'
+    const safeDelta = serverValidated
+      ? (correct ? RATING_POINTS[question.difficulty] : -RATING_LOSS[question.difficulty])
+      : Math.max(-50, Math.min(50, Number(params.delta || 0)))
     const rating = Math.max(RATING_MIN, previousRating + safeDelta)
     const now = new Date()
     answers.appendRow([playerKey, course, questionId, correct, safeDelta, now])
     courseProfiles.getRange(courseProfile.sheetRow, 3, 1, 3).setValues([[rating, courseProfile.answered + 1, now]])
     players.getRange(playerIndex + 1, 2).setValue(name)
     players.getRange(playerIndex + 1, 5).setValue(now)
-    const result = { ok: true, rating, delta: safeDelta }
+    const result = { ok: true, rating, delta: safeDelta, correct, serverValidated }
     if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, course)
     return json_(result, params.callback)
   } finally {
@@ -196,6 +1593,7 @@ function recordAnswer_(params) {
 }
 
 function getLeaderboard_(course, callback) {
+  course = cleanCourse_(course) || COURSE_NAME
   const book = getBook_()
   const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
   const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
@@ -222,6 +1620,29 @@ function leaderboard_(playersSheet, courseProfilesSheet, course) {
 
 function cleanName_(value) {
   return String(value || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 20)
+}
+
+function cleanCourse_(value) {
+  const course = String(value || '').trim()
+  if (['foundation-infinitive', 'foundation-gerund', 'foundation-participles'].includes(course)) return 'foundation-course'
+  return ALLOWED_COURSES.includes(course) ? course : ''
+}
+
+function questionFor_(course, questionId) {
+  const question = QUESTION_REGISTRY[String(questionId || '')]
+  return question && question.course === course ? question : null
+}
+
+function isAnswerCorrect_(question, submittedAnswer) {
+  const answer = normalizeAnswer_(submittedAnswer)
+  return (question.accepted || []).some((candidate) => normalizeAnswer_(candidate) === answer)
+}
+
+function normalizeAnswer_(value) {
+  return String(value || '').trim().toLowerCase()
+    .replace(/[’']/g, "'")
+    .replace(/[。．,，!！?？、「」]/g, '')
+    .replace(/\s+/g, ' ')
 }
 
 function cleanPinHash_(value) {
