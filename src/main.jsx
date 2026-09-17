@@ -2,11 +2,41 @@ import { StrictMode, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 import { FOUNDATION_TRANSLATIONS, GERUND_QUESTIONS, PARTICIPLE_QUESTIONS } from './questionBanks'
+import { REGULAR_QUESTIONS } from './regularQuestions'
+import {
+  ANSWER_SYNC_MAX_ATTEMPTS,
+  ANSWER_SYNC_TIMEOUT_MS,
+  applyProvisionalRating,
+  createPendingAnswer,
+  enqueueAnswer,
+  flushAnswerQueue,
+  getAnswerForQuestion,
+  getAnswerSyncSummary,
+  getSyncKey,
+  mergeQueueSnapshot,
+  prepareAnswerRetry,
+  recoverAnswerQueue,
+  rekeyAnswersForAuth,
+} from './answerSync'
 
 const STORAGE_KEY = 'grammar-arena-v1'
 const SCORE_API_URL = import.meta.env.VITE_SCORE_API_URL || 'https://script.google.com/macros/s/AKfycbw0HAcZcaqv8vRsU4uz02rKB7-jdsWM-xZrNwlHTlEyGOEdCSTWnaDBlqCuCv4Ho8AelQ/exec'
 const DEFAULT_RATING = 1240
 const SESSION_LENGTH = 10
+
+const DEFAULT_PERSISTED = {
+  rating: DEFAULT_RATING,
+  streak: 0,
+  history: [],
+  autoExplanation: true,
+  studentName: '',
+  authToken: '',
+  answeredIds: [],
+  publicLeaderboard: [],
+  ratingsByCourse: {},
+  authoritativeRatingsBySyncKey: {},
+  answerSyncQueue: [],
+}
 
 const QUESTIONS = [
   {
@@ -185,7 +215,7 @@ const QUESTION_BANKS = {
   'foundation-infinitive': FOUNDATION_QUESTIONS,
   'foundation-gerund': GERUND_QUESTIONS,
   'foundation-participles': PARTICIPLE_QUESTIONS,
-  'regular-english-practice': FOUNDATION_QUESTIONS,
+  'regular-english-practice': REGULAR_QUESTIONS,
 }
 
 function getQuestionBank(modeId) {
@@ -225,9 +255,14 @@ function Icon({ name, size = 20 }) {
 function readPersisted() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { rating: DEFAULT_RATING, streak: 0, history: [], autoExplanation: true, studentName: '', authToken: '', answeredIds: [], publicLeaderboard: [] }
-    return { rating: DEFAULT_RATING, streak: 0, history: [], autoExplanation: true, studentName: '', authToken: '', answeredIds: [], publicLeaderboard: [], ...JSON.parse(raw) }
-  } catch { return { rating: DEFAULT_RATING, streak: 0, history: [], autoExplanation: true, studentName: '', authToken: '', answeredIds: [], publicLeaderboard: [] } }
+    if (!raw) return { ...DEFAULT_PERSISTED }
+    const parsed = JSON.parse(raw)
+    return {
+      ...DEFAULT_PERSISTED,
+      ...parsed,
+      answerSyncQueue: recoverAnswerQueue(Array.isArray(parsed.answerSyncQueue) ? parsed.answerSyncQueue : []),
+    }
+  } catch { return { ...DEFAULT_PERSISTED } }
 }
 
 function normalize(value = '') {
@@ -262,13 +297,15 @@ async function hashPin(pin) {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-function requestScoreApi(params) {
+function requestScoreApi(params, { signal } = {}) {
   if (!SCORE_API_URL) return Promise.reject(new Error('score-api-not-configured'))
   const query = new URLSearchParams(params).toString()
-  return fetch(`${SCORE_API_URL}?${query}`, { cache: 'no-store' }).then((response) => {
+  const controller = signal || typeof AbortController === 'undefined' ? null : new AbortController()
+  const timeout = controller ? window.setTimeout(() => controller.abort(), 15000) : null
+  return fetch(`${SCORE_API_URL}?${query}`, { cache: 'no-store', signal: signal || controller?.signal }).then((response) => {
     if (!response.ok) throw new Error('score-api-response')
     return response.json()
-  })
+  }).finally(() => { if (timeout) window.clearTimeout(timeout) })
 }
 
 function shuffle(items) {
@@ -316,17 +353,30 @@ function App() {
   const [sessionRatingStart, setSessionRatingStart] = useState(persisted.rating)
   const [sessionCompletedAt, setSessionCompletedAt] = useState('')
   const [todaySeconds, setTodaySeconds] = useState(25 * 60)
-  const [submitting, setSubmitting] = useState(false)
   const [notice, setNotice] = useState('')
   const [authMode, setAuthMode] = useState('login')
   const [authName, setAuthName] = useState(() => readPersisted().studentName || '')
   const [authPin, setAuthPin] = useState('')
   const [authBusy, setAuthBusy] = useState(false)
   const leaderboardRequestRef = useRef(0)
+  const answerSyncRunningRef = useRef(false)
+  const answerSyncTimerRef = useRef(null)
+  const [answerSyncTick, setAnswerSyncTick] = useState(0)
+  const activeRef = useRef(null)
+  activeRef.current = { name: persisted.studentName, token: persisted.authToken, course: getRankingCourseId(modeId) }
+  const submitLock = useRef(false)
+  const submitting = false
 
   const question = queue[index]
   const isComplete = !question
   const hasSession = Boolean(cleanStudentName(persisted.studentName) && persisted.authToken)
+  const answerSyncIdentity = hasSession ? {
+    name: cleanStudentName(persisted.studentName),
+    authToken: persisted.authToken,
+    course: getRankingCourseId(modeId),
+  } : null
+  const answerSyncKey = answerSyncIdentity ? getSyncKey(answerSyncIdentity) : ''
+  const answerSyncSummary = getAnswerSyncSummary(persisted.answerSyncQueue, answerSyncKey)
   const student = { name: hasSession ? persisted.studentName : '未ログイン', grade: hasSession ? 'STUDENT' : 'NAME REQUIRED' }
 
   useEffect(() => {
@@ -343,8 +393,8 @@ function App() {
     return persisted.history.filter((item) => item.date === today)
   }, [persisted.history])
 
-  const todayAnswered = todaySessions.reduce((sum, item) => sum + item.total, 0) + sessionScore.answered
-  const todayCorrect = todaySessions.reduce((sum, item) => sum + item.correct, 0) + sessionScore.correct
+  const todayAnswered = todaySessions.reduce((sum, item) => sum + item.total, 0) + (sessionCompletedAt ? 0 : sessionScore.answered)
+  const todayCorrect = todaySessions.reduce((sum, item) => sum + item.correct, 0) + (sessionCompletedAt ? 0 : sessionScore.correct)
   const todayRate = todayAnswered ? Math.round((todayCorrect / todayAnswered) * 100) : 0
 
   const submitAuth = async () => {
@@ -377,19 +427,30 @@ function App() {
         return
       }
       const serverAnsweredIds = Array.isArray(result.answeredIds) ? result.answeredIds : []
+      const rankingId = getRankingCourseId(modeId)
+      const nextAuthToken = String(result.authToken)
+      const migratedQueue = rekeyAnswersForAuth(persisted.answerSyncQueue, {
+        name,
+        newAuthToken: nextAuthToken,
+      }).filter((entry) => !(entry.name.toLowerCase() === name.toLowerCase() && entry.course === rankingId && serverAnsweredIds.includes(entry.questionId)))
+      const nextSyncKey = getSyncKey({ name: result.name || name, authToken: nextAuthToken, course: rankingId })
+      const serverRating = Number(result.rating) || DEFAULT_RATING
+      const displayedRating = applyProvisionalRating(serverRating, migratedQueue, nextSyncKey)
       setPersisted((current) => ({
         ...current,
         studentName: result.name,
-        authToken: result.authToken,
-        rating: Number(result.rating) || DEFAULT_RATING,
-        ratingsByCourse: { ...(current.ratingsByCourse || {}), [getRankingCourseId(modeId)]: Number(result.rating) || DEFAULT_RATING },
-        answeredIds: serverAnsweredIds,
-        answeredByCourse: { ...(current.answeredByCourse || {}), [getRankingCourseId(modeId)]: serverAnsweredIds, [modeId]: serverAnsweredIds },
+        authToken: nextAuthToken,
+        rating: displayedRating,
+        ratingsByCourse: { ...(current.ratingsByCourse || {}), [rankingId]: displayedRating },
+        authoritativeRatingsBySyncKey: { ...(current.authoritativeRatingsBySyncKey || {}), [nextSyncKey]: serverRating },
+        answerSyncQueue: migratedQueue,
+        answeredIds: [...new Set([...serverAnsweredIds, ...migratedQueue.filter((entry) => entry.syncKey === nextSyncKey).map((entry) => entry.questionId)])],
+        answeredByCourse: { ...(current.studentName?.toLowerCase() === name.toLowerCase() ? current.answeredByCourse : {}), [rankingId]: [...new Set([...serverAnsweredIds, ...migratedQueue.filter((entry) => entry.syncKey === nextSyncKey).map((entry) => entry.questionId)])] },
         publicLeaderboard: Array.isArray(result.players) ? result.players : current.publicLeaderboard,
       }))
       setAuthName(result.name)
       setAuthPin('')
-      setSessionRatingStart(Number(result.rating) || DEFAULT_RATING)
+      setSessionRatingStart(displayedRating)
       setNotice('')
       setView('lobby')
     } catch {
@@ -486,14 +547,116 @@ function App() {
     if (SCORE_API_URL) refreshLeaderboard()
   }, [modeId])
 
+  const setSubmittedSync = (questionId, patch) => {
+    setSubmitted((current) => current?.questionId === questionId ? { ...current, ...patch } : current)
+  }
+
+  const retryAnswer = (questionId) => {
+    if (!answerSyncKey) return
+    const entry = getAnswerForQuestion(persisted.answerSyncQueue, answerSyncKey, questionId)
+    if (!entry || entry.status !== 'error') return
+    const nextAttemptAt = Date.now()
+    setPersisted((current) => ({
+      ...current,
+      answerSyncQueue: prepareAnswerRetry(current.answerSyncQueue, entry.id, nextAttemptAt),
+    }))
+    setSubmittedSync(questionId, { syncStatus: 'pending', syncError: '' })
+  }
+
+  const retryFailedAnswers = () => {
+    if (!answerSyncKey) return
+    const nextAttemptAt = Date.now()
+    setPersisted((current) => ({
+      ...current,
+      answerSyncQueue: current.answerSyncQueue.reduce((nextQueue, entry) => (
+        entry.syncKey === answerSyncKey && entry.status === 'error'
+          ? prepareAnswerRetry(nextQueue, entry.id, nextAttemptAt)
+          : nextQueue
+      ), current.answerSyncQueue),
+    }))
+    if (submitted?.questionId) setSubmittedSync(submitted.questionId, { syncStatus: 'pending', syncError: '' })
+  }
+
+  useEffect(() => {
+    if (answerSyncTimerRef.current) {
+      window.clearTimeout(answerSyncTimerRef.current)
+      answerSyncTimerRef.current = null
+    }
+    if (!SCORE_API_URL || !hasSession || !answerSyncIdentity || !answerSyncSummary.total || answerSyncRunningRef.current) return undefined
+    if (answerSyncSummary.nextAttemptAt && answerSyncSummary.nextAttemptAt > Date.now()) {
+      answerSyncTimerRef.current = window.setTimeout(() => setAnswerSyncTick((value) => value + 1), Math.max(50, answerSyncSummary.nextAttemptAt - Date.now()))
+      return () => window.clearTimeout(answerSyncTimerRef.current)
+    }
+    if (answerSyncSummary.blocked) return undefined
+
+    const queueSnapshot = persisted.answerSyncQueue
+    const initialIds = new Set(queueSnapshot.filter((entry) => entry.syncKey === answerSyncKey).map((entry) => entry.id))
+    answerSyncRunningRef.current = true
+    void flushAnswerQueue({
+      queue: queueSnapshot,
+      identity: answerSyncKey,
+      timeoutMs: ANSWER_SYNC_TIMEOUT_MS,
+      maxAttempts: ANSWER_SYNC_MAX_ATTEMPTS,
+      send: (entry, { signal } = {}) => requestScoreApi({
+        action: 'answer',
+        compact: 'true',
+        course: entry.course,
+        name: entry.name,
+        authToken: entry.authToken,
+        questionId: entry.questionId,
+        correct: String(entry.correct),
+        delta: String(entry.delta),
+      }, { signal }),
+      onChange: (nextQueue) => setPersisted((current) => current.authToken !== answerSyncIdentity.authToken ? current : ({
+        ...current,
+        answerSyncQueue: mergeQueueSnapshot(current.answerSyncQueue, nextQueue, answerSyncKey, initialIds),
+      })),
+      onResult: ({ type, entry, result, queue: nextQueue }) => {
+        const hasAuthoritativeRating = result?.rating != null && Number.isFinite(Number(result.rating))
+        const syncStatus = type === 'synced'
+          ? (hasAuthoritativeRating ? 'synced' : 'synced-unconfirmed')
+          : type === 'duplicate'
+            ? (hasAuthoritativeRating ? 'duplicate' : 'duplicate-unconfirmed')
+            : type === 'retry-scheduled' ? 'pending' : 'error'
+        const syncError = type === 'invalid-session' ? 'invalid-session' : type === 'failed' ? entry.lastError : ''
+        setPersisted((current) => {
+          if (current.authToken !== entry.authToken || current.studentName.toLowerCase() !== entry.name.toLowerCase()) return current
+          const mergedQueue = mergeQueueSnapshot(current.answerSyncQueue, nextQueue, answerSyncKey, initialIds)
+          if (!hasAuthoritativeRating) return { ...current, answerSyncQueue: mergedQueue }
+          const serverRating = Number(result.rating)
+          const displayedRating = applyProvisionalRating(serverRating, mergedQueue, entry.syncKey)
+          return {
+            ...current,
+            answerSyncQueue: mergedQueue,
+            rating: activeRef.current.course === entry.course ? displayedRating : current.rating,
+            ratingsByCourse: { ...(current.ratingsByCourse || {}), [entry.course]: displayedRating },
+            authoritativeRatingsBySyncKey: { ...(current.authoritativeRatingsBySyncKey || {}), [entry.syncKey]: serverRating },
+          }
+        })
+        if (activeRef.current.token !== entry.authToken || activeRef.current.course !== entry.course) return
+        if (type === 'invalid-session') setNotice('回答は端末に保管されています。再ログインして保存を再開してください。')
+        setSubmittedSync(entry.questionId, {
+          syncStatus,
+          syncError,
+          delta: Number.isFinite(Number(result?.delta)) ? Number(result.delta) : entry.delta,
+        })
+      },
+    }).finally(() => {
+      answerSyncRunningRef.current = false
+      setAnswerSyncTick((value) => value + 1)
+    })
+
+    return undefined
+  }, [answerSyncKey, answerSyncSummary.blocked, answerSyncSummary.errors, answerSyncSummary.nextAttemptAt, answerSyncSummary.pending, answerSyncSummary.total, answerSyncTick, hasSession, modeId, persisted.answerSyncQueue])
+
   const currentAnswer = () => {
     if (question.type === 'reorder') return tokens.join(' ')
     if (question.type === 'input') return input
     return selected
   }
 
-  const submit = async () => {
-    if (submitted || submitting) return
+  const submit = () => {
+    if (submitted || submitLock.current || !question) return
     if (!hasSession) {
       setNotice('先にログインしてください。')
       setView('landing')
@@ -503,61 +666,32 @@ function App() {
     if (!userAnswer.trim()) return
     const correct = isCorrectAnswer(question, userAnswer)
     const delta = correct ? RATING_POINTS[question.difficulty] : -RATING_LOSS[question.difficulty]
-    setSubmitting(true)
+    submitLock.current = true
     setNotice('')
-    let nextRating = Math.max(800, persisted.rating + delta)
-    let serverDelta = delta
-    if (SCORE_API_URL) {
-      try {
-        const params = new URLSearchParams({
-          action: 'answer',
-          course: getRankingCourseId(modeId),
-          name: cleanStudentName(persisted.studentName),
-          authToken: persisted.authToken,
-          questionId: question.id,
-          correct: String(correct),
-          delta: String(delta),
-        })
-        const result = await requestScoreApi(Object.fromEntries(params.entries()))
-        if (!result.ok && result.reason === 'already-answered') {
-          setPersisted((current) => addAnsweredId(current, getRankingCourseId(modeId), question.id))
-          setNotice('この問題はすでに回答済みです。次の問題へ進みます。')
-          setSubmitting(false)
-          return
-        }
-        if (!result.ok && result.reason === 'invalid-session') {
-          setPersisted((current) => ({ ...current, authToken: '' }))
-          setNotice('ログインの有効期限が切れました。もう一度ログインしてください。')
-          setView('landing')
-          setSubmitting(false)
-          return
-        }
-        if (!result.ok) throw new Error('score-api')
-        nextRating = result.rating
-        serverDelta = result.delta
-        if (Array.isArray(result.players)) setPersisted((current) => ({ ...current, publicLeaderboard: result.players, ratingsByCourse: { ...(current.ratingsByCourse || {}), [getRankingCourseId(modeId)]: Number(result.rating) || nextRating } }))
-      } catch {
-        setNotice('共有サーバーに接続できないため、この回答は保存されていません。再試行してください。')
-        setSubmitting(false)
-        return
-      }
-    }
-    setPersisted((current) => ({ ...current, rating: nextRating, streak: correct ? current.streak + 1 : 0 }))
-    setPersisted((current) => addAnsweredId(current, getRankingCourseId(modeId), question.id))
+    const entry = createPendingAnswer({ ...answerSyncIdentity, questionId: question.id, correct, delta })
+    const nextRating = Math.max(800, persisted.rating + delta)
+    const nextState = addAnsweredId({ ...persisted, rating: nextRating,
+      ratingsByCourse: { ...persisted.ratingsByCourse, [entry.course]: nextRating },
+      streak: correct ? persisted.streak + 1 : 0,
+      answerSyncQueue: enqueueAnswer(persisted.answerSyncQueue, entry),
+    }, entry.course, question.id)
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState)) }
+    catch { submitLock.current = false; setNotice('端末に回答を保存できません。空き容量やブラウザの保存設定を確認してください。'); return }
+    setPersisted(nextState)
     setSessionScore((score) => ({ correct: score.correct + (correct ? 1 : 0), answered: score.answered + 1 }))
     setSessionAnswers((answers) => [...answers, {
       id: `${question.id}-${Date.now()}`,
       question,
       userAnswer,
       correct,
-      delta: serverDelta,
+      delta,
       correctAnswer: question.answerLabel || question.answer,
     }])
-    setSubmitted({ correct, userAnswer, delta: serverDelta, correctAnswer: question.answerLabel })
-    setSubmitting(false)
+    setSubmitted({ questionId: question.id, correct, userAnswer, delta, correctAnswer: question.answerLabel || question.answer, syncStatus: 'pending' })
   }
 
   const nextQuestion = () => {
+    submitLock.current = false
     if (index === queue.length - 1) {
       const completedAt = new Date().toISOString()
       const session = {
@@ -613,7 +747,7 @@ function App() {
 
       <main className="main-area">
         <header className="topbar">
-          <div className="top-stat"><Icon name="chart" size={28} /><div><span>現在レート</span><strong>{hasSession ? persisted.rating.toLocaleString() : '—'}</strong></div>{hasSession && <span className={`rating-delta ${submitted?.delta >= 0 ? 'positive' : ''}`}>{submitted ? `${submitted.delta >= 0 ? '▲ +' : '▼ '}${submitted.delta}` : '▲ +20'}</span>}</div>
+          <div className="top-stat"><Icon name="chart" size={28} /><div><span>現在レート{hasSession && answerSyncSummary.total > 0 ? '（保存待ち）' : ''}</span><strong>{hasSession ? persisted.rating.toLocaleString() : '—'}</strong></div>{hasSession && submitted && <span className={`rating-delta ${submitted.delta >= 0 ? 'positive' : ''}`}>{`${submitted.delta >= 0 ? '▲ +' : '▼ '}${submitted.delta}`}</span>}</div>
           <div className="top-divider" />
           <div className="top-stat streak-stat"><Icon name="streak" size={27} /><div><span>連続正解</span><strong>{persisted.streak}</strong></div></div>
           <div className="topbar-spacer" />
@@ -625,7 +759,7 @@ function App() {
         <div className="content-wrap">
           {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard: persisted.publicLeaderboard }} />}
           {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={persisted.rating} leaderboard={persisted.publicLeaderboard} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
-          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard') }} />}
+          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
           {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={persisted.publicLeaderboard} rating={persisted.rating} studentName={persisted.studentName} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={persisted.rating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
@@ -682,13 +816,14 @@ function NavItem({ icon, label, active, onClick }) {
   return <button type="button" className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}><Icon name={icon} size={22} /><span>{label}</span></button>
 }
 
-function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName, openLeaderboard }) {
+function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName, openLeaderboard, answerSyncSummary, retryAnswer, retryFailedAnswers }) {
   return <div className="practice-layout">
     <section className="practice-column">
       <div className="course-banner"><div><span className="course-banner-label">{course.eyebrow}</span><strong>{course.label}</strong><span className="course-banner-unit">{course.unit} / {course.name}</span></div><span className="course-stamp">STUDY</span></div>
       <div className="section-heading"><div><p className="section-kicker">{course.label} / {course.name}</p><h1>{course.title}</h1><p className="session-hint">1セッション {SESSION_LENGTH}問 / {filter === 'all' ? '全レベルミックス' : `${DIFFICULTY[filter].label}を優先して出題`}</p></div><div className="difficulty-tabs" role="tablist" aria-label="難易度"><DifficultyTab value="all" current={filter} onClick={setFilter} label="すべて" /><DifficultyTab value="starter" current={filter} onClick={setFilter} label="基礎" /><DifficultyTab value="standard" current={filter} onClick={setFilter} label="標準" /><DifficultyTab value="advanced" current={filter} onClick={setFilter} label="発展" /></div></div>
       {notice && <div className="app-notice" role="status">{notice}</div>}
-      {isComplete ? <CompleteCard {...{ score: sessionScore, queue, reviews: sessionAnswers, course, studentName, ratingStart: sessionRatingStart, ratingAfter: rating, completedAt: sessionCompletedAt, restart: () => restart(filter) }} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }} />}
+      {answerSyncSummary.total > 0 && <div className={`sync-status ${answerSyncSummary.errors && !answerSyncSummary.pending ? 'has-error' : ''}`} role="status"><span>{answerSyncSummary.errors && !answerSyncSummary.pending ? `保存エラー ${answerSyncSummary.errors}問` : answerSyncSummary.errors ? `保存待ち ${answerSyncSummary.total}問（自動再送中）` : `保存待ち ${answerSyncSummary.total}問`}</span><small>解答と判定は画面に反映済みです。</small>{answerSyncSummary.errors > 0 && <button type="button" onClick={retryFailedAnswers}>再送する</button>}</div>}
+      {isComplete ? <CompleteCard {...{ score: sessionScore, queue, reviews: sessionAnswers, course, studentName, ratingStart: sessionRatingStart, ratingAfter: rating, completedAt: sessionCompletedAt, restart: () => restart(filter) }} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting, retryAnswer }} />}
     </section>
     <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} /><PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} onOpen={openLeaderboard} /></div>
   </div>
@@ -698,7 +833,7 @@ function DifficultyTab({ value, current, onClick, label }) {
   return <button type="button" className={`difficulty-tab ${current === value ? 'selected' : ''}`} onClick={() => onClick(value)}>{label}</button>
 }
 
-function QuestionCard({ question: sourceQuestion, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }) {
+function QuestionCard({ question: sourceQuestion, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting, retryAnswer }) {
   const [shuffledWords, setShuffledWords] = useState(() => sourceQuestion.type === 'reorder' ? shuffleDifferent(sourceQuestion.words) : [])
   const [shuffledChoices, setShuffledChoices] = useState(() => sourceQuestion.type === 'choice' ? shuffleDifferent(sourceQuestion.choices) : [])
   const question = sourceQuestion.type === 'choice' && shuffledChoices.length ? { ...sourceQuestion, choices: shuffledChoices } : sourceQuestion
@@ -721,7 +856,7 @@ function QuestionCard({ question: sourceQuestion, queue, index, submitted, submi
       {question.type === 'choice' && <div className="choices">{question.choices.map((choice, choiceIndex) => <button type="button" key={choice} className={`choice-button ${selected === choice ? 'chosen' : ''} ${submitted && isCorrectAnswer(question, choice) ? 'correct-choice' : ''} ${submitted && selected === choice && !isCorrectAnswer(question, selected) ? 'wrong-choice' : ''}`} onClick={() => !submitted && setSelected(choice)}><span className="choice-letter">{String.fromCharCode(65 + choiceIndex)}</span><span>{choice}</span>{submitted && isCorrectAnswer(question, choice) && <Icon name="check" size={19} />}</button>)}</div>}
       {question.type === 'reorder' && <div className="reorder-area"><div className={`answer-line ${submitted ? (submitted.correct ? 'answer-correct' : 'answer-wrong') : ''}`}>{tokens.length ? tokens.map((token, tokenIndex) => <button type="button" key={`${token}-${tokenIndex}`} className="token selected-token" onClick={() => removeWord(tokenIndex)}>{token}</button>) : <span className="answer-placeholder">ここに語句を並べます</span>}</div><div className="word-bank">{remainingWords.map((word, wordIndex) => <button type="button" key={`${word}-${wordIndex}`} className="token" onClick={() => useWord(word)}>{word}</button>)}</div></div>}
       {question.type === 'input' && <div className={`input-wrap ${submitted ? (submitted.correct ? 'input-correct' : 'input-wrong') : ''}`}><input aria-label="解答入力" value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') submit() }} placeholder="解答を入力" disabled={Boolean(submitted)} autoComplete="off" /><span>{(question.accepted?.[0] || question.answer).includes(' ') ? '語句' : '語'}</span></div>}
-      {submitted && <Feedback question={question} result={submitted} />}
+      {submitted && <Feedback question={question} result={submitted} onRetry={() => retryAnswer(question.id)} />}
     </div>
     <div className="question-actions"><button type="button" className="primary-button" onClick={submitted ? nextQuestion : submit} disabled={submitting}>{submitted ? (index === queue.length - 1 ? '結果を見る' : '次の問題へ') : submitting ? '共有中…' : '答えを確定する'}<Icon name="arrow" size={21} /></button>{submitted && <button type="button" className="secondary-button" onClick={() => document.getElementById('explanation')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}><Icon name="document" size={18} />解説を見る</button>}</div>
   </article>
@@ -732,8 +867,9 @@ function renderSentence(sentence = '') {
   return sentence.split(/(\(　　　\)|______)/g).map((part, index) => part.includes('　　　') || part === '______' ? <span key={index} className="sentence-blank">　</span> : <span key={index}>{part}</span>)
 }
 
-function Feedback({ question, result }) {
-  return <div id="explanation" className={`feedback ${result.correct ? 'feedback-correct' : 'feedback-wrong'}`}><div className="feedback-title"><span className="feedback-icon"><Icon name={result.correct ? 'check' : 'close'} size={17} /></span><strong>{result.correct ? '正解です' : '今回は不正解'}</strong><span className="feedback-delta">{result.delta > 0 ? `レート +${result.delta}` : `レート ${result.delta}`}</span></div><div className="correction"><span>正答</span><strong>{result.correctAnswer}</strong></div>{question.translation && question.type !== 'input' && <div className="translation"><span>日本語訳</span><p>{question.translation}</p></div>}<p>{question.explanation}</p><small>{question.source}</small></div>
+function Feedback({ question, result, onRetry }) {
+  const syncCopy = result.syncStatus === 'pending' ? '保存待ち（次の問題へ進めます）' : result.syncStatus === 'error' ? '保存できませんでした' : result.syncStatus === 'synced' || result.syncStatus === 'duplicate' ? 'レート保存済み' : ''
+  return <div id="explanation" className={`feedback ${result.correct ? 'feedback-correct' : 'feedback-wrong'}`}><div className="feedback-title"><span className="feedback-icon"><Icon name={result.correct ? 'check' : 'close'} size={17} /></span><strong>{result.correct ? '正解です' : '今回は不正解'}</strong><span className="feedback-delta">{result.delta > 0 ? `レート +${result.delta}` : `レート ${result.delta}`}</span></div>{syncCopy && <div className={`feedback-sync ${result.syncStatus === 'error' ? 'is-error' : ''}`}><span>{syncCopy}</span>{result.syncStatus === 'error' && <button type="button" onClick={onRetry}>この問題を再送</button>}</div>}<div className="correction"><span>正答</span><strong>{result.correctAnswer}</strong></div>{question.translation && question.type !== 'input' && <div className="translation"><span>日本語訳</span><p>{question.translation}</p></div>}<p>{question.explanation}</p><small>{question.source}</small></div>
 }
 
 function CompleteCard({ score, queue, reviews, course, studentName, ratingStart, ratingAfter, completedAt, restart }) {

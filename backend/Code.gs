@@ -173,11 +173,12 @@ function recordAnswer_(params) {
     const playerKey = auth.playerKey
     const rows = answers.getDataRange().getValues()
     const duplicate = rows.slice(1).some((row) => row[0] === playerKey && rankingCourses_(course).includes(String(row[1])) && row[2] === questionId)
-    if (duplicate) return json_({ ok: false, reason: 'already-answered' }, params.callback)
 
     const playerRows = players.getDataRange().getValues()
     const playerIndex = auth.playerIndex
     const courseProfile = ensureCourseProfile_(courseProfiles, playerKey, course, Number(playerRows[playerIndex][2]) || 1240, Number(playerRows[playerIndex][3]) || 0)
+    // A retry may follow a lost response. Return the authoritative rating without scoring twice.
+    if (duplicate) return json_({ ok: false, reason: 'already-answered', rating: courseProfile.rating, delta: 0 }, params.callback)
     const previousRating = courseProfile.rating
     const safeDelta = Math.max(-50, Math.min(50, requestedDelta))
     const rating = Math.max(RATING_MIN, previousRating + safeDelta)
@@ -186,7 +187,9 @@ function recordAnswer_(params) {
     courseProfiles.getRange(courseProfile.sheetRow, 3, 1, 3).setValues([[rating, courseProfile.answered + 1, now]])
     players.getRange(playerIndex + 1, 2).setValue(name)
     players.getRange(playerIndex + 1, 5).setValue(now)
-    return json_({ ok: true, rating, delta: safeDelta, players: leaderboard_(players, courseProfiles, course) }, params.callback)
+    const result = { ok: true, rating, delta: safeDelta }
+    if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, course)
+    return json_(result, params.callback)
   } finally {
     lock.releaseLock()
   }

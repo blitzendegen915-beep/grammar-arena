@@ -31,7 +31,15 @@ It stores player names and answers in a private Google Spreadsheet, uses a scrip
 
 Copy `.env.example` to `.env.local` and set `VITE_SCORE_API_URL` to the deployed Apps Script `/exec` URL before building the public site.
 
-The public site displays names on the leaderboard. This classroom MVP uses the entered name as the player key; it does not provide account authentication, so a student can impersonate another name. A future authenticated release can replace `keyFor_` with a login identity without changing the question UI.
+The public site displays names on the leaderboard. Registration/login uses a PIN and a server-issued token. Names remain the player keys. This is a classroom MVP, not high-assurance authentication or tamper-resistant scoring.
+
+## Answer responsiveness and saving
+
+Answers are graded in the browser immediately. Rating updates are saved separately using a durable browser-local queue, so a slow server does not block the next question. Until the server confirms a queued answer, its rating is provisional. Do not clear browser storage while answers are waiting to save.
+
+The queue sends answers in order, times out stalled requests, and uses bounded automatic retries. A duplicate answer response reconciles the rating without applying the score again. The Apps Script `compact=true` answer response omits a full leaderboard calculation; leaderboard reads remain separate. Deploy both the frontend and the updated `backend/Code.gs` for authoritative duplicate reconciliation.
+
+Run queue regression checks with `node --test src/answerSync.test.js`.
 
 ## GitHub Pages
 
