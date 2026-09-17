@@ -642,7 +642,7 @@ function App() {
       })
       .catch(() => {})
     return () => controller?.abort()
-  }, [answerSyncIdentity, hasSession, modeId])
+  }, [answerSyncKey, hasSession, modeId])
 
   const setSubmittedSync = (questionId, patch) => {
     setSubmitted((current) => current?.questionId === questionId ? { ...current, ...patch } : current)
