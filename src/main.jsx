@@ -165,6 +165,7 @@ const COURSE_MODES = [
   { id: 'foundation-infinitive', label: '基礎講座 - 不定詞', available: true },
   { id: 'foundation-gerund', label: '基礎講座 - 動名詞', available: true },
   { id: 'foundation-participles', label: '基礎講座 - 分詞', available: true },
+  { id: 'regular-english-practice', label: '英語演習 - 平常授業', available: true },
 ]
 
 const FOUNDATION_QUESTIONS = QUESTIONS.map((question) => ({
@@ -174,19 +175,29 @@ const FOUNDATION_QUESTIONS = QUESTIONS.map((question) => ({
 }))
 
 const COURSE_DETAILS = {
-  'foundation-infinitive': { label: '基礎講座', unit: 'UNIT 01', name: '不定詞', title: '不定詞を、解いて、理解する。' },
-  'foundation-gerund': { label: '基礎講座', unit: 'UNIT 02', name: '動名詞', title: '動名詞を、解いて、理解する。' },
-  'foundation-participles': { label: '基礎講座', unit: 'UNIT 03', name: '分詞', title: '分詞を、解いて、理解する。' },
+  'foundation-infinitive': { label: '基礎講座', unit: 'UNIT 01', name: '不定詞', title: '不定詞を、解いて、理解する。', rankingId: 'foundation-course' },
+  'foundation-gerund': { label: '基礎講座', unit: 'UNIT 02', name: '動名詞', title: '動名詞を、解いて、理解する。', rankingId: 'foundation-course' },
+  'foundation-participles': { label: '基礎講座', unit: 'UNIT 03', name: '分詞', title: '分詞を、解いて、理解する。', rankingId: 'foundation-course' },
+  'regular-english-practice': { label: '英語演習', unit: 'REGULAR CLASS', name: '平常授業', title: '平常授業を、解いて、理解する。', rankingId: 'regular-english-practice' },
 }
 
 const QUESTION_BANKS = {
   'foundation-infinitive': FOUNDATION_QUESTIONS,
   'foundation-gerund': GERUND_QUESTIONS,
   'foundation-participles': PARTICIPLE_QUESTIONS,
+  'regular-english-practice': FOUNDATION_QUESTIONS,
 }
 
 function getQuestionBank(modeId) {
   return QUESTION_BANKS[modeId] || FOUNDATION_QUESTIONS
+}
+
+function getCourseDetails(modeId) {
+  return COURSE_DETAILS[modeId] || COURSE_DETAILS['foundation-infinitive']
+}
+
+function getRankingCourseId(modeId) {
+  return getCourseDetails(modeId).rankingId
 }
 
 const RATING_POINTS = { starter: 12, standard: 18, advanced: 26 }
@@ -347,7 +358,7 @@ function App() {
     setNotice('')
     try {
       const pinHash = await hashPin(authPin)
-      const result = await requestScoreApi({ action: authMode, course: modeId, name, pinHash })
+      const result = await requestScoreApi({ action: authMode, course: getRankingCourseId(modeId), name, pinHash })
       if (!result.ok) {
         const messages = {
           'already-registered': 'この生徒名は登録済みです。ログインを選んでください。',
@@ -369,7 +380,7 @@ function App() {
         authToken: result.authToken,
         rating: Number(result.rating) || DEFAULT_RATING,
         answeredIds: serverAnsweredIds,
-        answeredByCourse: { ...(current.answeredByCourse || {}), [modeId]: serverAnsweredIds },
+        answeredByCourse: { ...(current.answeredByCourse || {}), [getRankingCourseId(modeId)]: serverAnsweredIds, [modeId]: serverAnsweredIds },
         publicLeaderboard: Array.isArray(result.players) ? result.players : current.publicLeaderboard,
       }))
       setAuthName(result.name)
@@ -384,7 +395,14 @@ function App() {
     }
   }
 
-  const answeredIdsForCourse = (courseId) => persisted.answeredByCourse?.[courseId] || (courseId === 'foundation-infinitive' ? persisted.answeredIds : [])
+  const answeredIdsForCourse = (modeOrCourseId) => {
+    const rankingId = getRankingCourseId(modeOrCourseId)
+    const keys = rankingId === 'foundation-course'
+      ? ['foundation-course', 'foundation-infinitive', 'foundation-gerund', 'foundation-participles']
+      : [rankingId, modeOrCourseId]
+    const stored = [...new Set(keys.flatMap((key) => persisted.answeredByCourse?.[key] || []))]
+    return stored.length ? stored : (rankingId === 'foundation-course' ? persisted.answeredIds : [])
+  }
 
   const changeMode = (nextModeId) => {
     const nextAnsweredIds = answeredIdsForCourse(nextModeId)
@@ -442,7 +460,7 @@ function App() {
       return
     }
     try {
-      const data = await requestScoreApi({ action: 'leaderboard', course: modeId })
+      const data = await requestScoreApi({ action: 'leaderboard', course: getRankingCourseId(modeId) })
       if (data.ok && Array.isArray(data.players)) setPersisted((current) => ({ ...current, publicLeaderboard: data.players }))
     } catch {
       setNotice('公開ランキングを読み込めませんでした。')
@@ -478,7 +496,7 @@ function App() {
       try {
         const params = new URLSearchParams({
           action: 'answer',
-          course: modeId,
+          course: getRankingCourseId(modeId),
           name: cleanStudentName(persisted.studentName),
           authToken: persisted.authToken,
           questionId: question.id,
@@ -487,7 +505,7 @@ function App() {
         })
         const result = await requestScoreApi(Object.fromEntries(params.entries()))
         if (!result.ok && result.reason === 'already-answered') {
-          setPersisted((current) => addAnsweredId(current, modeId, question.id))
+          setPersisted((current) => addAnsweredId(current, getRankingCourseId(modeId), question.id))
           setNotice('この問題はすでに回答済みです。次の問題へ進みます。')
           setSubmitting(false)
           return
@@ -510,7 +528,7 @@ function App() {
       }
     }
     setPersisted((current) => ({ ...current, rating: nextRating, streak: correct ? current.streak + 1 : 0 }))
-    setPersisted((current) => addAnsweredId(current, modeId, question.id))
+    setPersisted((current) => addAnsweredId(current, getRankingCourseId(modeId), question.id))
     setSessionScore((score) => ({ correct: score.correct + (correct ? 1 : 0), answered: score.answered + 1 }))
     setSubmitted({ correct, userAnswer, delta: serverDelta, correctAnswer: question.answerLabel })
     setSubmitting(false)
@@ -573,15 +591,15 @@ function App() {
           <div className="top-stat streak-stat"><Icon name="streak" size={27} /><div><span>連続正解</span><strong>{persisted.streak}</strong></div></div>
           <div className="topbar-spacer" />
           <div className="selector-stack name-stack"><label htmlFor="student-name">生徒</label><div id="student-name" className="name-display">{persisted.studentName || '未ログイン'}</div><span>{hasSession ? 'ログイン中 / ランキングに表示' : '暗証番号でログイン'}</span></div>
-          <div className="selector-stack course-switcher"><label htmlFor="course-selector">講座</label><select id="course-selector" value={modeId} onChange={(event) => changeMode(event.target.value)}>{COURSE_MODES.map((course) => <option key={course.id} value={course.id} disabled={!course.available}>{course.label}</option>)}</select><span>動名詞・分詞も選択できます</span></div>
+          <div className="selector-stack course-switcher"><label htmlFor="course-selector">講座</label><select id="course-selector" value={modeId} onChange={(event) => changeMode(event.target.value)}>{COURSE_MODES.map((course) => <option key={course.id} value={course.id} disabled={!course.available}>{course.label}</option>)}</select><span>講座ごとにランキングが分かれます</span></div>
           <div className="profile-orb">{student.name.slice(0, 1)}</div>
         </header>
 
         <div className="content-wrap">
-          {view === 'landing' && <LandingView {...{ course: COURSE_DETAILS[modeId], authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard: persisted.publicLeaderboard }} />}
-          {view === 'lobby' && <LobbyView course={COURSE_DETAILS[modeId]} studentName={persisted.studentName} rating={persisted.rating} leaderboard={persisted.publicLeaderboard} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
-          {view === 'practice' && <PracticeView {...{ course: COURSE_DETAILS[modeId], question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard') }} />}
-          {view === 'leaderboard' && <LeaderboardView players={persisted.publicLeaderboard} rating={persisted.rating} studentName={persisted.studentName} refresh={refreshLeaderboard} notice={notice} />}
+          {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard: persisted.publicLeaderboard }} />}
+          {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={persisted.rating} leaderboard={persisted.publicLeaderboard} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
+          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard') }} />}
+          {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={persisted.publicLeaderboard} rating={persisted.rating} studentName={persisted.studentName} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={persisted.rating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
         </div>
@@ -612,9 +630,9 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
           <p className="landing-note">暗証番号は画面に表示されず、照合用の情報だけを保存します。各問題への回答は1つの名前につき1回までです。</p>
         </form>
       </section>
-      <PublicLeaderboard players={leaderboard} currentName={authName} limit={5} />
+      <PublicLeaderboard players={leaderboard} currentName={authName} courseLabel={course.label} limit={5} />
     </div>
-    <div className="landing-footer"><span>NOW PLAYING</span><strong>{course.label} - {course.name}</strong><span className="landing-footer-muted">動名詞・分詞も選択できます</span></div>
+    <div className="landing-footer"><span>NOW PLAYING</span><strong>{course.label} - {course.name}</strong><span className="landing-footer-muted">講座ごとにランキングが分かれます</span></div>
   </div>
 }
 
@@ -627,7 +645,7 @@ function LobbyView({ course, studentName, rating, leaderboard, startPractice, op
       <div className="lobby-rate"><span>YOUR CURRENT RATE</span><strong>{rating.toLocaleString()}</strong><small>{studentName} の現在レート / {course.name}</small></div>
       <button type="button" className="primary-button lobby-start" onClick={startPractice}>レート対戦を始める<Icon name="arrow" size={21} /></button>
     </section>
-    <PublicLeaderboard players={leaderboard} currentName={studentName} limit={5} onOpen={openLeaderboard} />
+    <PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} limit={5} onOpen={openLeaderboard} />
   </div>
 }
 
@@ -643,7 +661,7 @@ function PracticeView({ course, question, queue, index, filter, setFilter, submi
       {notice && <div className="app-notice" role="status">{notice}</div>}
       {isComplete ? <CompleteCard score={sessionScore} queue={queue} restart={() => restart(filter)} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }} />}
     </section>
-    <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} /><PublicLeaderboard players={leaderboard} currentName={studentName} onOpen={openLeaderboard} /></div>
+    <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} /><PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} onOpen={openLeaderboard} /></div>
   </div>
 }
 
@@ -670,7 +688,7 @@ function QuestionCard({ question: sourceQuestion, queue, index, submitted, submi
   const questionNumber = String(index + 1).padStart(2, '0')
   return <article className="question-card">
     <div className="question-head"><div><div className="lesson-label">{question.lesson} <span>•</span> {question.topic}</div><div className="question-type">QUESTION {questionNumber}</div></div><div className="progress-block"><span>{index + 1} / {queue.length}</span><div className="progress-track"><span style={{ width: `${((index + 1) / queue.length) * 100}%` }} /></div></div></div>
-    <div className="question-body"><p className="prompt">{question.prompt}</p>{question.japanese && <p className="japanese-prompt">{question.japanese}</p>}{question.sentence && <p className="sentence">{renderSentence(question.sentence, question.inputPrefix)}</p>}
+    <div className="question-body"><p className="prompt">{question.prompt}</p>{question.type === 'input' && question.translation && <p className="japanese-prompt input-translation"><span>日本語訳</span>{question.translation}</p>}{question.japanese && <p className="japanese-prompt">{question.japanese}</p>}{question.sentence && <p className="sentence">{renderSentence(question.sentence, question.inputPrefix)}</p>}
       {question.type === 'choice' && <div className="choices">{question.choices.map((choice, choiceIndex) => <button type="button" key={choice} className={`choice-button ${selected === choice ? 'chosen' : ''} ${submitted && isCorrectAnswer(question, choice) ? 'correct-choice' : ''} ${submitted && selected === choice && !isCorrectAnswer(question, selected) ? 'wrong-choice' : ''}`} onClick={() => !submitted && setSelected(choice)}><span className="choice-letter">{String.fromCharCode(65 + choiceIndex)}</span><span>{choice}</span>{submitted && isCorrectAnswer(question, choice) && <Icon name="check" size={19} />}</button>)}</div>}
       {question.type === 'reorder' && <div className="reorder-area"><div className={`answer-line ${submitted ? (submitted.correct ? 'answer-correct' : 'answer-wrong') : ''}`}>{tokens.length ? tokens.map((token, tokenIndex) => <button type="button" key={`${token}-${tokenIndex}`} className="token selected-token" onClick={() => removeWord(tokenIndex)}>{token}</button>) : <span className="answer-placeholder">ここに語句を並べます</span>}</div><div className="word-bank">{remainingWords.map((word, wordIndex) => <button type="button" key={`${word}-${wordIndex}`} className="token" onClick={() => useWord(word)}>{word}</button>)}</div></div>}
       {question.type === 'input' && <div className={`input-wrap ${submitted ? (submitted.correct ? 'input-correct' : 'input-wrong') : ''}`}><input aria-label="解答入力" value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') submit() }} placeholder="解答を入力" disabled={Boolean(submitted)} autoComplete="off" /><span>{(question.accepted?.[0] || question.answer).includes(' ') ? '語句' : '語'}</span></div>}
@@ -686,7 +704,7 @@ function renderSentence(sentence = '') {
 }
 
 function Feedback({ question, result }) {
-  return <div id="explanation" className={`feedback ${result.correct ? 'feedback-correct' : 'feedback-wrong'}`}><div className="feedback-title"><span className="feedback-icon"><Icon name={result.correct ? 'check' : 'close'} size={17} /></span><strong>{result.correct ? '正解です' : '今回は不正解'}</strong><span className="feedback-delta">{result.delta > 0 ? `レート +${result.delta}` : `レート ${result.delta}`}</span></div><div className="correction"><span>正答</span><strong>{result.correctAnswer}</strong></div>{question.translation && <div className="translation"><span>日本語訳</span><p>{question.translation}</p></div>}<p>{question.explanation}</p><small>{question.source}</small></div>
+  return <div id="explanation" className={`feedback ${result.correct ? 'feedback-correct' : 'feedback-wrong'}`}><div className="feedback-title"><span className="feedback-icon"><Icon name={result.correct ? 'check' : 'close'} size={17} /></span><strong>{result.correct ? '正解です' : '今回は不正解'}</strong><span className="feedback-delta">{result.delta > 0 ? `レート +${result.delta}` : `レート ${result.delta}`}</span></div><div className="correction"><span>正答</span><strong>{result.correctAnswer}</strong></div>{question.translation && question.type !== 'input' && <div className="translation"><span>日本語訳</span><p>{question.translation}</p></div>}<p>{question.explanation}</p><small>{question.source}</small></div>
 }
 
 function CompleteCard({ score, queue, restart }) {
@@ -701,14 +719,14 @@ function DailyRail({ correct, answered, seconds }) {
   return <aside className="daily-rail"><div className="rail-card"><div className="rail-title"><Icon name="calendar" size={21} /><h2>今日の記録</h2><span className="study-stamp">STUDY</span></div><div className="metric-list"><Metric icon="check" label="正解数" value={correct} /><Metric icon="close" label="不正解数" value={incorrect} /><Metric icon="chart" label="正答率" value={rate} /><Metric icon="clock" label="学習時間" value={minutes} /></div><div className="rail-divider" /><h3>レートの推移</h3><RatingChart /></div><div className="rail-note"><Icon name="chart" size={25} /><p>コツコツ積み重ねて、<br />もっと高いレベルへ。</p></div></aside>
 }
 
-function PublicLeaderboard({ players = [], currentName = '', limit = 5, onOpen }) {
+function PublicLeaderboard({ players = [], currentName = '', courseLabel = '基礎講座', limit = 5, onOpen }) {
   const visiblePlayers = players.length ? players.slice(0, limit) : [{ name: 'まだ参加者はいません', rating: '—', answered: 0 }]
-  return <section className="leaderboard-card"><div className="leaderboard-head"><div><span className="section-kicker">PUBLIC RATE</span><h2>みんなのレート</h2></div><span className="leaderboard-live">LIVE</span></div><p className="leaderboard-copy">同じ講座を学ぶ生徒の現在レート</p><div className="leaderboard-list">{visiblePlayers.map((player, index) => <div className={`leaderboard-row ${player.name === currentName ? 'current' : ''}`} key={`${player.name}-${index}`}><span className="leaderboard-rank">{String(index + 1).padStart(2, '0')}</span><span className="leaderboard-name">{player.name}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div>{onOpen && <button type="button" className="leaderboard-link" onClick={onOpen}>全体ランキングを見る <Icon name="arrow" size={16} /></button>}</section>
+  return <section className="leaderboard-card"><div className="leaderboard-head"><div><span className="section-kicker">PUBLIC RATE / {courseLabel}</span><h2>みんなのレート</h2></div><span className="leaderboard-live">LIVE</span></div><p className="leaderboard-copy">{courseLabel}に参加している生徒の現在レート</p><div className="leaderboard-list">{visiblePlayers.map((player, index) => <div className={`leaderboard-row ${player.name === currentName ? 'current' : ''}`} key={`${player.name}-${index}`}><span className="leaderboard-rank">{String(index + 1).padStart(2, '0')}</span><span className="leaderboard-name">{player.name}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div>{onOpen && <button type="button" className="leaderboard-link" onClick={onOpen}>全体ランキングを見る <Icon name="arrow" size={16} /></button>}</section>
 }
 
-function LeaderboardView({ players = [], rating, studentName, refresh, notice }) {
+function LeaderboardView({ course, players = [], rating, studentName, refresh, notice }) {
   return <div className="leaderboard-page">
-    <div className="leaderboard-page-head"><div><p className="section-kicker">PUBLIC RATEBOARD</p><h1>全体ランキング</h1><p className="subcopy">同じ講座に参加している生徒のレートを確認できます。</p></div><button type="button" className="secondary-button leaderboard-refresh" onClick={refresh}><Icon name="history" size={18} />ランキングを更新</button></div>
+    <div className="leaderboard-page-head"><div><p className="section-kicker">PUBLIC RATEBOARD / {course.label}</p><h1>{course.label}のランキング</h1><p className="subcopy">{course.label}に参加している生徒のレートを確認できます。</p></div><button type="button" className="secondary-button leaderboard-refresh" onClick={refresh}><Icon name="history" size={18} />ランキングを更新</button></div>
     {notice && <div className="app-notice" role="status">{notice}</div>}
     <div className="leaderboard-overview"><div className="leaderboard-you"><span>YOUR RATE</span><strong>{rating.toLocaleString()}</strong><small>{studentName ? `${studentName} の現在レート` : '名前を入力すると参加できます'}</small></div><div className="leaderboard-rule"><span>RANKING RULE</span><strong>正答で上昇 / 不正解で下降</strong><small>問題ごとに1回だけレートへ反映されます。</small></div></div>
     <section className="leaderboard-table-card"><div className="leaderboard-table-head"><h2>参加者一覧</h2><span>{players.length ? `${players.length}人` : '共有データなし'}</span></div>{players.length ? <div className="leaderboard-table"><div className="leaderboard-table-row leaderboard-table-label"><span>RANK</span><span>PLAYER</span><span>ANSWERED</span><span>RATE</span></div>{players.map((player, index) => <div className={`leaderboard-table-row ${player.name === studentName ? 'current' : ''}`} key={`${player.name}-${index}`}><strong>{String(index + 1).padStart(2, '0')}</strong><span>{player.name}</span><span>{player.answered ?? 0}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div> : <div className="leaderboard-empty"><Icon name="leaderboard" size={34} /><h3>まだ共有ランキングがありません。</h3><p>共有サーバーに接続すると、他の生徒のレートがここに表示されます。</p></div>}</section>
