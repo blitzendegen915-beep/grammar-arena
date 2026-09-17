@@ -5,6 +5,7 @@ import './styles.css'
 const STORAGE_KEY = 'grammar-arena-v1'
 const SCORE_API_URL = import.meta.env.VITE_SCORE_API_URL || 'https://script.google.com/macros/s/AKfycbw0HAcZcaqv8vRsU4uz02rKB7-jdsWM-xZrNwlHTlEyGOEdCSTWnaDBlqCuCv4Ho8AelQ/exec'
 const DEFAULT_RATING = 1240
+const SESSION_LENGTH = 10
 
 const QUESTIONS = [
   {
@@ -235,8 +236,11 @@ function shuffleDifferent(items) {
 }
 
 function buildQueue(filter, answeredIds = []) {
-  const filtered = filter === 'all' ? QUESTIONS : QUESTIONS.filter((question) => question.difficulty === filter)
-  return filtered.filter((question) => !answeredIds.includes(question.id)).slice(0, 10)
+  const available = QUESTIONS.filter((question) => !answeredIds.includes(question.id))
+  if (filter === 'all') return shuffle(available).slice(0, SESSION_LENGTH)
+  const preferred = shuffle(available.filter((question) => question.difficulty === filter))
+  const supplemental = shuffle(available.filter((question) => question.difficulty !== filter))
+  return [...preferred, ...supplemental].slice(0, SESSION_LENGTH)
 }
 
 function App() {
@@ -490,7 +494,7 @@ function PracticeView({ question, queue, index, filter, setFilter, submitted, su
   return <div className="practice-layout">
     <section className="practice-column">
       <div className="course-banner"><div><span className="course-banner-label">FOUNDATION COURSE</span><strong>基礎講座</strong><span className="course-banner-unit">UNIT 01 / 不定詞</span></div><span className="course-stamp">STUDY</span></div>
-      <div className="section-heading"><div><p className="section-kicker">基礎講座 / 不定詞</p><h1>不定詞を、解いて、理解する。</h1></div><div className="difficulty-tabs" role="tablist" aria-label="難易度"><DifficultyTab value="all" current={filter} onClick={setFilter} label="すべて" /><DifficultyTab value="starter" current={filter} onClick={setFilter} label="基礎" /><DifficultyTab value="standard" current={filter} onClick={setFilter} label="標準" /><DifficultyTab value="advanced" current={filter} onClick={setFilter} label="発展" /></div></div>
+      <div className="section-heading"><div><p className="section-kicker">基礎講座 / 不定詞</p><h1>不定詞を、解いて、理解する。</h1><p className="session-hint">1セッション {SESSION_LENGTH}問 / {filter === 'all' ? '全レベルミックス' : `${DIFFICULTY[filter].label}を優先して出題`}</p></div><div className="difficulty-tabs" role="tablist" aria-label="難易度"><DifficultyTab value="all" current={filter} onClick={setFilter} label="すべて" /><DifficultyTab value="starter" current={filter} onClick={setFilter} label="基礎" /><DifficultyTab value="standard" current={filter} onClick={setFilter} label="標準" /><DifficultyTab value="advanced" current={filter} onClick={setFilter} label="発展" /></div></div>
       {notice && <div className="app-notice" role="status">{notice}</div>}
       {isComplete ? <CompleteCard score={sessionScore} queue={queue} restart={() => restart(filter)} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }} />}
     </section>
