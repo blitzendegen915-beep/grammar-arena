@@ -17,6 +17,8 @@ export const FOUNDATION_TRANSLATIONS = {
   'plus-04': '彼女はどこへ行けばよいのか分かりませんでした。',
 }
 
+import { countSentenceBlanks } from './questionQuality.js'
+
 const shared = (question) => {
   const { japanese, ...rest } = question
   return {
@@ -24,6 +26,7 @@ const shared = (question) => {
     japanese: question.type === 'reorder' ? japanese : '',
     translation: japanese || '',
     source: question.source || '基礎講座・追加演習',
+    blankCount: countSentenceBlanks(question.sentence || ''),
   }
 }
 

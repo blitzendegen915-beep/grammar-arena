@@ -1,9 +1,12 @@
+import { countSentenceBlanks } from './questionQuality.js'
+
 const SOURCE = '英語演習I 2中・平常授業'
 
 const make = (id, lesson, topic, difficulty, type, data) => ({
   id, lesson, topic, difficulty, type,
   prompt: type === 'reorder' ? '日本語の意味に合うように、語句を並べかえなさい。' : type === 'choice' ? '空所に入る最も適切なものを選びなさい。' : '空所に入る語句を入力しなさい。',
   source: `${SOURCE}・${lesson}`,
+  blankCount: countSentenceBlanks(data.sentence || ''),
   ...data,
 })
 
@@ -14,13 +17,13 @@ const translate = (id, lesson, topic, difficulty, sentence, answer, explanation,
 
 export const REGULAR_QUESTIONS = [
   // Lesson 27: 助動詞
-  fill('reg27-01', 'Lesson 27', '助動詞', 'starter', 'The answer (　　　) right.', 'will be', '未来の推量や意志には will を使います。'),
+  fill('reg27-01', 'Lesson 27', '助動詞', 'starter', 'The answer (　　　) (　　　) right.', 'will be', '未来の推量や意志には will be を使います。'),
   fill('reg27-02', 'Lesson 27', '助動詞', 'starter', 'It is raining heavily. You (　　　) drive carefully.', 'should', 'should は「〜すべきだ」という助言を表します。', '雨が激しく降っています。あなたは注意して運転すべきです。'),
   fill('reg27-03', 'Lesson 27', '助動詞', 'standard', 'I asked her some questions, but she (　　　) answer them.', "wouldn't", 'would not は「どうしても〜しようとしなかった」という拒否を表します。'),
-  fill('reg27-04', 'Lesson 27', '助動詞', 'starter', 'There (　　　) be a famous castle around here.', 'must', 'must be は「〜に違いない」という現在の推量です。'),
-  fill('reg27-05', 'Lesson 27', '助動詞', 'standard', 'There were many flowers in the park. I (　　　) (　　　) my picture taken.', 'had', 'have + O + 過去分詞で「Oを〜してもらう」を表します。', '', ['had my picture', 'had my picture taken']),
-  fill('reg27-06', 'Lesson 27', '助動詞', 'standard', 'He (　　　) (　　　) tired because he played soccer all day.', 'must have been', '過去のことへの強い推量は must have + 過去分詞です。', '', ['must have been', 'must have']),
-  fill('reg27-07', 'Lesson 27', '助動詞', 'starter', 'Let\'s sing a song together. (　　　) we sing a song?', 'Shall', 'Shall we ...? は「〜しましょうか」と提案する表現です。'),
+  fill('reg27-04', 'Lesson 27', '助動詞', 'starter', 'There (　　　) (　　　) be a famous castle around here.', 'used to', 'used to be は「以前は〜があった」という過去の習慣・状態を表します。'),
+  fill('reg27-05', 'Lesson 27', '助動詞', 'standard', 'There were a lot of beautiful flowers in the park. I (　　　) (　　　) taken pictures.', 'should have', 'should have + 過去分詞で「〜しておくべきだった」という過去の後悔を表します。', 'その公園にはたくさんの美しい花があった。写真を撮っておくべきだったなあ。'),
+  fill('reg27-06', 'Lesson 27', '助動詞', 'standard', 'He (　　　) (　　　) tired because he played soccer all day yesterday.', 'must be', 'must be は、現在の状態についての強い推量「〜に違いない」を表します。'),
+  fill('reg27-07', 'Lesson 27', '助動詞', 'starter', 'Let\'s sing a song together. (　　　) (　　　) sing a song?', 'Shall we', 'Shall we ...? は「〜しましょうか」と提案する表現です。'),
   fill('reg27-08', 'Lesson 27', '助動詞', 'starter', 'You must not park your car here. (　　　) park your car here.', "Don't", 'must not は禁止を表し、命令文では Don\'t を使えます。'),
   fill('reg27-09', 'Lesson 27', '助動詞', 'starter', 'You needn\'t finish it by tomorrow. You (　　　) (　　　) (　　　) finish it by tomorrow.', "don't have to", 'needn\'t は don\'t have to と同じ「〜する必要はない」です。', '', ["don't have to", 'do not have to']),
   fill('reg27-10', 'Lesson 27', '助動詞', 'starter', 'Must I do my homework before dinner? (　　　) I (　　　) (　　　) do my homework before dinner?', 'Do ... have to', '義務を尋ねる must は、疑問文では do ... have to に言い換えられます。', '', ['Do have to', 'Do I have to']),
@@ -32,7 +35,7 @@ export const REGULAR_QUESTIONS = [
   choice('reg27-16', 'Lesson 27', '助動詞', 'starter', 'My brother and I (　　　) often make trips together when we were young.', ['would', 'shall', 'could', 'will'], 'would', '過去の習慣には would を使えます。'),
   choice('reg27-17', 'Lesson 27', '助動詞', 'starter', '(　　　) I carry your baggage?', ['Shall', 'Will', 'Ought', 'Would'], 'Shall', 'Shall I ...? は申し出を表します。'),
   choice('reg27-18', 'Lesson 27', '助動詞', 'starter', '(　　　) you lend me your bicycle?', ['May', 'Must', 'Will', 'Might'], 'May', 'May I ...? は丁寧な許可の依頼です。'),
-  choice('reg27-19', 'Lesson 27', '助動詞', 'standard', 'She (　　　) come to the party because she had a cold.', ['should have', 'must have', 'need not have', 'may not have'], 'may not have', 'may not have + 過去分詞は「〜しなかったかもしれない」です。'),
+  choice('reg27-19', 'Lesson 27', '助動詞', 'standard', 'She (　　　) come to the party because she had a cold.', ['should have', 'must have', 'need not have', 'may have'], 'may have', 'may have + 過去分詞は「〜したかもしれない」を表します。'),
   choice('reg27-20', 'Lesson 27', '助動詞', 'standard', 'He isn\'t rich, so he (　　　) bought such an expensive car.', ['may have', 'should have', 'must have', 'cannot have'], 'cannot have', 'cannot have + 過去分詞は「〜したはずがない」です。'),
   choice('reg27-21', 'Lesson 27', '助動詞', 'starter', 'I (　　　) invite him to the party if he is interested in it.', ['would often', "don't have to", 'would like to', 'should have'], 'would like to', 'would like to は「〜したい」という希望を表します。'),
   choice('reg27-22', 'Lesson 27', '助動詞', 'standard', 'Look at that dark cloud! It [may / can\'t] rain soon.', ['may', "can't"], 'may', '暗い雲から雨が降る可能性を may で表します。'),
@@ -55,10 +58,10 @@ export const REGULAR_QUESTIONS = [
   reorder('reg13-02', 'Lesson 13', '不定詞・名詞的用法', 'starter', '私たちは船で北海道に行くことを計画した。', ['We', 'planned', 'to', 'go', 'to', 'Hokkaido', 'by', 'ship.'], 'We planned to go to Hokkaido by ship.', 'plan to do は「〜することを計画する」です。'),
   reorder('reg13-03', 'Lesson 13', '不定詞・名詞的用法', 'starter', '外国語を習得するのはとても難しい。', ['It', 'is', 'very', 'hard', 'to', 'master', 'a', 'foreign', 'language.'], 'It is very hard to master a foreign language.', 'It を仮主語にして、to不定詞を後ろに置いています。'),
   reorder('reg13-04', 'Lesson 13', '不定詞・名詞的用法', 'standard', 'トムはその木に登ることは容易だとわかった。', ['Tom', 'found', 'it', 'easy', 'to', 'climb', 'the', 'tree.'], 'Tom found it easy to climb the tree.', 'find it easy to do は「〜するのは容易だとわかる」です。'),
-  fill('reg13-05', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'I have a lot of friends (　　　).', 'to talk with', 'to talk with が friends を後ろから説明します。', '私は話し相手になってくれる友達がたくさんいます。'),
-  fill('reg13-06', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'Bob bought a book (　　　) on the bus.', 'to read', 'to read が「読むための本」という意味で book を修飾します。', 'ボブはバスの中で読む本を買いました。'),
-  fill('reg13-07', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'She has the ability (　　　) the work.', 'to do', 'ability to do は「〜する能力」です。', '彼女にはその仕事をする能力があります。'),
-  fill('reg13-08', 'Lesson 13', '不定詞・形容詞的用法', 'starter', "He's looking for a house (　　　) (　　　).", 'to live in', 'live in の in を残して「住むための家」とします。', '彼は住む家を探しています。', ['to live in', 'to live in it']),
+  fill('reg13-05', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'I have a lot of friends (　　　) (　　　) (　　　).', 'to talk with', 'to talk with が friends を後ろから説明します。', '私は話し相手になってくれる友達がたくさんいます。'),
+  fill('reg13-06', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'Bob bought a book (　　　) (　　　) on the bus.', 'to read', 'to read が「読むための本」という意味で book を修飾します。', 'ボブはバスの中で読む本を買いました。'),
+  fill('reg13-07', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'She has the ability (　　　) (　　　) the work.', 'to do', 'ability to do は「〜する能力」です。', '彼女にはその仕事をする能力があります。'),
+  fill('reg13-08', 'Lesson 13', '不定詞・形容詞的用法', 'starter', "He's looking for a house (　　　) (　　　) (　　　).", 'to live in', 'live in の in を残して「住むための家」とします。', '彼は住む家を探しています。', ['to live in', 'to live in it']),
   translate('reg13-09', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'He is not a person to tell a lie.', '彼はうそをつくような人ではありません。', 'to tell a lie が person を修飾しています。'),
   translate('reg13-10', 'Lesson 13', '不定詞・名詞的用法', 'standard', 'To study a language is to know a different culture.', '言語を学ぶことは、異なる文化を知ることです。', '文頭の to study が主語、to know が補語です。'),
   translate('reg13-11', 'Lesson 13', '不定詞・名詞的用法', 'starter', 'He decided to join the soccer team.', '彼はサッカーチームに入ることを決めました。', 'decide to do は「〜することを決める」です。'),
@@ -72,9 +75,9 @@ export const REGULAR_QUESTIONS = [
   translate('reg14-03', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'She is very kind to help them.', '彼女は親切にも彼らを助けてあげました。', '形容詞 + to不定詞で判断の理由を表します。'),
   translate('reg14-04', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'I was sad to hear the news.', '私はその知らせを聞いて悲しかった。', '感情の原因を to hear が表します。'),
   translate('reg14-05', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'He was very happy to get the job.', '彼はその仕事を得てとても幸せでした。', 'happy の原因を to get が表します。'),
-  fill('reg14-06', 'Lesson 14', 'SVO + 不定詞', 'standard', 'I (　　　) (　　　) (　　　) the role.', 'want you to play', 'want + 人 + to do は「人に〜してほしい」です。', '私はあなたにその役を演じてほしい。', ['want you to play', 'want you to take']),
-  fill('reg14-07', 'Lesson 14', 'SVO + 不定詞', 'standard', 'The police officer (　　　) (　　　) (　　　) home.', 'told us to go', 'tell + 人 + to do は「人に〜するように言う」です。', 'その警官は私たちに家に帰るように言いました。'),
-  fill('reg14-08', 'Lesson 14', 'SVO + 不定詞', 'standard', 'My parents (　　　) (　　　) (　　　) a telescope.', 'allowed me to use', 'allow + 人 + to do は「人が〜するのを許す」です。', '両親は私が望遠鏡を使うのを許してくれました。'),
+  fill('reg14-06', 'Lesson 14', 'SVO + 不定詞', 'standard', 'I (　　　) (　　　) (　　　) (　　　) the role.', 'want him to take', 'want + 人 + to do は「人に〜してほしい」です。', '私は彼にその役を演じてほしい。', ['want him to take', 'want him to play']),
+  fill('reg14-07', 'Lesson 14', 'SVO + 不定詞', 'standard', 'The police officer (　　　) (　　　) (　　　) (　　　) home.', 'told us to go', 'tell + 人 + to do は「人に〜するように言う」です。', 'その警官は私たちに家に帰るように言いました。'),
+  fill('reg14-08', 'Lesson 14', 'SVO + 不定詞', 'standard', 'My parents (　　　) (　　　) (　　　) (　　　) a telescope.', 'allowed me to use', 'allow + 人 + to do は「人が〜するのを許す」です。', '両親は私が望遠鏡を使うのを許してくれました。'),
   fill('reg14-09', 'Lesson 14', 'SVO + 不定詞', 'standard', 'The doctor (　　　) (　　　) (　　　) more exercise.', 'advised me to do', 'advise + 人 + to do は「人に〜するよう助言する」です。', '医師は私にもっと運動するように助言しました。'),
   reorder('reg14-10', 'Lesson 14', '意味上の主語', 'standard', 'アンがその机を動かすことは困難だった。', ['It', 'was', 'hard', 'for', 'Anne', 'to', 'move', 'the', 'desk.'], 'It was hard for Anne to move the desk.', 'for + 人 + to do で不定詞の意味上の主語を表します。'),
   reorder('reg14-11', 'Lesson 14', '意味上の主語', 'standard', '他人の気持ちを理解するのは簡単ではない。', ['It', 'is', 'not', 'easy', 'to', 'understand', 'others\'','feelings.'], "It is not easy to understand others' feelings.", 'It is + 形容詞 + to do の形です。'),
@@ -90,8 +93,8 @@ export const REGULAR_QUESTIONS = [
   choice('reg15-05', 'Lesson 15', '知覚動詞', 'standard', "I didn't notice Brad [leave / to leave] the house.", ['leave', 'to leave'], 'leave', 'notice + O + 動詞の原形の形です。'),
   choice('reg15-06', 'Lesson 15', '知覚動詞', 'standard', 'The man was seen [enter / to enter] the building.', ['enter', 'to enter'], 'to enter', '知覚動詞の受動態では to不定詞を使います。'),
   fill('reg15-07', 'Lesson 15', 'seem + 不定詞', 'standard', 'It appeared that the gentleman was very rich. The gentleman appeared (　　　) (　　　) very rich.', 'to be', 'appear to be は「〜のようだ」を表します。'),
-  fill('reg15-08', 'Lesson 15', 'seem + 不定詞', 'standard', 'It seemed Mr. Inoue was looking for something. Mr. Inoue seemed (　　　) (　　　) for something.', 'to be looking', '進行中の内容は seem to be doing で表します。'),
-  fill('reg15-09', 'Lesson 15', '完了形の不定詞', 'advanced', 'It seemed that I had left my glasses somewhere. I seemed (　　　) (　　　) my glasses somewhere.', 'to have left', 'seem の時点より前のことなので to have + 過去分詞です。'),
+  fill('reg15-08', 'Lesson 15', 'seem + 不定詞', 'standard', 'It seemed Mr. Inoue was looking for something. Mr. Inoue seemed (　　　) (　　　) (　　　) for something.', 'to be looking', '進行中の内容は seem to be doing で表します。'),
+  fill('reg15-09', 'Lesson 15', '完了形の不定詞', 'advanced', 'It seemed that I had left my glasses somewhere. I seemed (　　　) (　　　) (　　　) my glasses somewhere.', 'to have left', 'seem の時点より前のことなので to have + 過去分詞です。'),
   fill('reg15-10', 'Lesson 15', '完了形の不定詞', 'advanced', 'It seems that he was caught in a shower. He seems (　　　) (　　　) (　　　) in a shower.', 'to have been caught', '受動態の完了形は to have been + 過去分詞です。'),
   reorder('reg15-11', 'Lesson 15', '完了形の不定詞', 'advanced', '昨夜、私は誰かが大声で叫ぶのを聞いた。', ['I', 'heard', 'someone', 'cry', 'out', 'last', 'night.'], 'I heard someone cry out last night.', 'hear + O + 動詞の原形の形です。'),
   reorder('reg15-12', 'Lesson 15', 'seem + 不定詞', 'standard', '弟にその場所まで案内させますね。', ['I\'ll', 'have', 'my', 'brother', 'show', 'you', 'the', 'place.'], "I'll have my brother show you the place.", 'have + O + 動詞の原形で依頼・使役を表します。'),
@@ -133,7 +136,7 @@ export const REGULAR_QUESTIONS = [
   fill('reg16-13', 'Lesson 16', '動名詞', 'standard', '私は友達とサッカーをして楽しんだ。', 'I enjoyed playing soccer with my friends.', 'enjoy の後ろには動名詞を置きます。', '', ['I enjoyed playing soccer with my friends.', 'I had fun playing soccer with my friends.']),
 
   // Lesson 17: 動名詞 (2)
-  fill('reg17-01', 'Lesson 17', '動名詞を使った重要表現', 'standard', 'Wayne is looking (　　　) (　　　) to Kochi this summer.', 'forward to going', 'look forward to -ing は「〜を楽しみに待つ」です。', 'ウェインはこの夏、高知に行くことを楽しみにしています。'),
+  fill('reg17-01', 'Lesson 17', '動名詞を使った重要表現', 'standard', 'Wayne is looking (　　　) (　　　) (　　　) to Kochi this summer.', 'forward to going', 'look forward to -ing は「〜を楽しみに待つ」です。', 'ウェインはこの夏、高知に行くことを楽しみにしています。'),
   fill('reg17-02', 'Lesson 17', '動名詞を使った重要表現', 'standard', 'The heavy rain prevented (　　　) (　　　) (　　　) the mountain.', 'me from climbing', 'prevent + O + from -ing は「Oが〜するのを妨げる」です。', '大雨で私はその山に登れませんでした。'),
   fill('reg17-03', 'Lesson 17', '動名詞を使った重要表現', 'standard', "I'm tired. I don't (　　　) (　　　) (　　　) a book this evening.", 'feel like reading', 'feel like -ing は「〜したい気がする」です。', '私は疲れていて、今夜は本を読む気分ではありません。'),
   fill('reg17-04', 'Lesson 17', '動名詞を使った重要表現', 'standard', 'Would you (　　　) (　　　) the window?', 'mind opening', 'Would you mind -ing? は依頼を表します。', '窓を開けていただけますか。'),
@@ -185,4 +188,3 @@ export const REGULAR_QUESTIONS = [
   choice('regopt7-15', 'Option 7', '前置詞の使い分け', 'starter', 'I drew the picture [by / with] a ball-point pen.', ['by', 'with'], 'with', '道具には with を使います。'),
   choice('regopt7-16', 'Option 7', '前置詞の使い分け', 'starter', 'I usually go to school [by / with] bike.', ['by', 'with'], 'by', '交通手段には by を使います。'),
 ]
-

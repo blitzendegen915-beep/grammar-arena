@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './styles.css'
 import { FOUNDATION_TRANSLATIONS, GERUND_QUESTIONS, PARTICIPLE_QUESTIONS } from './questionBanks'
 import { REGULAR_QUESTIONS } from './regularQuestions'
+import { isBlankPlaceholder, withBlankCount } from './questionQuality'
 import {
   ANSWER_SYNC_MAX_ATTEMPTS,
   ANSWER_SYNC_TIMEOUT_MS,
@@ -198,7 +199,7 @@ const COURSE_MODES = [
   { id: 'regular-english-practice', label: '英語演習 - 平常授業', available: true },
 ]
 
-const FOUNDATION_QUESTIONS = QUESTIONS.map((question) => ({
+const FOUNDATION_QUESTIONS = QUESTIONS.map((question) => withBlankCount({
   ...question,
   japanese: question.japanese || '',
   translation: FOUNDATION_TRANSLATIONS[question.id] || question.japanese || '',
@@ -864,7 +865,7 @@ function QuestionCard({ question: sourceQuestion, queue, index, submitted, submi
 
 function renderSentence(sentence = '') {
   if (!sentence) return null
-  return sentence.split(/(\(　　　\)|______)/g).map((part, index) => part.includes('　　　') || part === '______' ? <span key={index} className="sentence-blank">　</span> : <span key={index}>{part}</span>)
+  return sentence.split(/(\(\s*\u3000+\s*\)|\uFF08\s*\u3000+\s*\uFF09|_{2,})/g).map((part, index) => isBlankPlaceholder(part) ? <span key={index} className="sentence-blank">　</span> : <span key={index}>{part}</span>)
 }
 
 function Feedback({ question, result, onRetry }) {
