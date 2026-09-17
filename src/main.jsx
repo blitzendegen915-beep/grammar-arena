@@ -1,6 +1,7 @@
 import { StrictMode, useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
+import { FOUNDATION_TRANSLATIONS, GERUND_QUESTIONS, PARTICIPLE_QUESTIONS } from './questionBanks'
 
 const STORAGE_KEY = 'grammar-arena-v1'
 const SCORE_API_URL = import.meta.env.VITE_SCORE_API_URL || 'https://script.google.com/macros/s/AKfycbw0HAcZcaqv8vRsU4uz02rKB7-jdsWM-xZrNwlHTlEyGOEdCSTWnaDBlqCuCv4Ho8AelQ/exec'
@@ -162,9 +163,31 @@ const STUDENTS = [
 
 const COURSE_MODES = [
   { id: 'foundation-infinitive', label: '基礎講座 - 不定詞', available: true },
-  { id: 'foundation-gerund', label: '基礎講座 - 動名詞', available: false },
-  { id: 'foundation-participles', label: '基礎講座 - 分詞', available: false },
+  { id: 'foundation-gerund', label: '基礎講座 - 動名詞', available: true },
+  { id: 'foundation-participles', label: '基礎講座 - 分詞', available: true },
 ]
+
+const FOUNDATION_QUESTIONS = QUESTIONS.map((question) => ({
+  ...question,
+  japanese: question.japanese || '',
+  translation: FOUNDATION_TRANSLATIONS[question.id] || question.japanese || '',
+}))
+
+const COURSE_DETAILS = {
+  'foundation-infinitive': { label: '基礎講座', unit: 'UNIT 01', name: '不定詞', title: '不定詞を、解いて、理解する。' },
+  'foundation-gerund': { label: '基礎講座', unit: 'UNIT 02', name: '動名詞', title: '動名詞を、解いて、理解する。' },
+  'foundation-participles': { label: '基礎講座', unit: 'UNIT 03', name: '分詞', title: '分詞を、解いて、理解する。' },
+}
+
+const QUESTION_BANKS = {
+  'foundation-infinitive': FOUNDATION_QUESTIONS,
+  'foundation-gerund': GERUND_QUESTIONS,
+  'foundation-participles': PARTICIPLE_QUESTIONS,
+}
+
+function getQuestionBank(modeId) {
+  return QUESTION_BANKS[modeId] || FOUNDATION_QUESTIONS
+}
 
 const RATING_POINTS = { starter: 12, standard: 18, advanced: 26 }
 const RATING_LOSS = { starter: 7, standard: 11, advanced: 16 }
@@ -198,6 +221,24 @@ function readPersisted() {
 
 function normalize(value = '') {
   return value.trim().toLowerCase().replace(/[’']/g, "'").replace(/[。．,，!！?？]/g, '').replace(/\s+/g, ' ')
+}
+
+function normalizeAnswer(value = '') {
+  return normalize(value).replace(/[.,!?。、「」]/g, '')
+}
+
+function isCorrectAnswer(question, userAnswer) {
+  const candidates = question.accepted?.length ? question.accepted : [question.answer]
+  return candidates.some((answer) => normalizeAnswer(answer) === normalizeAnswer(userAnswer))
+}
+
+function addAnsweredId(profile, courseId, questionId) {
+  const answeredIds = [...new Set([...(profile.answeredIds || []), questionId])]
+  return {
+    ...profile,
+    answeredIds,
+    answeredByCourse: { ...(profile.answeredByCourse || {}), [courseId]: answeredIds },
+  }
 }
 
 function cleanStudentName(value = '') {
@@ -234,8 +275,8 @@ function shuffleDifferent(items) {
   return shuffled.every((item, index) => item === items[index]) ? [...items.slice(1), items[0]] : shuffled
 }
 
-function buildQueue(filter, answeredIds = []) {
-  const available = QUESTIONS.filter((question) => !answeredIds.includes(question.id))
+function buildQueue(filter, answeredIds = [], questionBank = FOUNDATION_QUESTIONS) {
+  const available = questionBank.filter((question) => !answeredIds.includes(question.id))
   if (filter === 'all') return shuffle(available).slice(0, SESSION_LENGTH)
   const preferred = shuffle(available.filter((question) => question.difficulty === filter))
   const supplemental = shuffle(available.filter((question) => question.difficulty !== filter))
@@ -252,7 +293,7 @@ function App() {
   const [filter, setFilter] = useState('all')
   const [queue, setQueue] = useState(() => {
     const initial = readPersisted()
-    return buildQueue('all', initial.answeredIds)
+    return buildQueue('all', initial.answeredIds, getQuestionBank('foundation-infinitive'))
   })
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState('')
@@ -321,12 +362,14 @@ function App() {
         setNotice('ログイン情報を受け取れませんでした。管理者がApps Scriptを更新してから再試行してください。')
         return
       }
+      const serverAnsweredIds = Array.isArray(result.answeredIds) ? result.answeredIds : []
       setPersisted((current) => ({
         ...current,
         studentName: result.name,
         authToken: result.authToken,
         rating: Number(result.rating) || DEFAULT_RATING,
-        answeredIds: Array.isArray(result.answeredIds) ? result.answeredIds : [],
+        answeredIds: serverAnsweredIds,
+        answeredByCourse: { ...(current.answeredByCourse || {}), [modeId]: serverAnsweredIds },
         publicLeaderboard: Array.isArray(result.players) ? result.players : current.publicLeaderboard,
       }))
       setAuthName(result.name)
@@ -341,9 +384,28 @@ function App() {
     }
   }
 
+  const answeredIdsForCourse = (courseId) => persisted.answeredByCourse?.[courseId] || (courseId === 'foundation-infinitive' ? persisted.answeredIds : [])
+
+  const changeMode = (nextModeId) => {
+    const nextAnsweredIds = answeredIdsForCourse(nextModeId)
+    setModeId(nextModeId)
+    setPersisted((current) => ({ ...current, answeredIds: nextAnsweredIds }))
+    setFilter('all')
+    setQueue(buildQueue('all', nextAnsweredIds, getQuestionBank(nextModeId)))
+    setIndex(0)
+    setSelected('')
+    setTokens([])
+    setInput('')
+    setSubmitted(null)
+    setSessionScore({ correct: 0, answered: 0 })
+    setSessionRatingStart(persisted.rating)
+    setNotice('')
+    setView(hasSession ? 'practice' : 'landing')
+  }
+
   const restart = (nextFilter = filter) => {
     setFilter(nextFilter)
-    setQueue(buildQueue(nextFilter, persisted.answeredIds))
+    setQueue(buildQueue(nextFilter, answeredIdsForCourse(modeId), getQuestionBank(modeId)))
     setIndex(0)
     setSelected('')
     setTokens([])
@@ -406,9 +468,7 @@ function App() {
     }
     const userAnswer = currentAnswer()
     if (!userAnswer.trim()) return
-    const correct = question.type === 'input'
-      ? question.accepted.some((answer) => normalize(answer) === normalize(userAnswer))
-      : normalize(userAnswer) === normalize(question.answer)
+    const correct = isCorrectAnswer(question, userAnswer)
     const delta = correct ? RATING_POINTS[question.difficulty] : -RATING_LOSS[question.difficulty]
     setSubmitting(true)
     setNotice('')
@@ -427,7 +487,7 @@ function App() {
         })
         const result = await requestScoreApi(Object.fromEntries(params.entries()))
         if (!result.ok && result.reason === 'already-answered') {
-          setPersisted((current) => ({ ...current, answeredIds: [...new Set([...current.answeredIds, question.id])] }))
+          setPersisted((current) => addAnsweredId(current, modeId, question.id))
           setNotice('この問題はすでに回答済みです。次の問題へ進みます。')
           setSubmitting(false)
           return
@@ -450,7 +510,7 @@ function App() {
       }
     }
     setPersisted((current) => ({ ...current, rating: nextRating, streak: correct ? current.streak + 1 : 0 }))
-    setPersisted((current) => ({ ...current, answeredIds: [...new Set([...current.answeredIds, question.id])] }))
+    setPersisted((current) => addAnsweredId(current, modeId, question.id))
     setSessionScore((score) => ({ correct: score.correct + (correct ? 1 : 0), answered: score.answered + 1 }))
     setSubmitted({ correct, userAnswer, delta: serverDelta, correctAnswer: question.answerLabel })
     setSubmitting(false)
@@ -513,14 +573,14 @@ function App() {
           <div className="top-stat streak-stat"><Icon name="streak" size={27} /><div><span>連続正解</span><strong>{persisted.streak}</strong></div></div>
           <div className="topbar-spacer" />
           <div className="selector-stack name-stack"><label htmlFor="student-name">生徒</label><div id="student-name" className="name-display">{persisted.studentName || '未ログイン'}</div><span>{hasSession ? 'ログイン中 / ランキングに表示' : '暗証番号でログイン'}</span></div>
-          <div className="selector-stack course-switcher"><label htmlFor="course-selector">講座</label><select id="course-selector" value={modeId} onChange={(event) => setModeId(event.target.value)}>{COURSE_MODES.map((course) => <option key={course.id} value={course.id} disabled={!course.available}>{course.label}</option>)}</select><span>他の単元は後日追加</span></div>
+          <div className="selector-stack course-switcher"><label htmlFor="course-selector">講座</label><select id="course-selector" value={modeId} onChange={(event) => changeMode(event.target.value)}>{COURSE_MODES.map((course) => <option key={course.id} value={course.id} disabled={!course.available}>{course.label}</option>)}</select><span>動名詞・分詞も選択できます</span></div>
           <div className="profile-orb">{student.name.slice(0, 1)}</div>
         </header>
 
         <div className="content-wrap">
-          {view === 'landing' && <LandingView {...{ authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard: persisted.publicLeaderboard }} />}
-          {view === 'lobby' && <LobbyView studentName={persisted.studentName} rating={persisted.rating} leaderboard={persisted.publicLeaderboard} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
-          {view === 'practice' && <PracticeView {...{ question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard') }} />}
+          {view === 'landing' && <LandingView {...{ course: COURSE_DETAILS[modeId], authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard: persisted.publicLeaderboard }} />}
+          {view === 'lobby' && <LobbyView course={COURSE_DETAILS[modeId]} studentName={persisted.studentName} rating={persisted.rating} leaderboard={persisted.publicLeaderboard} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
+          {view === 'practice' && <PracticeView {...{ course: COURSE_DETAILS[modeId], question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard') }} />}
           {view === 'leaderboard' && <LeaderboardView players={persisted.publicLeaderboard} rating={persisted.rating} studentName={persisted.studentName} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={persisted.rating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
@@ -530,14 +590,14 @@ function App() {
   )
 }
 
-function LandingView({ authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard }) {
+function LandingView({ course, authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard }) {
   return <div className="landing-view">
     <div className="landing-layout">
       <section className="landing-hero">
         <div className="landing-eyebrow"><span className="landing-mark"><Icon name="practice" size={25} /></span><span>WELCOME TO GRAMMAR ARENA</span></div>
-        <p className="section-kicker">FOUNDATION COURSE / UNIT 01</p>
+        <p className="section-kicker">FOUNDATION COURSE / {course.unit}</p>
         <h1>レートを確認して、<br /><em>対戦を始める。</em></h1>
-        <p className="landing-copy">生徒名と暗証番号でログインすると、現在レートを確認してから基礎講座の10問対戦を始められます。</p>
+        <p className="landing-copy">生徒名と暗証番号でログインすると、現在レートを確認してから{course.label}・{course.name}の10問対戦を始められます。</p>
         <div className="auth-tabs" role="tablist" aria-label="アカウント操作">
           <button type="button" className={authMode === 'login' ? 'selected' : ''} onClick={() => { setAuthMode('login'); setNotice('') }}>ログイン</button>
           <button type="button" className={authMode === 'register' ? 'selected' : ''} onClick={() => { setAuthMode('register'); setNotice('') }}>初回登録</button>
@@ -554,17 +614,17 @@ function LandingView({ authMode, setAuthMode, authName, setAuthName, authPin, se
       </section>
       <PublicLeaderboard players={leaderboard} currentName={authName} limit={5} />
     </div>
-    <div className="landing-footer"><span>NOW PLAYING</span><strong>基礎講座 - 不定詞</strong><span className="landing-footer-muted">他の単元は後日追加予定</span></div>
+    <div className="landing-footer"><span>NOW PLAYING</span><strong>{course.label} - {course.name}</strong><span className="landing-footer-muted">動名詞・分詞も選択できます</span></div>
   </div>
 }
 
-function LobbyView({ studentName, rating, leaderboard, startPractice, openLeaderboard }) {
+function LobbyView({ course, studentName, rating, leaderboard, startPractice, openLeaderboard }) {
   return <div className="lobby-view">
     <section className="lobby-card">
       <div className="landing-eyebrow"><span className="landing-mark"><Icon name="leaderboard" size={25} /></span><span>READY FOR RATED MATCH</span></div>
       <p className="section-kicker">WELCOME BACK / {studentName}</p>
       <h1>レート対戦の準備完了。</h1>
-      <div className="lobby-rate"><span>YOUR CURRENT RATE</span><strong>{rating.toLocaleString()}</strong><small>{studentName} の現在レート</small></div>
+      <div className="lobby-rate"><span>YOUR CURRENT RATE</span><strong>{rating.toLocaleString()}</strong><small>{studentName} の現在レート / {course.name}</small></div>
       <button type="button" className="primary-button lobby-start" onClick={startPractice}>レート対戦を始める<Icon name="arrow" size={21} /></button>
     </section>
     <PublicLeaderboard players={leaderboard} currentName={studentName} limit={5} onOpen={openLeaderboard} />
@@ -575,11 +635,11 @@ function NavItem({ icon, label, active, onClick }) {
   return <button type="button" className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}><Icon name={icon} size={22} /><span>{label}</span></button>
 }
 
-function PracticeView({ question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName, openLeaderboard }) {
+function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName, openLeaderboard }) {
   return <div className="practice-layout">
     <section className="practice-column">
-      <div className="course-banner"><div><span className="course-banner-label">FOUNDATION COURSE</span><strong>基礎講座</strong><span className="course-banner-unit">UNIT 01 / 不定詞</span></div><span className="course-stamp">STUDY</span></div>
-      <div className="section-heading"><div><p className="section-kicker">基礎講座 / 不定詞</p><h1>不定詞を、解いて、理解する。</h1><p className="session-hint">1セッション {SESSION_LENGTH}問 / {filter === 'all' ? '全レベルミックス' : `${DIFFICULTY[filter].label}を優先して出題`}</p></div><div className="difficulty-tabs" role="tablist" aria-label="難易度"><DifficultyTab value="all" current={filter} onClick={setFilter} label="すべて" /><DifficultyTab value="starter" current={filter} onClick={setFilter} label="基礎" /><DifficultyTab value="standard" current={filter} onClick={setFilter} label="標準" /><DifficultyTab value="advanced" current={filter} onClick={setFilter} label="発展" /></div></div>
+      <div className="course-banner"><div><span className="course-banner-label">FOUNDATION COURSE</span><strong>{course.label}</strong><span className="course-banner-unit">{course.unit} / {course.name}</span></div><span className="course-stamp">STUDY</span></div>
+      <div className="section-heading"><div><p className="section-kicker">{course.label} / {course.name}</p><h1>{course.title}</h1><p className="session-hint">1セッション {SESSION_LENGTH}問 / {filter === 'all' ? '全レベルミックス' : `${DIFFICULTY[filter].label}を優先して出題`}</p></div><div className="difficulty-tabs" role="tablist" aria-label="難易度"><DifficultyTab value="all" current={filter} onClick={setFilter} label="すべて" /><DifficultyTab value="starter" current={filter} onClick={setFilter} label="基礎" /><DifficultyTab value="standard" current={filter} onClick={setFilter} label="標準" /><DifficultyTab value="advanced" current={filter} onClick={setFilter} label="発展" /></div></div>
       {notice && <div className="app-notice" role="status">{notice}</div>}
       {isComplete ? <CompleteCard score={sessionScore} queue={queue} restart={() => restart(filter)} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }} />}
     </section>
@@ -591,11 +651,16 @@ function DifficultyTab({ value, current, onClick, label }) {
   return <button type="button" className={`difficulty-tab ${current === value ? 'selected' : ''}`} onClick={() => onClick(value)}>{label}</button>
 }
 
-function QuestionCard({ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }) {
-  const [shuffledWords, setShuffledWords] = useState(() => question.type === 'reorder' ? shuffleDifferent(question.words) : [])
+function QuestionCard({ question: sourceQuestion, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }) {
+  const [shuffledWords, setShuffledWords] = useState(() => sourceQuestion.type === 'reorder' ? shuffleDifferent(sourceQuestion.words) : [])
+  const [shuffledChoices, setShuffledChoices] = useState(() => sourceQuestion.type === 'choice' ? shuffleDifferent(sourceQuestion.choices) : [])
+  const question = sourceQuestion.type === 'choice' && shuffledChoices.length ? { ...sourceQuestion, choices: shuffledChoices } : sourceQuestion
   useEffect(() => {
     setShuffledWords(question.type === 'reorder' ? shuffleDifferent(question.words) : [])
   }, [question.id, question.type])
+  useEffect(() => {
+    setShuffledChoices(sourceQuestion.type === 'choice' ? shuffleDifferent(sourceQuestion.choices) : [])
+  }, [sourceQuestion.id, sourceQuestion.type])
   const wordSource = shuffledWords.length ? shuffledWords : question.words
   const remainingWords = question.type === 'reorder' ? wordSource.filter((word, wordIndex) => {
     const usedCount = tokens.filter((token) => token === word).length
@@ -606,9 +671,9 @@ function QuestionCard({ question, queue, index, submitted, submit, nextQuestion,
   return <article className="question-card">
     <div className="question-head"><div><div className="lesson-label">{question.lesson} <span>•</span> {question.topic}</div><div className="question-type">QUESTION {questionNumber}</div></div><div className="progress-block"><span>{index + 1} / {queue.length}</span><div className="progress-track"><span style={{ width: `${((index + 1) / queue.length) * 100}%` }} /></div></div></div>
     <div className="question-body"><p className="prompt">{question.prompt}</p>{question.japanese && <p className="japanese-prompt">{question.japanese}</p>}{question.sentence && <p className="sentence">{renderSentence(question.sentence, question.inputPrefix)}</p>}
-      {question.type === 'choice' && <div className="choices">{question.choices.map((choice, choiceIndex) => <button type="button" key={choice} className={`choice-button ${selected === choice ? 'chosen' : ''} ${submitted && choice === question.answer ? 'correct-choice' : ''} ${submitted && selected === choice && selected !== question.answer ? 'wrong-choice' : ''}`} onClick={() => !submitted && setSelected(choice)}><span className="choice-letter">{String.fromCharCode(65 + choiceIndex)}</span><span>{choice}</span>{submitted && choice === question.answer && <Icon name="check" size={19} />}</button>)}</div>}
+      {question.type === 'choice' && <div className="choices">{question.choices.map((choice, choiceIndex) => <button type="button" key={choice} className={`choice-button ${selected === choice ? 'chosen' : ''} ${submitted && isCorrectAnswer(question, choice) ? 'correct-choice' : ''} ${submitted && selected === choice && !isCorrectAnswer(question, selected) ? 'wrong-choice' : ''}`} onClick={() => !submitted && setSelected(choice)}><span className="choice-letter">{String.fromCharCode(65 + choiceIndex)}</span><span>{choice}</span>{submitted && isCorrectAnswer(question, choice) && <Icon name="check" size={19} />}</button>)}</div>}
       {question.type === 'reorder' && <div className="reorder-area"><div className={`answer-line ${submitted ? (submitted.correct ? 'answer-correct' : 'answer-wrong') : ''}`}>{tokens.length ? tokens.map((token, tokenIndex) => <button type="button" key={`${token}-${tokenIndex}`} className="token selected-token" onClick={() => removeWord(tokenIndex)}>{token}</button>) : <span className="answer-placeholder">ここに語句を並べます</span>}</div><div className="word-bank">{remainingWords.map((word, wordIndex) => <button type="button" key={`${word}-${wordIndex}`} className="token" onClick={() => useWord(word)}>{word}</button>)}</div></div>}
-      {question.type === 'input' && <div className={`input-wrap ${submitted ? (submitted.correct ? 'input-correct' : 'input-wrong') : ''}`}><input aria-label="解答入力" value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') submit() }} placeholder="解答を入力" disabled={Boolean(submitted)} autoComplete="off" /><span>{question.answer.includes(' ') ? '語句' : '語'}</span></div>}
+      {question.type === 'input' && <div className={`input-wrap ${submitted ? (submitted.correct ? 'input-correct' : 'input-wrong') : ''}`}><input aria-label="解答入力" value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') submit() }} placeholder="解答を入力" disabled={Boolean(submitted)} autoComplete="off" /><span>{(question.accepted?.[0] || question.answer).includes(' ') ? '語句' : '語'}</span></div>}
       {submitted && <Feedback question={question} result={submitted} />}
     </div>
     <div className="question-actions"><button type="button" className="primary-button" onClick={submitted ? nextQuestion : submit} disabled={submitting}>{submitted ? (index === queue.length - 1 ? '結果を見る' : '次の問題へ') : submitting ? '共有中…' : '答えを確定する'}<Icon name="arrow" size={21} /></button>{submitted && <button type="button" className="secondary-button" onClick={() => document.getElementById('explanation')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}><Icon name="document" size={18} />解説を見る</button>}</div>
@@ -621,7 +686,7 @@ function renderSentence(sentence = '') {
 }
 
 function Feedback({ question, result }) {
-  return <div id="explanation" className={`feedback ${result.correct ? 'feedback-correct' : 'feedback-wrong'}`}><div className="feedback-title"><span className="feedback-icon"><Icon name={result.correct ? 'check' : 'close'} size={17} /></span><strong>{result.correct ? '正解です' : '今回は不正解'}</strong><span className="feedback-delta">{result.delta > 0 ? `レート +${result.delta}` : `レート ${result.delta}`}</span></div><div className="correction"><span>正答</span><strong>{result.correctAnswer}</strong></div><p>{question.explanation}</p><small>{question.source}</small></div>
+  return <div id="explanation" className={`feedback ${result.correct ? 'feedback-correct' : 'feedback-wrong'}`}><div className="feedback-title"><span className="feedback-icon"><Icon name={result.correct ? 'check' : 'close'} size={17} /></span><strong>{result.correct ? '正解です' : '今回は不正解'}</strong><span className="feedback-delta">{result.delta > 0 ? `レート +${result.delta}` : `レート ${result.delta}`}</span></div><div className="correction"><span>正答</span><strong>{result.correctAnswer}</strong></div>{question.translation && <div className="translation"><span>日本語訳</span><p>{question.translation}</p></div>}<p>{question.explanation}</p><small>{question.source}</small></div>
 }
 
 function CompleteCard({ score, queue, restart }) {
