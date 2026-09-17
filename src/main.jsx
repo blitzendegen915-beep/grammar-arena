@@ -312,7 +312,9 @@ function App() {
   const [input, setInput] = useState('')
   const [submitted, setSubmitted] = useState(null)
   const [sessionScore, setSessionScore] = useState({ correct: 0, answered: 0 })
+  const [sessionAnswers, setSessionAnswers] = useState([])
   const [sessionRatingStart, setSessionRatingStart] = useState(persisted.rating)
+  const [sessionCompletedAt, setSessionCompletedAt] = useState('')
   const [todaySeconds, setTodaySeconds] = useState(25 * 60)
   const [submitting, setSubmitting] = useState(false)
   const [notice, setNotice] = useState('')
@@ -423,7 +425,8 @@ function App() {
     setInput('')
     setSubmitted(null)
     setSessionScore({ correct: 0, answered: 0 })
-    setSessionRatingStart(persisted.rating)
+    setSessionAnswers([])
+    setSessionCompletedAt('')
     setNotice('')
     setView(hasSession ? 'practice' : 'landing')
   }
@@ -437,6 +440,8 @@ function App() {
     setInput('')
     setSubmitted(null)
     setSessionScore({ correct: 0, answered: 0 })
+    setSessionAnswers([])
+    setSessionCompletedAt('')
     setSessionRatingStart(persisted.rating)
     setNotice('')
     setView(hasSession ? 'practice' : 'landing')
@@ -540,15 +545,25 @@ function App() {
     setPersisted((current) => ({ ...current, rating: nextRating, streak: correct ? current.streak + 1 : 0 }))
     setPersisted((current) => addAnsweredId(current, getRankingCourseId(modeId), question.id))
     setSessionScore((score) => ({ correct: score.correct + (correct ? 1 : 0), answered: score.answered + 1 }))
+    setSessionAnswers((answers) => [...answers, {
+      id: `${question.id}-${Date.now()}`,
+      question,
+      userAnswer,
+      correct,
+      delta: serverDelta,
+      correctAnswer: question.answerLabel || question.answer,
+    }])
     setSubmitted({ correct, userAnswer, delta: serverDelta, correctAnswer: question.answerLabel })
     setSubmitting(false)
   }
 
   const nextQuestion = () => {
     if (index === queue.length - 1) {
+      const completedAt = new Date().toISOString()
       const session = {
         id: `${Date.now()}`,
-        date: new Date().toISOString().slice(0, 10),
+        date: completedAt.slice(0, 10),
+        completedAt,
         label: filter === 'all' ? 'ミックス演習' : `${DIFFICULTY[filter].label}演習`,
         correct: sessionScore.correct,
         total: sessionScore.answered,
@@ -556,6 +571,7 @@ function App() {
         ratingAfter: persisted.rating,
       }
       setPersisted((current) => ({ ...current, history: [session, ...current.history].slice(0, 20) }))
+      setSessionCompletedAt(completedAt)
       setIndex(index + 1)
       return
     }
@@ -579,6 +595,7 @@ function App() {
   const answerPreview = question ? (question.type === 'reorder' ? tokens.join(' ') : currentAnswer()) : ''
 
   return (
+    <>
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand-block">
@@ -608,13 +625,15 @@ function App() {
         <div className="content-wrap">
           {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard: persisted.publicLeaderboard }} />}
           {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={persisted.rating} leaderboard={persisted.publicLeaderboard} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
-          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard') }} />}
+          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard') }} />}
           {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={persisted.publicLeaderboard} rating={persisted.rating} studentName={persisted.studentName} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={persisted.rating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
         </div>
       </main>
     </div>
+    {isComplete && sessionAnswers.length > 0 && <SessionPrintView {...{ reviews: sessionAnswers, score: sessionScore, course: getCourseDetails(modeId), studentName: persisted.studentName, ratingStart: sessionRatingStart, ratingAfter: persisted.rating, completedAt: sessionCompletedAt }} />}
+    </>
   )
 }
 
@@ -663,13 +682,13 @@ function NavItem({ icon, label, active, onClick }) {
   return <button type="button" className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}><Icon name={icon} size={22} /><span>{label}</span></button>
 }
 
-function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName, openLeaderboard }) {
+function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName, openLeaderboard }) {
   return <div className="practice-layout">
     <section className="practice-column">
       <div className="course-banner"><div><span className="course-banner-label">{course.eyebrow}</span><strong>{course.label}</strong><span className="course-banner-unit">{course.unit} / {course.name}</span></div><span className="course-stamp">STUDY</span></div>
       <div className="section-heading"><div><p className="section-kicker">{course.label} / {course.name}</p><h1>{course.title}</h1><p className="session-hint">1セッション {SESSION_LENGTH}問 / {filter === 'all' ? '全レベルミックス' : `${DIFFICULTY[filter].label}を優先して出題`}</p></div><div className="difficulty-tabs" role="tablist" aria-label="難易度"><DifficultyTab value="all" current={filter} onClick={setFilter} label="すべて" /><DifficultyTab value="starter" current={filter} onClick={setFilter} label="基礎" /><DifficultyTab value="standard" current={filter} onClick={setFilter} label="標準" /><DifficultyTab value="advanced" current={filter} onClick={setFilter} label="発展" /></div></div>
       {notice && <div className="app-notice" role="status">{notice}</div>}
-      {isComplete ? <CompleteCard score={sessionScore} queue={queue} restart={() => restart(filter)} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }} />}
+      {isComplete ? <CompleteCard {...{ score: sessionScore, queue, reviews: sessionAnswers, course, studentName, ratingStart: sessionRatingStart, ratingAfter: rating, completedAt: sessionCompletedAt, restart: () => restart(filter) }} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }} />}
     </section>
     <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} /><PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} onOpen={openLeaderboard} /></div>
   </div>
@@ -717,9 +736,36 @@ function Feedback({ question, result }) {
   return <div id="explanation" className={`feedback ${result.correct ? 'feedback-correct' : 'feedback-wrong'}`}><div className="feedback-title"><span className="feedback-icon"><Icon name={result.correct ? 'check' : 'close'} size={17} /></span><strong>{result.correct ? '正解です' : '今回は不正解'}</strong><span className="feedback-delta">{result.delta > 0 ? `レート +${result.delta}` : `レート ${result.delta}`}</span></div><div className="correction"><span>正答</span><strong>{result.correctAnswer}</strong></div>{question.translation && question.type !== 'input' && <div className="translation"><span>日本語訳</span><p>{question.translation}</p></div>}<p>{question.explanation}</p><small>{question.source}</small></div>
 }
 
-function CompleteCard({ score, queue, restart }) {
+function CompleteCard({ score, queue, reviews, course, studentName, ratingStart, ratingAfter, completedAt, restart }) {
   const percentage = score.answered ? Math.round((score.correct / score.answered) * 100) : 0
-  return <article className="complete-card"><div className="complete-icon"><Icon name="check" size={32} /></div><p className="section-kicker">SESSION COMPLETE</p><h2>今日の{queue.length}問、完了。</h2><div className="result-grid"><div><span>正答数</span><strong>{score.correct} / {queue.length}</strong></div><div><span>正答率</span><strong>{percentage}%</strong></div><div><span>学習モード</span><strong>不定詞</strong></div></div><button type="button" className="primary-button" onClick={restart}>もう一度解く<Icon name="arrow" size={21} /></button></article>
+  return <>
+    <article className="complete-card"><div className="complete-icon"><Icon name="check" size={32} /></div><p className="section-kicker">SESSION COMPLETE</p><h2>今日の{queue.length}問、完了。</h2><div className="result-grid"><div><span>正答数</span><strong>{score.correct} / {queue.length}</strong></div><div><span>正答率</span><strong>{percentage}%</strong></div><div><span>学習モード</span><strong>{course.name}</strong></div></div><div className="complete-actions"><button type="button" className="primary-button" onClick={restart}>もう一度解く<Icon name="arrow" size={21} /></button><button type="button" className="secondary-button" onClick={() => exportSessionPdf(studentName, completedAt)}><Icon name="document" size={19} />PDFとして出力</button></div></article>
+    <section className="session-review"><div className="session-review-head"><div><p className="section-kicker">SESSION REVIEW</p><h2>今回の{reviews.length}問を復習する</h2><p>解いた問題の正答・日本語訳・解説をまとめています。</p></div><div className="session-review-meta"><span>{formatJapaneseDate(completedAt)}</span><strong>{studentName}</strong><small>レート {ratingStart.toLocaleString()} → {ratingAfter.toLocaleString()}</small></div></div><div className="review-list">{reviews.map((review, index) => <ReviewItem key={review.id || `${review.question.id}-${index}`} review={review} index={index} />)}</div></section>
+  </>
+}
+
+function ReviewItem({ review, index }) {
+  const { question } = review
+  const translation = question.translation || question.japanese
+  return <article className={`review-item ${review.correct ? 'review-correct' : 'review-wrong'}`}><div className="review-item-head"><div><span className="review-number">QUESTION {String(index + 1).padStart(2, '0')}</span><strong>{question.lesson} ・ {question.topic}</strong></div><span className="review-result">{review.correct ? '正解' : '不正解'}</span></div><p className="review-prompt">{question.prompt}</p>{question.sentence && <p className="review-sentence">{renderSentence(question.sentence)}</p>}{question.type === 'reorder' && <p className="review-sentence review-reorder">並べ替え：{question.words.join(' / ')}</p>}<div className="review-answers"><div><span>あなたの解答</span><strong>{review.userAnswer || '（未回答）'}</strong></div><div><span>正答</span><strong>{review.correctAnswer}</strong></div></div>{translation && <div className="review-translation"><span>日本語訳</span><p>{translation}</p></div>}<div className="review-explanation"><span>解説</span><p>{question.explanation}</p></div><small>{question.source}</small></article>
+}
+
+function formatJapaneseDate(value) {
+  const date = value ? new Date(value) : new Date()
+  return new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' }).format(date)
+}
+
+function exportSessionPdf(studentName, completedAt) {
+  const originalTitle = document.title
+  const datePart = (completedAt || new Date().toISOString()).slice(0, 10)
+  document.title = `Grammar Arena_${studentName || 'student'}_${datePart}`
+  window.print()
+  window.setTimeout(() => { document.title = originalTitle }, 1000)
+}
+
+function SessionPrintView({ reviews, score, course, studentName, ratingStart, ratingAfter, completedAt }) {
+  const percentage = score.answered ? Math.round((score.correct / score.answered) * 100) : 0
+  return <section className="print-sheet"><header className="print-header"><p>GRAMMAR ARENA / SESSION REVIEW</p><h1>{course.label} ・ {course.name}</h1><div className="print-meta"><div><span>年月日</span><strong>{formatJapaneseDate(completedAt)}</strong></div><div><span>名前</span><strong>{studentName}</strong></div><div><span>正答数</span><strong>{score.correct} / {score.answered}</strong></div><div><span>正答率</span><strong>{percentage}%</strong></div><div><span>レート</span><strong>{ratingStart.toLocaleString()} → {ratingAfter.toLocaleString()}</strong></div></div></header><div className="print-list">{reviews.map((review, index) => <ReviewItem key={review.id || `${review.question.id}-${index}`} review={review} index={index} />)}</div><footer className="print-footer">GRAMMAR ARENA / {course.label} ・ {course.name}</footer></section>
 }
 
 function DailyRail({ correct, answered, seconds }) {

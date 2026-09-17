@@ -381,3 +381,78 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 @media (max-width: 780px) { .sidebar { border-right: 0; border-bottom: 4px solid var(--ink); padding-top: 13px; } .brand-block { padding-bottom: 12px; } .topbar { min-height: 168px; padding: 13px 16px; flex-wrap: wrap; align-content: center; } .topbar-spacer { display: none; } .selector-stack { min-width: calc(50% - 10px); margin: 17px 7px 0 0; } .course-switcher { min-width: calc(50% - 10px); margin-right: 0; } .profile-orb { display: none; } .content-wrap { padding: 25px 16px 42px; } .content-wrap::before { width: 22%; } .course-banner { min-height: 84px; padding: 14px 15px; box-shadow: 5px 5px 0 var(--ink); } .course-banner > div { gap: 8px; flex-wrap: wrap; } .course-banner strong { font-size: 26px; } .course-banner-label { width: 100%; } .course-banner-unit { font-size: 10px; } .course-stamp { font-size: 11px; border-width: 2px; } .question-card, .rail-card, .complete-card, .history-panel, .settings-panel, .leaderboard-card, .landing-hero, .leaderboard-table-card, .leaderboard-you, .leaderboard-rule, .lobby-card { box-shadow: 5px 5px 0 var(--ink); } .right-column { margin-top: 8px; } .landing-layout, .leaderboard-overview, .lobby-view { grid-template-columns: 1fr; } .landing-hero, .lobby-card { min-height: auto; padding: 32px 24px 30px; } .landing-eyebrow { margin-bottom: 30px; } .landing-hero h1, .lobby-card h1 { font-size: 39px; } .landing-footer { flex-wrap: wrap; gap: 8px 12px; } .landing-footer-muted { width: 100%; margin-left: 0; } .leaderboard-page-head { display: block; } .leaderboard-refresh { margin-top: 16px; min-height: 48px; } .leaderboard-table-row { grid-template-columns: .55fr 1.5fr .8fr .9fr; padding: 0 14px; gap: 8px; font-size: 11px; } .leaderboard-table-row strong:last-child { font-size: 14px; } }
 .lobby-card h1 { overflow-wrap: normal; }
 @media (max-width: 780px) { .lobby-card h1 { font-size: clamp(26px, 7vw, 38px); white-space: normal; text-wrap: balance; } }
+
+.complete-actions { display: grid; grid-template-columns: minmax(0, 350px) minmax(190px, 240px); gap: 12px; width: 100%; align-items: stretch; }
+.complete-actions .secondary-button { width: auto; }
+.session-review { margin-top: 24px; padding: 28px; color: var(--ink); background: var(--cream); border: 3px solid var(--ink); box-shadow: 9px 9px 0 var(--ink); }
+.session-review-head { display: flex; justify-content: space-between; gap: 22px; align-items: start; padding-bottom: 20px; border-bottom: 3px solid var(--ink); }
+.session-review-head h2 { margin: 0 0 8px; font: 900 24px/1.2 'Arial Black', 'Noto Sans JP', sans-serif; letter-spacing: -.06em; }
+.session-review-head p:not(.section-kicker) { margin: 0; color: #5a564b; font-size: 12px; font-weight: 700; }
+.session-review-meta { min-width: 190px; display: grid; gap: 4px; padding: 13px 15px; color: var(--ink); background: var(--sun); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.session-review-meta span { font: 900 10px/1 'DM Sans', sans-serif; letter-spacing: .1em; }
+.session-review-meta strong { font-size: 15px; }
+.session-review-meta small { font-size: 11px; font-weight: 700; }
+.review-list { display: grid; gap: 15px; margin-top: 20px; }
+.review-item { padding: 17px 18px 16px; color: var(--ink); background: var(--paper); border: 2px solid var(--ink); box-shadow: 4px 4px 0 rgba(23,23,23,.16); break-inside: avoid; }
+.review-item.review-correct { border-left: 8px solid #267a57; }
+.review-item.review-wrong { border-left: 8px solid var(--signal); }
+.review-item-head { display: flex; justify-content: space-between; gap: 16px; align-items: start; padding-bottom: 10px; border-bottom: 1px solid #cbbfa5; }
+.review-item-head > div { display: grid; gap: 4px; }
+.review-number { color: var(--blue); font: 900 10px/1 'DM Sans', sans-serif; letter-spacing: .12em; }
+.review-item-head strong { font-size: 12px; }
+.review-result { flex: 0 0 auto; padding: 5px 8px 4px; color: #fff; background: #267a57; font: 900 11px/1 'Noto Sans JP', sans-serif; }
+.review-wrong .review-result { background: var(--signal); }
+.review-prompt { margin: 14px 0 9px; color: #514d43; font-size: 12px; font-weight: 700; }
+.review-sentence { margin: 0 0 12px; color: var(--ink); font: 18px/1.55 Georgia, 'Times New Roman', serif; }
+.review-reorder { color: #4d4a41; font-size: 15px; }
+.review-answers { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin: 12px 0; }
+.review-answers > div { display: grid; gap: 4px; padding: 10px 12px; background: #fffaf0; border: 1px solid #cbbfa5; }
+.review-answers span, .review-translation > span, .review-explanation > span { color: #766f5d; font: 900 10px/1 'DM Sans', sans-serif; letter-spacing: .08em; }
+.review-answers strong { overflow-wrap: anywhere; font-size: 14px; line-height: 1.45; }
+.review-translation, .review-explanation { margin-top: 11px; padding: 10px 12px; border-left: 4px solid var(--blue); background: #fff0a7; }
+.review-translation p, .review-explanation p { margin: 5px 0 0; color: #35332e; font-size: 12px; line-height: 1.7; }
+.review-explanation { border-left-color: #267a57; background: #e4f0e5; }
+.review-item > small { display: block; margin-top: 11px; color: #786f5d; font-size: 10px; }
+.print-sheet { display: none; }
+
+@media (max-width: 780px) {
+  .complete-actions { grid-template-columns: 1fr; }
+  .complete-actions .secondary-button { width: 100%; }
+  .session-review { padding: 20px 16px; }
+  .session-review-head { display: grid; gap: 16px; }
+  .session-review-meta { min-width: 0; }
+  .review-answers { grid-template-columns: 1fr; }
+}
+
+@media print {
+  @page { size: A4; margin: 13mm 12mm; }
+  html, body { min-width: 0; background: #fff !important; }
+  body { color: #171717 !important; }
+  .app-shell { display: none !important; }
+  .print-sheet { display: block !important; color: #171717; font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif; font-size: 10pt; line-height: 1.55; }
+  .print-header { padding-bottom: 12px; border-bottom: 2px solid #171717; }
+  .print-header > p { margin: 0 0 3px; color: #2d6b9f; font: 900 10px/1 'DM Sans', sans-serif; letter-spacing: .14em; }
+  .print-header h1 { margin: 0 0 14px; color: #171717; font: 900 22px/1.25 'Noto Sans JP', sans-serif; letter-spacing: -.04em; }
+  .print-meta { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
+  .print-meta > div { display: grid; gap: 2px; padding: 7px 8px; border: 1px solid #777; }
+  .print-meta span { color: #555; font-size: 8px; font-weight: 700; }
+  .print-meta strong { font-size: 11px; overflow-wrap: anywhere; }
+  .print-list { display: grid; gap: 7mm; margin-top: 7mm; }
+  .print-sheet .review-item { padding: 11px 12px 10px; background: #fff; border: 1px solid #777; border-left: 5px solid #267a57; box-shadow: none; }
+  .print-sheet .review-item.review-wrong { border-left-color: #c8463c; }
+  .print-sheet .review-item-head { padding-bottom: 6px; }
+  .print-sheet .review-item-head strong { font-size: 9px; }
+  .print-sheet .review-number { font-size: 8px; }
+  .print-sheet .review-result { padding: 3px 6px; font-size: 8px; }
+  .print-sheet .review-prompt { margin: 7px 0 4px; font-size: 9px; }
+  .print-sheet .review-sentence { margin-bottom: 6px; font-size: 13px; }
+  .print-sheet .review-reorder { font-size: 11px; }
+  .print-sheet .review-answers { gap: 6px; margin: 6px 0; }
+  .print-sheet .review-answers > div { padding: 5px 7px; }
+  .print-sheet .review-answers span, .print-sheet .review-translation > span, .print-sheet .review-explanation > span { font-size: 7px; }
+  .print-sheet .review-answers strong { font-size: 10px; }
+  .print-sheet .review-translation, .print-sheet .review-explanation { margin-top: 6px; padding: 6px 8px; }
+  .print-sheet .review-translation p, .print-sheet .review-explanation p { margin-top: 2px; font-size: 9px; line-height: 1.5; }
+  .print-sheet .review-item > small { margin-top: 5px; font-size: 7px; }
+  .print-footer { margin-top: 8mm; padding-top: 5px; border-top: 1px solid #777; color: #555; font-size: 8px; }
+}
