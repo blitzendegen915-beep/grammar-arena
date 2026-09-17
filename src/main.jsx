@@ -173,6 +173,7 @@ function Icon({ name, size = 20 }) {
   const paths = {
     practice: <><path d="M4 19.5V5.8a1.8 1.8 0 0 1 1.8-1.8H20v15.5H5.8A1.8 1.8 0 0 0 4 21.3"/><path d="M4 19.5c0-1 0.8-1.8 1.8-1.8H20"/><path d="m8 8 2 2 4-4"/></>,
     history: <><circle cx="12" cy="12" r="8.8"/><path d="M12 7v5l3.2 2"/><path d="M4.5 5.5 3 4"/></>,
+    leaderboard: <><path d="M4 20h16"/><path d="M6.5 17V9h3v8M10.5 17v-5h3v5M14.5 17V5h3v12"/></>,
     settings: <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 1.7-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V20h-2.4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L8 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H6v-2.4h.8a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L8 8.6l1.7-1.7.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V5h2.4v.7a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.7 1.7-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.8V14h-.8a1.7 1.7 0 0 0-1.6 1Z"/></>,
     chart: <><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-8"/><path d="M22 19V3"/></>,
     streak: <path d="M12.2 21c3.9-.2 6.8-2.7 6.8-6.5 0-3-1.6-5.1-4.1-7.2.1 2-.5 3.2-1.5 4.2-.1-3.9-2.3-6.7-5.1-8.5.4 3.9-3.2 5.7-3.2 9.7C5.1 17.7 8 21 12.2 21Z"/>,
@@ -227,6 +228,12 @@ function shuffle(items) {
   return copy
 }
 
+function shuffleDifferent(items) {
+  if (items.length < 2) return [...items]
+  const shuffled = shuffle(items)
+  return shuffled.every((item, index) => item === items[index]) ? [...items.slice(1), items[0]] : shuffled
+}
+
 function buildQueue(filter, answeredIds = []) {
   const filtered = filter === 'all' ? QUESTIONS : QUESTIONS.filter((question) => question.difficulty === filter)
   return filtered.filter((question) => !answeredIds.includes(question.id)).slice(0, 10)
@@ -234,7 +241,7 @@ function buildQueue(filter, answeredIds = []) {
 
 function App() {
   const [persisted, setPersisted] = useState(readPersisted)
-  const [view, setView] = useState('practice')
+  const [view, setView] = useState(() => readPersisted().studentName ? 'practice' : 'landing')
   const [modeId, setModeId] = useState('foundation-infinitive')
   const [filter, setFilter] = useState('all')
   const [queue, setQueue] = useState(() => {
@@ -261,15 +268,6 @@ function App() {
   }, [persisted])
 
   useEffect(() => {
-    if (!SCORE_API_URL) return
-    requestScoreApi({ action: 'leaderboard', course: modeId })
-      .then((data) => {
-        if (data.ok && Array.isArray(data.players)) setPersisted((current) => ({ ...current, publicLeaderboard: data.players }))
-      })
-      .catch(() => setNotice('公開ランキングを読み込めませんでした。演習は続けられます。'))
-  }, [modeId])
-
-  useEffect(() => {
     const timer = window.setInterval(() => setTodaySeconds((seconds) => seconds + 1), 1000)
     return () => window.clearInterval(timer)
   }, [])
@@ -294,13 +292,45 @@ function App() {
     setSessionScore({ correct: 0, answered: 0 })
     setSessionRatingStart(persisted.rating)
     setNotice('')
-    setView('practice')
+    setView(cleanStudentName(persisted.studentName) ? 'practice' : 'landing')
   }
 
   const selectNav = (nextView) => {
+    if (nextView === 'practice' && !cleanStudentName(persisted.studentName)) {
+      setView('landing')
+      return
+    }
     setView(nextView)
     if (nextView === 'practice' && isComplete) restart(filter)
   }
+
+  const startPractice = () => {
+    const name = cleanStudentName(persisted.studentName)
+    if (!name) {
+      setNotice('ランキングに表示する名前を入力してください。')
+      return
+    }
+    setPersisted((current) => ({ ...current, studentName: name }))
+    restart('all')
+    setView('practice')
+  }
+
+  const refreshLeaderboard = async () => {
+    if (!SCORE_API_URL) {
+      setNotice('共有ランキングはサーバー接続後に表示されます。')
+      return
+    }
+    try {
+      const data = await requestScoreApi({ action: 'leaderboard', course: modeId })
+      if (data.ok && Array.isArray(data.players)) setPersisted((current) => ({ ...current, publicLeaderboard: data.players }))
+    } catch {
+      setNotice('公開ランキングを読み込めませんでした。')
+    }
+  }
+
+  useEffect(() => {
+    if (SCORE_API_URL) refreshLeaderboard()
+  }, [modeId])
 
   const currentAnswer = () => {
     if (question.type === 'reorder') return tokens.join(' ')
@@ -400,7 +430,8 @@ function App() {
           <div><div className="brand-name">GRAMMAR</div><div className="brand-name">ARENA</div></div>
         </div>
         <nav className="main-nav" aria-label="メインナビゲーション">
-          <NavItem icon="practice" label="演習" active={view === 'practice'} onClick={() => selectNav('practice')} />
+          <NavItem icon="practice" label="演習" active={view === 'practice' || view === 'landing'} onClick={() => selectNav('practice')} />
+          <NavItem icon="leaderboard" label="ランキング" active={view === 'leaderboard'} onClick={() => selectNav('leaderboard')} />
           <NavItem icon="history" label="履歴" active={view === 'history'} onClick={() => selectNav('history')} />
           <NavItem icon="settings" label="出題設定" active={view === 'settings'} onClick={() => selectNav('settings')} />
         </nav>
@@ -419,7 +450,9 @@ function App() {
         </header>
 
         <div className="content-wrap">
-          {view === 'practice' && <PracticeView {...{ question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName }} />}
+          {view === 'landing' && <LandingView name={persisted.studentName} setName={(name) => setPersisted((current) => ({ ...current, studentName: cleanStudentName(name) }))} startPractice={startPractice} leaderboard={persisted.publicLeaderboard} />}
+          {view === 'practice' && <PracticeView {...{ question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard') }} />}
+          {view === 'leaderboard' && <LeaderboardView players={persisted.publicLeaderboard} rating={persisted.rating} studentName={persisted.studentName} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={persisted.rating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
         </div>
@@ -428,11 +461,32 @@ function App() {
   )
 }
 
+function LandingView({ name, setName, startPractice, leaderboard }) {
+  return <div className="landing-view">
+    <div className="landing-layout">
+      <section className="landing-hero">
+        <div className="landing-eyebrow"><span className="landing-mark"><Icon name="practice" size={25} /></span><span>WELCOME TO GRAMMAR ARENA</span></div>
+        <p className="section-kicker">FOUNDATION COURSE / UNIT 01</p>
+        <h1>不定詞を、<br /><em>解いて、理解する。</em></h1>
+        <p className="landing-copy">基礎講座の問題に挑戦して、正答数に応じてレートを伸ばそう。まずはランキングに表示する名前を入力してください。</p>
+        <div className="landing-form">
+          <label htmlFor="landing-student-name">生徒名</label>
+          <input id="landing-student-name" value={name} onChange={(event) => setName(event.target.value)} placeholder="例：山田 太郎" maxLength={20} autoComplete="off" />
+          <button type="button" className="primary-button landing-start" onClick={startPractice} disabled={!cleanStudentName(name)}>この名前で始める<Icon name="arrow" size={21} /></button>
+          <p className="landing-note">名前はランキングに表示されます。各問題への回答は、1つの名前につき1回までです。</p>
+        </div>
+      </section>
+      <PublicLeaderboard players={leaderboard} currentName={name} limit={5} />
+    </div>
+    <div className="landing-footer"><span>NOW PLAYING</span><strong>基礎講座 - 不定詞</strong><span className="landing-footer-muted">他の単元は後日追加予定</span></div>
+  </div>
+}
+
 function NavItem({ icon, label, active, onClick }) {
   return <button type="button" className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}><Icon name={icon} size={22} /><span>{label}</span></button>
 }
 
-function PracticeView({ question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName }) {
+function PracticeView({ question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName, openLeaderboard }) {
   return <div className="practice-layout">
     <section className="practice-column">
       <div className="course-banner"><div><span className="course-banner-label">FOUNDATION COURSE</span><strong>基礎講座</strong><span className="course-banner-unit">UNIT 01 / 不定詞</span></div><span className="course-stamp">STUDY</span></div>
@@ -440,7 +494,7 @@ function PracticeView({ question, queue, index, filter, setFilter, submitted, su
       {notice && <div className="app-notice" role="status">{notice}</div>}
       {isComplete ? <CompleteCard score={sessionScore} queue={queue} restart={() => restart(filter)} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }} />}
     </section>
-    <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} /><PublicLeaderboard players={leaderboard} currentName={studentName} /></div>
+    <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} /><PublicLeaderboard players={leaderboard} currentName={studentName} onOpen={openLeaderboard} /></div>
   </div>
 }
 
@@ -449,9 +503,14 @@ function DifficultyTab({ value, current, onClick, label }) {
 }
 
 function QuestionCard({ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }) {
-  const remainingWords = question.type === 'reorder' ? question.words.filter((word, wordIndex) => {
+  const [shuffledWords, setShuffledWords] = useState(() => question.type === 'reorder' ? shuffleDifferent(question.words) : [])
+  useEffect(() => {
+    setShuffledWords(question.type === 'reorder' ? shuffleDifferent(question.words) : [])
+  }, [question.id, question.type])
+  const wordSource = shuffledWords.length ? shuffledWords : question.words
+  const remainingWords = question.type === 'reorder' ? wordSource.filter((word, wordIndex) => {
     const usedCount = tokens.filter((token) => token === word).length
-    const priorCount = question.words.slice(0, wordIndex).filter((item) => item === word).length
+    const priorCount = wordSource.slice(0, wordIndex).filter((item) => item === word).length
     return usedCount < priorCount + 1
   }) : []
   const questionNumber = String(index + 1).padStart(2, '0')
@@ -488,9 +547,18 @@ function DailyRail({ correct, answered, seconds }) {
   return <aside className="daily-rail"><div className="rail-card"><div className="rail-title"><Icon name="calendar" size={21} /><h2>今日の記録</h2><span className="study-stamp">STUDY</span></div><div className="metric-list"><Metric icon="check" label="正解数" value={correct} /><Metric icon="close" label="不正解数" value={incorrect} /><Metric icon="chart" label="正答率" value={rate} /><Metric icon="clock" label="学習時間" value={minutes} /></div><div className="rail-divider" /><h3>レートの推移</h3><RatingChart /></div><div className="rail-note"><Icon name="chart" size={25} /><p>コツコツ積み重ねて、<br />もっと高いレベルへ。</p></div></aside>
 }
 
-function PublicLeaderboard({ players = [], currentName = '' }) {
-  const visiblePlayers = players.length ? players.slice(0, 5) : [{ name: 'まだ参加者はいません', rating: '—', answered: 0 }]
-  return <section className="leaderboard-card"><div className="leaderboard-head"><div><span className="section-kicker">PUBLIC RATE</span><h2>みんなのレート</h2></div><span className="leaderboard-live">LIVE</span></div><p className="leaderboard-copy">同じ講座を学ぶ生徒の現在レート</p><div className="leaderboard-list">{visiblePlayers.map((player, index) => <div className={`leaderboard-row ${player.name === currentName ? 'current' : ''}`} key={`${player.name}-${index}`}><span className="leaderboard-rank">{String(index + 1).padStart(2, '0')}</span><span className="leaderboard-name">{player.name}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div></section>
+function PublicLeaderboard({ players = [], currentName = '', limit = 5, onOpen }) {
+  const visiblePlayers = players.length ? players.slice(0, limit) : [{ name: 'まだ参加者はいません', rating: '—', answered: 0 }]
+  return <section className="leaderboard-card"><div className="leaderboard-head"><div><span className="section-kicker">PUBLIC RATE</span><h2>みんなのレート</h2></div><span className="leaderboard-live">LIVE</span></div><p className="leaderboard-copy">同じ講座を学ぶ生徒の現在レート</p><div className="leaderboard-list">{visiblePlayers.map((player, index) => <div className={`leaderboard-row ${player.name === currentName ? 'current' : ''}`} key={`${player.name}-${index}`}><span className="leaderboard-rank">{String(index + 1).padStart(2, '0')}</span><span className="leaderboard-name">{player.name}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div>{onOpen && <button type="button" className="leaderboard-link" onClick={onOpen}>全体ランキングを見る <Icon name="arrow" size={16} /></button>}</section>
+}
+
+function LeaderboardView({ players = [], rating, studentName, refresh, notice }) {
+  return <div className="leaderboard-page">
+    <div className="leaderboard-page-head"><div><p className="section-kicker">PUBLIC RATEBOARD</p><h1>全体ランキング</h1><p className="subcopy">同じ講座に参加している生徒のレートを確認できます。</p></div><button type="button" className="secondary-button leaderboard-refresh" onClick={refresh}><Icon name="history" size={18} />ランキングを更新</button></div>
+    {notice && <div className="app-notice" role="status">{notice}</div>}
+    <div className="leaderboard-overview"><div className="leaderboard-you"><span>YOUR RATE</span><strong>{rating.toLocaleString()}</strong><small>{studentName ? `${studentName} の現在レート` : '名前を入力すると参加できます'}</small></div><div className="leaderboard-rule"><span>RANKING RULE</span><strong>正答で上昇 / 不正解で下降</strong><small>問題ごとに1回だけレートへ反映されます。</small></div></div>
+    <section className="leaderboard-table-card"><div className="leaderboard-table-head"><h2>参加者一覧</h2><span>{players.length ? `${players.length}人` : '共有データなし'}</span></div>{players.length ? <div className="leaderboard-table"><div className="leaderboard-table-row leaderboard-table-label"><span>RANK</span><span>PLAYER</span><span>ANSWERED</span><span>RATE</span></div>{players.map((player, index) => <div className={`leaderboard-table-row ${player.name === studentName ? 'current' : ''}`} key={`${player.name}-${index}`}><strong>{String(index + 1).padStart(2, '0')}</strong><span>{player.name}</span><span>{player.answered ?? 0}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div> : <div className="leaderboard-empty"><Icon name="leaderboard" size={34} /><h3>まだ共有ランキングがありません。</h3><p>共有サーバーに接続すると、他の生徒のレートがここに表示されます。</p></div>}</section>
+  </div>
 }
 
 function Metric({ icon, label, value }) {
