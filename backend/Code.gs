@@ -242,7 +242,7 @@ function digest_(value) {
 
 function answeredIds_(sheet, playerKey, course) {
   return sheet.getDataRange().getValues().slice(1)
-    .filter((row) => row[0] === playerKey && row[1] === course && row[2])
+    .filter((row) => row[0] === playerKey && rankingCourses_(course).includes(String(row[1])) && row[2])
     .map((row) => String(row[2]))
 }
 

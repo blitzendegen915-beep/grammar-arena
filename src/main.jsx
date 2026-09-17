@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useMemo, useState } from 'react'
+import { StrictMode, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 import { FOUNDATION_TRANSLATIONS, GERUND_QUESTIONS, PARTICIPLE_QUESTIONS } from './questionBanks'
@@ -175,10 +175,10 @@ const FOUNDATION_QUESTIONS = QUESTIONS.map((question) => ({
 }))
 
 const COURSE_DETAILS = {
-  'foundation-infinitive': { label: '基礎講座', unit: 'UNIT 01', name: '不定詞', title: '不定詞を、解いて、理解する。', rankingId: 'foundation-course' },
-  'foundation-gerund': { label: '基礎講座', unit: 'UNIT 02', name: '動名詞', title: '動名詞を、解いて、理解する。', rankingId: 'foundation-course' },
-  'foundation-participles': { label: '基礎講座', unit: 'UNIT 03', name: '分詞', title: '分詞を、解いて、理解する。', rankingId: 'foundation-course' },
-  'regular-english-practice': { label: '英語演習', unit: 'REGULAR CLASS', name: '平常授業', title: '平常授業を、解いて、理解する。', rankingId: 'regular-english-practice' },
+  'foundation-infinitive': { label: '基礎講座', eyebrow: 'FOUNDATION COURSE', unit: 'UNIT 01', name: '不定詞', title: '不定詞を、解いて、理解する。', rankingId: 'foundation-course' },
+  'foundation-gerund': { label: '基礎講座', eyebrow: 'FOUNDATION COURSE', unit: 'UNIT 02', name: '動名詞', title: '動名詞を、解いて、理解する。', rankingId: 'foundation-course' },
+  'foundation-participles': { label: '基礎講座', eyebrow: 'FOUNDATION COURSE', unit: 'UNIT 03', name: '分詞', title: '分詞を、解いて、理解する。', rankingId: 'foundation-course' },
+  'regular-english-practice': { label: '英語演習', eyebrow: 'ENGLISH PRACTICE', unit: 'REGULAR CLASS', name: '平常授業', title: '平常授業を、解いて、理解する。', rankingId: 'regular-english-practice' },
 }
 
 const QUESTION_BANKS = {
@@ -320,6 +320,7 @@ function App() {
   const [authName, setAuthName] = useState(() => readPersisted().studentName || '')
   const [authPin, setAuthPin] = useState('')
   const [authBusy, setAuthBusy] = useState(false)
+  const leaderboardRequestRef = useRef(0)
 
   const question = queue[index]
   const isComplete = !question
@@ -379,6 +380,7 @@ function App() {
         studentName: result.name,
         authToken: result.authToken,
         rating: Number(result.rating) || DEFAULT_RATING,
+        ratingsByCourse: { ...(current.ratingsByCourse || {}), [getRankingCourseId(modeId)]: Number(result.rating) || DEFAULT_RATING },
         answeredIds: serverAnsweredIds,
         answeredByCourse: { ...(current.answeredByCourse || {}), [getRankingCourseId(modeId)]: serverAnsweredIds, [modeId]: serverAnsweredIds },
         publicLeaderboard: Array.isArray(result.players) ? result.players : current.publicLeaderboard,
@@ -406,8 +408,11 @@ function App() {
 
   const changeMode = (nextModeId) => {
     const nextAnsweredIds = answeredIdsForCourse(nextModeId)
+    const nextRankingId = getRankingCourseId(nextModeId)
+    const nextRating = persisted.ratingsByCourse?.[nextRankingId] || (nextRankingId === getRankingCourseId(modeId) ? persisted.rating : DEFAULT_RATING)
     setModeId(nextModeId)
-    setPersisted((current) => ({ ...current, answeredIds: nextAnsweredIds }))
+    setPersisted((current) => ({ ...current, rating: nextRating, answeredIds: nextAnsweredIds }))
+    setSessionRatingStart(nextRating)
     setFilter('all')
     setQueue(buildQueue('all', nextAnsweredIds, getQuestionBank(nextModeId)))
     setIndex(0)
@@ -459,11 +464,14 @@ function App() {
       setNotice('共有ランキングはサーバー接続後に表示されます。')
       return
     }
+    const requestId = ++leaderboardRequestRef.current
+    const rankingId = getRankingCourseId(modeId)
     try {
-      const data = await requestScoreApi({ action: 'leaderboard', course: getRankingCourseId(modeId) })
+      const data = await requestScoreApi({ action: 'leaderboard', course: rankingId })
+      if (requestId !== leaderboardRequestRef.current) return
       if (data.ok && Array.isArray(data.players)) setPersisted((current) => ({ ...current, publicLeaderboard: data.players }))
     } catch {
-      setNotice('公開ランキングを読み込めませんでした。')
+      if (requestId === leaderboardRequestRef.current) setNotice('公開ランキングを読み込めませんでした。')
     }
   }
 
@@ -520,7 +528,7 @@ function App() {
         if (!result.ok) throw new Error('score-api')
         nextRating = result.rating
         serverDelta = result.delta
-        if (Array.isArray(result.players)) setPersisted((current) => ({ ...current, publicLeaderboard: result.players }))
+        if (Array.isArray(result.players)) setPersisted((current) => ({ ...current, publicLeaderboard: result.players, ratingsByCourse: { ...(current.ratingsByCourse || {}), [getRankingCourseId(modeId)]: Number(result.rating) || nextRating } }))
       } catch {
         setNotice('共有サーバーに接続できないため、この回答は保存されていません。再試行してください。')
         setSubmitting(false)
@@ -613,7 +621,7 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
     <div className="landing-layout">
       <section className="landing-hero">
         <div className="landing-eyebrow"><span className="landing-mark"><Icon name="practice" size={25} /></span><span>WELCOME TO GRAMMAR ARENA</span></div>
-        <p className="section-kicker">FOUNDATION COURSE / {course.unit}</p>
+      <p className="section-kicker">{course.eyebrow} / {course.unit}</p>
         <h1>レートを確認して、<br /><em>対戦を始める。</em></h1>
         <p className="landing-copy">生徒名と暗証番号でログインすると、現在レートを確認してから{course.label}・{course.name}の10問対戦を始められます。</p>
         <div className="auth-tabs" role="tablist" aria-label="アカウント操作">
@@ -656,7 +664,7 @@ function NavItem({ icon, label, active, onClick }) {
 function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName, openLeaderboard }) {
   return <div className="practice-layout">
     <section className="practice-column">
-      <div className="course-banner"><div><span className="course-banner-label">FOUNDATION COURSE</span><strong>{course.label}</strong><span className="course-banner-unit">{course.unit} / {course.name}</span></div><span className="course-stamp">STUDY</span></div>
+      <div className="course-banner"><div><span className="course-banner-label">{course.eyebrow}</span><strong>{course.label}</strong><span className="course-banner-unit">{course.unit} / {course.name}</span></div><span className="course-stamp">STUDY</span></div>
       <div className="section-heading"><div><p className="section-kicker">{course.label} / {course.name}</p><h1>{course.title}</h1><p className="session-hint">1セッション {SESSION_LENGTH}問 / {filter === 'all' ? '全レベルミックス' : `${DIFFICULTY[filter].label}を優先して出題`}</p></div><div className="difficulty-tabs" role="tablist" aria-label="難易度"><DifficultyTab value="all" current={filter} onClick={setFilter} label="すべて" /><DifficultyTab value="starter" current={filter} onClick={setFilter} label="基礎" /><DifficultyTab value="standard" current={filter} onClick={setFilter} label="標準" /><DifficultyTab value="advanced" current={filter} onClick={setFilter} label="発展" /></div></div>
       {notice && <div className="app-notice" role="status">{notice}</div>}
       {isComplete ? <CompleteCard score={sessionScore} queue={queue} restart={() => restart(filter)} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting }} />}
