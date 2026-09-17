@@ -408,10 +408,12 @@ function App() {
 
   const changeMode = (nextModeId) => {
     const nextAnsweredIds = answeredIdsForCourse(nextModeId)
+    const currentRankingId = getRankingCourseId(modeId)
     const nextRankingId = getRankingCourseId(nextModeId)
-    const nextRating = persisted.ratingsByCourse?.[nextRankingId] || (nextRankingId === getRankingCourseId(modeId) ? persisted.rating : DEFAULT_RATING)
+    const ratingsByCourse = { ...(persisted.ratingsByCourse || {}), [currentRankingId]: persisted.rating }
+    const nextRating = ratingsByCourse[nextRankingId] || DEFAULT_RATING
     setModeId(nextModeId)
-    setPersisted((current) => ({ ...current, rating: nextRating, answeredIds: nextAnsweredIds, publicLeaderboard: [] }))
+    setPersisted((current) => ({ ...current, rating: nextRating, ratingsByCourse, answeredIds: nextAnsweredIds, publicLeaderboard: [] }))
     setSessionRatingStart(nextRating)
     setFilter('all')
     setQueue(buildQueue('all', nextAnsweredIds, getQuestionBank(nextModeId)))
