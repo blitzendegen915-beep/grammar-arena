@@ -25,6 +25,7 @@ const STORAGE_KEY = 'grammar-arena-v1'
 const SCORE_API_URL = import.meta.env.VITE_SCORE_API_URL || 'https://script.google.com/macros/s/AKfycbw0HAcZcaqv8vRsU4uz02rKB7-jdsWM-xZrNwlHTlEyGOEdCSTWnaDBlqCuCv4Ho8AelQ/exec'
 const DEFAULT_RATING = 1240
 const SESSION_LENGTH = 10
+const DEFAULT_MODE_ID = 'foundation-infinitive'
 
 const DEFAULT_PERSISTED = {
   rating: DEFAULT_RATING,
@@ -39,6 +40,7 @@ const DEFAULT_PERSISTED = {
   authoritativeRatingsBySyncKey: {},
   answerSyncQueue: [],
   studyTimeByDate: {},
+  modeId: DEFAULT_MODE_ID,
 }
 
 const QUESTIONS = [
@@ -359,7 +361,10 @@ function App() {
     const initial = readPersisted()
     return initial.studentName && initial.authToken ? 'lobby' : 'landing'
   })
-  const [modeId, setModeId] = useState('foundation-infinitive')
+  const [modeId, setModeId] = useState(() => {
+    const initial = readPersisted()
+    return COURSE_DETAILS[initial.modeId] ? initial.modeId : DEFAULT_MODE_ID
+  })
   const [filter, setFilter] = useState('all')
   const [queue, setQueue] = useState(() => {
     const initial = readPersisted()
@@ -412,6 +417,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted))
   }, [persisted])
+
+  useEffect(() => {
+    setPersisted((current) => current.modeId === modeId ? current : { ...current, modeId })
+  }, [modeId])
 
   useEffect(() => {
     if (!hasSession || view !== 'practice' || isComplete) return undefined
@@ -494,7 +503,7 @@ function App() {
       }))
       setAuthName(result.name)
       setAuthPin('')
-      setSessionRatingStart(displayedRating)
+      setSessionRatingStart(serverRating)
       setNotice('')
       setView('lobby')
     } catch {
@@ -522,8 +531,11 @@ function App() {
     const ratingsByCourse = { ...(persisted.ratingsByCourse || {}), [currentRankingId]: persisted.rating }
     const nextRating = ratingsByCourse[nextRankingId] || DEFAULT_RATING
     setModeId(nextModeId)
-    setPersisted((current) => ({ ...current, rating: nextRating, ratingsByCourse, answeredIds: nextAnsweredIds, publicLeaderboard: [] }))
-    setSessionRatingStart(nextRating)
+    const nextSyncKey = hasSession ? getSyncKey({ name: persisted.studentName, authToken: persisted.authToken, course: nextRankingId }) : ''
+    const storedAuthoritative = Number(persisted.authoritativeRatingsBySyncKey?.[nextSyncKey])
+    const nextSessionRating = Number.isFinite(storedAuthoritative) ? storedAuthoritative : nextRating
+    setPersisted((current) => ({ ...current, modeId: nextModeId, rating: nextRating, ratingsByCourse, answeredIds: nextAnsweredIds, publicLeaderboard: [] }))
+    setSessionRatingStart(nextSessionRating)
     setFilter('all')
     setQueue(buildQueue('all', nextAnsweredIds, getQuestionBank(nextModeId)))
     setIndex(0)
@@ -550,7 +562,7 @@ function App() {
     setSessionScore({ correct: 0, answered: 0 })
     setSessionAnswers([])
     setSessionCompletedAt('')
-    setSessionRatingStart(persisted.rating)
+    setSessionRatingStart(authoritativeRating)
     setNotice('')
     setView(hasSession ? 'practice' : 'landing')
   }
@@ -804,8 +816,8 @@ function App() {
         label: filter === 'all' ? 'ミックス演習' : `${DIFFICULTY[filter].label}演習`,
         correct: sessionScore.correct,
         total: sessionScore.answered,
-        ratingDelta: persisted.rating - sessionRatingStart,
-        ratingAfter: persisted.rating,
+        ratingDelta: authoritativeRating - sessionRatingStart,
+        ratingAfter: authoritativeRating,
       }
       setPersisted((current) => ({ ...current, history: [session, ...current.history].slice(0, 20), studyTimeByDate: { ...(current.studyTimeByDate || {}), [localDateKey()]: todaySecondsRef.current } }))
       setSessionCompletedAt(completedAt)
@@ -865,7 +877,7 @@ function App() {
           {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={authoritativeRating} leaderboard={persisted.publicLeaderboard} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
           {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
           {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={persisted.publicLeaderboard} rating={authoritativeRating} studentName={persisted.studentName} refresh={refreshLeaderboard} notice={notice} />}
-          {view === 'history' && <HistoryView history={persisted.history} rating={persisted.rating} />}
+          {view === 'history' && <HistoryView history={persisted.history} rating={authoritativeRating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
         </div>
       </main>
