@@ -411,7 +411,7 @@ function App() {
     const nextRankingId = getRankingCourseId(nextModeId)
     const nextRating = persisted.ratingsByCourse?.[nextRankingId] || (nextRankingId === getRankingCourseId(modeId) ? persisted.rating : DEFAULT_RATING)
     setModeId(nextModeId)
-    setPersisted((current) => ({ ...current, rating: nextRating, answeredIds: nextAnsweredIds }))
+    setPersisted((current) => ({ ...current, rating: nextRating, answeredIds: nextAnsweredIds, publicLeaderboard: [] }))
     setSessionRatingStart(nextRating)
     setFilter('all')
     setQueue(buildQueue('all', nextAnsweredIds, getQuestionBank(nextModeId)))
