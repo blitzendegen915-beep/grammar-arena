@@ -315,7 +315,10 @@ async function hashPin(pin) {
 
 function requestScoreApi(params, { signal } = {}) {
   if (!SCORE_API_URL) return Promise.reject(new Error('score-api-not-configured'))
-  const body = new URLSearchParams(params).toString()
+  // Keep URLSearchParams as the body object so fetch sets the form content
+  // type Apps Script uses to populate e.parameter. Passing .toString() here
+  // turns it into text/plain and makes every POST look like a leaderboard read.
+  const body = new URLSearchParams(params)
   const controller = signal ? null : typeof AbortController === 'undefined' ? null : new AbortController()
   const timeout = controller ? window.setTimeout(() => controller.abort(), 15000) : null
   return fetch(SCORE_API_URL, { method: 'POST', body, cache: 'no-store', signal: signal || controller?.signal }).then((response) => {
