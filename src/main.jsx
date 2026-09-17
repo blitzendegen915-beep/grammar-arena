@@ -317,6 +317,10 @@ function App() {
         setNotice(messages[result.reason] || 'ログインできませんでした。入力内容を確認してください。')
         return
       }
+      if (!result.authToken) {
+        setNotice('ログイン情報を受け取れませんでした。管理者がApps Scriptを更新してから再試行してください。')
+        return
+      }
       setPersisted((current) => ({
         ...current,
         studentName: result.name,
@@ -560,7 +564,6 @@ function LobbyView({ studentName, rating, leaderboard, startPractice, openLeader
       <div className="landing-eyebrow"><span className="landing-mark"><Icon name="leaderboard" size={25} /></span><span>READY FOR RATED MATCH</span></div>
       <p className="section-kicker">WELCOME BACK / {studentName}</p>
       <h1>レート対戦の準備完了。</h1>
-      <p className="landing-copy">現在のレートを確認しました。基礎講座・不定詞から10問に挑戦して、正答でレートを上げよう。</p>
       <div className="lobby-rate"><span>YOUR CURRENT RATE</span><strong>{rating.toLocaleString()}</strong><small>{studentName} の現在レート</small></div>
       <button type="button" className="primary-button lobby-start" onClick={startPractice}>レート対戦を始める<Icon name="arrow" size={21} /></button>
     </section>
