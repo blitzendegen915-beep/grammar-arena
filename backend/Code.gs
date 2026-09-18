@@ -1396,7 +1396,7 @@ const QUESTION_REGISTRY = {
 function doGet(e) {
   const params = e && e.parameter ? e.parameter : {}
   if ((params.action || 'leaderboard') !== 'leaderboard') return json_({ ok: false, reason: 'post-required' }, params.callback)
-  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.callback)
+  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
 }
 
 function doPost(e) {
@@ -1407,7 +1407,7 @@ function doPost(e) {
   if (action === 'session') return sessionPlayer_(params)
   if (action === 'update-profile') return updatePlayerProfile_(params)
   if (action === 'answer') return recordAnswer_(params)
-  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.callback)
+  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
 }
 
 function setup() {
@@ -1542,8 +1542,11 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
     poolId,
     ...ensurePoolProfile_(poolProfiles, courseProfiles, playerKey, course, poolId, Number(row[2]) || 1240, Number(row[3]) || 0),
   }))
-  const activePool = poolIds.includes(requestedPool) ? requestedPool : poolIds[0]
-  const activeProfile = profiles.find((profile) => profile.poolId === activePool) || profiles[0]
+  const activePool = poolIds.includes(requestedPool) ? requestedPool : poolIds[0] || ''
+  const activeProfile = profiles.find((profile) => profile.poolId === activePool) || profiles[0] || {
+    rating: Number(row[2]) || 1240,
+    answered: Number(row[3]) || 0,
+  }
   const ratings = Object.fromEntries(profiles.map((profile) => [profile.poolId, { rating: profile.rating, answered: profile.answered }]))
   return {
     ok: true,
@@ -1559,7 +1562,7 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
     poolId: activePool,
     poolIds,
     ratings,
-    players: leaderboard_(players, courseProfiles, poolProfiles, course, activePool),
+    players: activePool ? leaderboard_(players, courseProfiles, poolProfiles, course, activePool) : [],
   }
 }
 
@@ -1598,10 +1601,9 @@ function rankingCourses_(course) {
 function playerPools_(row) {
   const grade = cleanGrade_(row[7])
   const className = cleanClassName_(row[8])
-  if (!grade || !className) return [FOUNDATION_POOL_ID]
-  const pools = [grade + '-' + className]
-  if (String(row[9] || '').toLowerCase() === 'true') pools.push(FOUNDATION_POOL_ID)
-  return pools
+  if (String(row[9] || '').toLowerCase() === 'true') return [FOUNDATION_POOL_ID]
+  if (!grade || !className) return []
+  return [grade + '-' + className]
 }
 
 function ensurePoolProfile_(poolSheet, legacySheet, playerKey, course, poolId, fallbackRating, fallbackAnswered) {
@@ -1669,6 +1671,7 @@ function recordAnswer_(params) {
     const playerIndex = auth.playerIndex
     const playerRow = playerRows[playerIndex]
     const poolIds = playerPools_(playerRow)
+    if (!poolIds.length) return json_({ ok: false, reason: 'placement-required' }, params.callback)
     const profiles = poolIds.map((poolId) => ({
       poolId,
       ...ensurePoolProfile_(poolProfiles, courseProfiles, playerKey, course, poolId, Number(playerRow[2]) || 1240, Number(playerRow[3]) || 0),
@@ -1710,13 +1713,17 @@ function recordAnswer_(params) {
   }
 }
 
-function getLeaderboard_(course, poolId, callback) {
+function getLeaderboard_(course, poolId, name, authToken, callback) {
   course = cleanCourse_(course) || COURSE_NAME
   const book = getBook_()
   const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
   const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
   const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
-  const activePool = cleanPoolId_(poolId) || (course === COURSE_NAME ? FOUNDATION_POOL_ID : 'all')
+  const auth = authenticate_(players, cleanName_(name), String(authToken || ''))
+  if (!auth) return json_({ ok: false, reason: 'auth-required', players: [] }, callback)
+  const memberPools = playerPools_(players.getDataRange().getValues()[auth.playerIndex])
+  const activePool = cleanPoolId_(poolId) || memberPools[0] || ''
+  if (!activePool || !memberPools.includes(activePool)) return json_({ ok: false, reason: 'pool-forbidden', poolId: activePool, allowedPoolId: memberPools[0] || '', players: [] }, callback)
   return json_({ ok: true, course, poolId: activePool, players: leaderboard_(players, courseProfiles, poolProfiles, course, activePool) }, callback)
 }
 

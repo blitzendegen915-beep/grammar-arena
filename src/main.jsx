@@ -276,9 +276,14 @@ function readPersisted() {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return { ...DEFAULT_PERSISTED }
     const parsed = JSON.parse(raw)
+    const restored = { ...DEFAULT_PERSISTED, ...parsed }
+    const restoredPoolId = restored.grade && restored.className ? preferredPoolId(restored) : ''
     return {
-      ...DEFAULT_PERSISTED,
-      ...parsed,
+      ...restored,
+      // Never render a cached name list before the authenticated pool is re-read.
+      publicLeaderboard: [],
+      poolIds: restoredPoolId ? [restoredPoolId] : [],
+      rankingPoolId: restoredPoolId || 'foundation',
       answerSyncQueue: recoverAnswerQueue(Array.isArray(parsed.answerSyncQueue) ? parsed.answerSyncQueue : []),
     }
   } catch { return { ...DEFAULT_PERSISTED } }
@@ -462,6 +467,9 @@ function App() {
   const authoritativeRating = hasSession ? getAuthoritativeRating(persisted, answerSyncKey, rankingPoolId) : DEFAULT_RATING
   const provisionalDelta = hasSession ? persisted.rating - authoritativeRating : 0
   const hasActivePractice = hasSession && view === 'practice' && !isComplete
+  const allowedPoolOptions = hasSession
+    ? RANKING_POOL_OPTIONS.filter((pool) => Array.isArray(persisted.poolIds) && persisted.poolIds.includes(pool.id))
+    : []
   const student = { name: hasSession ? persisted.studentName : '未ログイン', grade: hasSession ? 'STUDENT' : 'NAME REQUIRED' }
 
   useEffect(() => {
@@ -647,6 +655,10 @@ function App() {
 
   const changeRankingPool = (nextPoolId) => {
     if (!RANKING_POOL_OPTIONS.some((pool) => pool.id === nextPoolId) || nextPoolId === rankingPoolId) return
+    if (!hasSession || !Array.isArray(persisted.poolIds) || !persisted.poolIds.includes(nextPoolId)) {
+      setNotice('所属プールのみ表示できます。')
+      return
+    }
     if (hasActivePractice && !window.confirm('進行中の10問を破棄してランキング対象を変更しますか？')) return
     const currentCourse = getRankingCourseId(modeId)
     const currentScope = ratingScopeKey(currentCourse, rankingPoolId)
@@ -748,24 +760,34 @@ function App() {
   }
 
   const refreshLeaderboard = async () => {
+    if (!hasSession || !persisted.studentName || !persisted.authToken) {
+      setPersisted((current) => current.publicLeaderboard.length ? { ...current, publicLeaderboard: [] } : current)
+      return
+    }
     if (!SCORE_API_URL) {
       setNotice('共有ランキングはサーバー接続後に表示されます。')
+      return
+    }
+    if (!Array.isArray(persisted.poolIds) || !persisted.poolIds.includes(rankingPoolId)) {
+      setPersisted((current) => current.publicLeaderboard.length ? { ...current, publicLeaderboard: [] } : current)
       return
     }
     const requestId = ++leaderboardRequestRef.current
     const rankingId = getRankingCourseId(modeId)
     try {
-      const data = await requestScoreApi({ action: 'leaderboard', course: rankingId, poolId: rankingPoolId })
+      const data = await requestScoreApi({ action: 'leaderboard', course: rankingId, poolId: rankingPoolId, name: persisted.studentName, authToken: persisted.authToken })
       if (requestId !== leaderboardRequestRef.current) return
       if (data.ok && Array.isArray(data.players)) setPersisted((current) => ({ ...current, publicLeaderboard: data.players }))
+      else setPersisted((current) => ({ ...current, publicLeaderboard: [] }))
     } catch {
       if (requestId === leaderboardRequestRef.current) setNotice('公開ランキングを読み込めませんでした。')
     }
   }
 
   useEffect(() => {
-    if (SCORE_API_URL) refreshLeaderboard()
-  }, [modeId, rankingPoolId])
+    if (SCORE_API_URL && hasSession) refreshLeaderboard()
+    if (!hasSession) setPersisted((current) => current.publicLeaderboard.length ? { ...current, publicLeaderboard: [] } : current)
+  }, [modeId, rankingPoolId, hasSession, persisted.studentName, persisted.authToken, persisted.poolIds])
 
   useEffect(() => {
     if (!SCORE_API_URL || !hasSession || !answerSyncIdentity) return undefined
@@ -774,6 +796,8 @@ function App() {
     requestScoreApi({ action: 'session', course: identity.course, poolId: rankingPoolId, name: identity.name, authToken: identity.authToken }, { signal: controller?.signal })
       .then((result) => {
         if (!result.ok || activeRef.current.token !== identity.authToken || activeRef.current.course !== identity.course || activeRef.current.poolId !== rankingPoolId) return
+        const nextPoolId = result.poolId || preferredPoolId(result)
+        if (nextPoolId && nextPoolId !== rankingPoolId) setRankingPoolId(nextPoolId)
         const serverRating = Number(result.rating) || DEFAULT_RATING
         const syncKey = getSyncKey(identity)
         setPersisted((current) => {
@@ -782,6 +806,7 @@ function App() {
           return {
             ...current,
             rating: displayedRating,
+            rankingPoolId: nextPoolId || current.rankingPoolId,
             ratingsByCourse: { ...(current.ratingsByCourse || {}), [identity.course]: displayedRating },
             ratingsByScope: { ...(current.ratingsByScope || {}), ...ratingsToScopeMap(result.ratings, identity.course, { [ratingScopeKey(identity.course, rankingPoolId)]: displayedRating }) },
             authoritativeRatingsBySyncKey: { ...(current.authoritativeRatingsBySyncKey || {}), [syncKey]: serverRating },
@@ -1020,16 +1045,16 @@ function App() {
           <div className="topbar-spacer" />
           <div className="selector-stack name-stack"><label htmlFor="student-name">生徒</label><div id="student-name" className="name-display">{persisted.studentName || '未ログイン'}</div><span>{hasSession ? 'ログイン中 / ランキングに表示' : '暗証番号でログイン'}</span></div>
           <div className="selector-stack course-switcher"><label htmlFor="course-selector">講座</label><select id="course-selector" value={modeId} onChange={(event) => changeMode(event.target.value)}>{COURSE_MODES.map((course) => <option key={course.id} value={course.id} disabled={!course.available}>{course.label}</option>)}</select><span>講座と所属別にランキングが分かれます</span></div>
-          <div className="selector-stack pool-switcher"><label htmlFor="ranking-pool-selector">ランキング</label><select id="ranking-pool-selector" value={rankingPoolId} onChange={(event) => changeRankingPool(event.target.value)}>{RANKING_POOL_OPTIONS.map((pool) => <option key={pool.id} value={pool.id}>{pool.label}</option>)}</select><span>{poolLabel(rankingPoolId)}の参加者を表示</span></div>
+          {hasSession && allowedPoolOptions.length > 0 && <div className="selector-stack pool-switcher"><label htmlFor="ranking-pool-selector">ランキング</label><select id="ranking-pool-selector" value={rankingPoolId} onChange={(event) => changeRankingPool(event.target.value)}>{allowedPoolOptions.map((pool) => <option key={pool.id} value={pool.id}>{pool.label}</option>)}</select><span>{poolLabel(rankingPoolId)}の参加者を表示</span></div>}
           {hasSession && <button type="button" className="logout-button" onClick={logout}>ログアウト</button>}
           <div className="profile-orb" aria-hidden="true">{student.name.slice(0, 1)}</div>
         </header>
 
         <div className="content-wrap">
-          {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, setNotice, leaderboard: persisted.publicLeaderboard, rankingPoolId }} />}
-          {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={authoritativeRating} leaderboard={persisted.publicLeaderboard} rankingPoolId={rankingPoolId} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
-          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
-          {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={persisted.publicLeaderboard} rating={authoritativeRating} studentName={persisted.studentName} rankingPoolId={rankingPoolId} refresh={refreshLeaderboard} notice={notice} />}
+          {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, setNotice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId }} />}
+          {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={authoritativeRating} leaderboard={hasSession ? persisted.publicLeaderboard : []} rankingPoolId={rankingPoolId} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
+          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
+          {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={hasSession ? persisted.publicLeaderboard : []} rating={authoritativeRating} studentName={persisted.studentName} rankingPoolId={rankingPoolId} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={authoritativeRating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
         </div>
@@ -1065,7 +1090,7 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
               <div><label htmlFor="landing-class">クラス</label><select id="landing-class" value={authClassName} onChange={(event) => setAuthClassName(event.target.value)}>{CLASS_OPTIONS.map((className) => <option key={className} value={className}>{className}組</option>)}</select></div>
             </div>
             <label className="placement-check"><input type="checkbox" checked={authFoundationMember} onChange={(event) => setAuthFoundationMember(event.target.checked)} /><span>基礎講座受講中</span></label>
-            <p className="placement-help">クラスランキングには全員参加。チェックを入れると基礎講座ランキングにも参加します。</p>
+            <p className="placement-help">チェックを入れると基礎講座ランキング、入れない場合は所属クラスランキングに参加します。</p>
           </>}
           {notice && <p className="auth-notice" role="alert">{notice}</p>}
           <button type="submit" className="primary-button landing-start" disabled={authBusy}>{authBusy ? '確認中…' : placementSetup ? '所属情報を保存して開始' : authMode === 'login' ? 'ログインしてレート確認' : '登録してレート対戦へ'}<Icon name="arrow" size={21} /></button>
