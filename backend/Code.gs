@@ -10,6 +10,10 @@ const ALLOWED_COURSES = ['foundation-course', 'regular-english-practice']
 const ALLOWED_GRADES = ['1', '2', '3']
 const ALLOWED_CLASSES = 'ABCDEFGHIJKLM'.split('')
 const FOUNDATION_POOL_ID = 'foundation'
+const JAPANESE_INAPPROPRIATE_PATTERNS = [
+  /(?:死ね|しね|消えろ|きえろ|殺す|ころす|殺せ|ころせ|レイプ|強姦|ちんこ|ちんぽ|まんこ|おっぱい|セックス|えっち|オナニー|自慰|精子|ペニス|ヴァギナ|アナル|肛門|フェラ|裸|ばか(?!り)|馬鹿|バカ(?!り)|アホ|あほ|ブス|デブ|ハゲ|クズ|ゴミ|カス|無能|キモい|きもい|うざい)/i,
+]
+const ENGLISH_INAPPROPRIATE_PATTERN = /(?:^|[^a-z0-9])(fuck(?:ing|ed|er)?|shit|bitch|asshole|dick|pussy|cunt|cock|nigger|faggot|slut|whore|rape)(?:$|[^a-z0-9])/i
 const QUESTION_REGISTRY = {
   "l13-01": {
     "course": "foundation-course",
@@ -1452,6 +1456,7 @@ function registerPlayer_(params) {
   const className = cleanClassName_(params.className)
   const foundationMember = cleanBoolean_(params.foundationMember)
   if (!name || !playerKey || !pinHash) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
+  if (isInappropriateContent_(name)) return json_({ ok: false, reason: 'inappropriate-content' }, params.callback)
   if (!grade || !className) return json_({ ok: false, reason: 'placement-required' }, params.callback)
 
   const lock = LockService.getScriptLock()
@@ -1488,6 +1493,7 @@ function loginPlayer_(params) {
   const pinHash = cleanPinHash_(params.pinHash)
   const course = cleanCourse_(params.course) || COURSE_NAME
   if (!name || !playerKey || !pinHash) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
+  if (isInappropriateContent_(name)) return json_({ ok: false, reason: 'inappropriate-content' }, params.callback)
 
   const lock = LockService.getScriptLock()
   lock.waitLock(10000)
@@ -1572,6 +1578,7 @@ function updatePlayerProfile_(params) {
   const grade = cleanGrade_(params.grade)
   const className = cleanClassName_(params.className)
   if (!name || !token || !grade || !className) return json_({ ok: false, reason: 'placement-required' }, params.callback)
+  if (isInappropriateContent_(name)) return json_({ ok: false, reason: 'inappropriate-content' }, params.callback)
 
   const lock = LockService.getScriptLock()
   lock.waitLock(10000)
@@ -1678,11 +1685,12 @@ function recordAnswer_(params) {
     }))
     const activePool = poolIds.includes(requestedPool) ? requestedPool : poolIds[0]
     const activeProfile = profiles.find((profile) => profile.poolId === activePool) || profiles[0]
+    const submittedAnswer = String(params.answer || '')
+    if (isInappropriateContent_(submittedAnswer)) return json_({ ok: false, reason: 'inappropriate-content', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles) }, params.callback)
     const rows = answers.getDataRange().getValues()
     const duplicate = rows.slice(1).some((row) => row[0] === playerKey && rankingCourses_(course).includes(String(row[1])) && row[2] === questionId)
     // A retry may follow a lost response. Return the authoritative rating without scoring twice.
     if (duplicate) return json_({ ok: false, reason: 'already-answered', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles) }, params.callback)
-    const submittedAnswer = String(params.answer || '')
     // New clients send the answer text. Older queued answers only have the
     // browser's result, so retain a temporary compatibility path for them.
     const serverValidated = submittedAnswer.length > 0
@@ -1756,6 +1764,13 @@ function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, cour
 
 function cleanName_(value) {
   return String(value || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 20)
+}
+
+function isInappropriateContent_(value) {
+  const original = String(value || '').normalize('NFKC').toLowerCase().trim()
+  if (!original) return false
+  const compact = original.replace(/[\s\p{P}\p{S}]+/gu, '')
+  return JAPANESE_INAPPROPRIATE_PATTERNS.some((pattern) => pattern.test(original) || pattern.test(compact)) || ENGLISH_INAPPROPRIATE_PATTERN.test(original)
 }
 
 function cleanCourse_(value) {

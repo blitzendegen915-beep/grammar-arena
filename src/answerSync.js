@@ -206,6 +206,12 @@ export async function flushAnswerQueue({
         onResult({ type: 'invalid-session', entry: invalidSessionEntry, result, queue: working })
         break
       }
+      if (result?.reason === 'inappropriate-content') {
+        working = working.filter((item) => item.id !== entry.id)
+        onChange(working)
+        onResult({ type: 'blocked', entry, result, queue: working })
+        continue
+      }
       throw new Error(result?.reason || 'score-api-rejected')
     } catch (error) {
       const attempt = (Number(entry.attempt) || 0) + 1

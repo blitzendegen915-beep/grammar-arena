@@ -5,6 +5,7 @@ import { FOUNDATION_TRANSLATIONS, GERUND_QUESTIONS, PARTICIPLE_QUESTIONS } from 
 import { REGULAR_QUESTIONS } from './regularQuestions'
 import { isBlankPlaceholder, withBlankCount } from './questionQuality'
 import { getQuestionTranslation } from './questionPresentation'
+import { isModerationBlocked, MODERATION_NOTICE } from './contentModeration'
 import {
   ANSWER_SYNC_MAX_ATTEMPTS,
   ANSWER_SYNC_TIMEOUT_MS,
@@ -562,6 +563,10 @@ function App() {
       setNotice('生徒名を入力してください。')
       return
     }
+    if (isModerationBlocked(name)) {
+      setNotice(MODERATION_NOTICE)
+      return
+    }
     if (!isPlacement && !/^\d{4,8}$/.test(authPin)) {
       setNotice('暗証番号は4〜8桁の数字で設定してください。')
       return
@@ -585,6 +590,7 @@ function App() {
           'wrong-pin': '暗証番号が一致しません。',
           'placement-required': '学年とクラスを選択してください。',
           'invalid-session': '登録情報を確認できませんでした。もう一度ログインしてください。',
+          'inappropriate-content': MODERATION_NOTICE,
         }
         setNotice(messages[result.reason] || 'ログインできませんでした。入力内容を確認してください。')
         return
@@ -898,6 +904,7 @@ function App() {
           ? (hasAuthoritativeRating ? 'synced' : 'synced-unconfirmed')
           : type === 'duplicate'
             ? (hasAuthoritativeRating ? 'duplicate' : 'duplicate-unconfirmed')
+            : type === 'blocked' ? 'blocked'
             : type === 'retry-scheduled' ? 'pending' : 'error'
         const syncError = type === 'invalid-session' ? 'invalid-session' : type === 'failed' ? entry.lastError : ''
         setPersisted((current) => {
@@ -923,6 +930,7 @@ function App() {
         })
         if (activeRef.current.token !== entry.authToken || activeRef.current.course !== entry.course) return
         if (type === 'invalid-session') setNotice('回答は端末に保管されています。再ログインして保存を再開してください。')
+        if (type === 'blocked') setNotice('不適切な表現を含む解答は保存できません。表現を見直してください。')
         setSubmittedSync(entry.questionId, {
           ...(result?.serverValidated === true && typeof result.correct === 'boolean' ? { correct: result.correct } : {}),
           syncStatus,
@@ -953,6 +961,10 @@ function App() {
     }
     const userAnswer = currentAnswer()
     if (!userAnswer.trim()) return
+    if (isModerationBlocked(userAnswer)) {
+      setNotice('不適切な表現は解答として送信できません。表現を見直してください。')
+      return
+    }
     const correct = isCorrectAnswer(question, userAnswer)
     const delta = correct ? RATING_POINTS[question.difficulty] : -RATING_LOSS[question.difficulty]
     submitLock.current = true
@@ -1176,7 +1188,7 @@ function renderSentence(sentence = '') {
 }
 
 function Feedback({ question, result, onRetry }) {
-  const syncCopy = result.syncStatus === 'not-rated' ? '復習問題（レート変動なし）' : result.syncStatus === 'pending' ? '保存待ち（次の問題へ進めます）' : result.syncStatus === 'error' ? '保存できませんでした' : result.syncStatus === 'synced' || result.syncStatus === 'duplicate' ? 'レート保存済み' : ''
+  const syncCopy = result.syncStatus === 'not-rated' ? '復習問題（レート変動なし）' : result.syncStatus === 'pending' ? '保存待ち（次の問題へ進めます）' : result.syncStatus === 'blocked' ? '不適切な表現のため保存されませんでした' : result.syncStatus === 'error' ? '保存できませんでした' : result.syncStatus === 'synced' || result.syncStatus === 'duplicate' ? 'レート保存済み' : ''
   return <div id="explanation" className={`feedback ${result.correct ? 'feedback-correct' : 'feedback-wrong'}`}><div className="feedback-title"><span className="feedback-icon"><Icon name={result.correct ? 'check' : 'close'} size={17} /></span><strong>{result.correct ? '正解です' : '今回は不正解'}</strong><span className="feedback-delta">{result.delta > 0 ? `レート +${result.delta}` : `レート ${result.delta}`}</span></div>{syncCopy && <div className={`feedback-sync ${result.syncStatus === 'error' ? 'is-error' : ''}`}><span>{syncCopy}</span>{result.syncStatus === 'error' && <button type="button" onClick={onRetry}>この問題を再送</button>}</div>}<div className="correction"><span>正答</span><strong>{result.correctAnswer}</strong></div>{question.translation && question.type !== 'input' && <div className="translation"><span>日本語訳</span><p>{question.translation}</p></div>}<p>{question.explanation}</p><small>{question.source}</small></div>
 }
 

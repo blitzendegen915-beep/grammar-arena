@@ -142,6 +142,20 @@ test('paused or delayed first answer blocks later answers in the same scope', as
   assert.equal(result[1].status, 'pending')
 })
 
+test('permanent moderation rejection is removed without retrying', async () => {
+  const pending = answer()
+  const events = []
+  const result = await flushAnswerQueue({
+    queue: [pending],
+    identity: pending.syncKey,
+    send: async () => ({ ok: false, reason: 'inappropriate-content', rating: 1240, delta: 0 }),
+    onResult: (event) => events.push(event.type),
+  })
+
+  assert.deepEqual(result, [])
+  assert.deepEqual(events, ['blocked'])
+})
+
 test('pending answers can move to a freshly issued auth token without crossing names', () => {
   const pending = answer()
   const untouched = answer({ name: '佐藤 太郎', questionId: 'l13-02' })
