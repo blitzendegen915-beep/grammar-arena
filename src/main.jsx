@@ -6,6 +6,7 @@ import { REGULAR_QUESTIONS } from './regularQuestions'
 import { isBlankPlaceholder, withBlankCount } from './questionQuality'
 import { getQuestionTranslation } from './questionPresentation'
 import { isModerationBlocked, MODERATION_NOTICE } from './contentModeration'
+import { buildRatingChartModel, projectSessionRating } from './ratingHistory'
 import {
   ANSWER_SYNC_MAX_ATTEMPTS,
   ANSWER_SYNC_TIMEOUT_MS,
@@ -998,6 +999,7 @@ function App() {
     submitLock.current = false
     if (index === queue.length - 1) {
       const completedAt = new Date().toISOString()
+      const sessionRatingAfter = projectSessionRating(sessionRatingStart, sessionAnswers)
       const session = {
         id: `${Date.now()}`,
         date: localDateKey(new Date(completedAt)),
@@ -1005,8 +1007,9 @@ function App() {
         label: filter === 'all' ? 'ミックス演習' : `${DIFFICULTY[filter].label}演習`,
         correct: sessionScore.correct,
         total: sessionScore.answered,
-        ratingDelta: authoritativeRating - sessionRatingStart,
-        ratingAfter: authoritativeRating,
+        ratingStart: sessionRatingStart,
+        ratingDelta: sessionRatingAfter - sessionRatingStart,
+        ratingAfter: sessionRatingAfter,
       }
       setPersisted((current) => ({ ...current, history: [session, ...current.history].slice(0, 20), studyTimeByDate: { ...(current.studyTimeByDate || {}), [localDateKey()]: todaySecondsRef.current } }))
       setSessionCompletedAt(completedAt)
@@ -1065,7 +1068,7 @@ function App() {
         <div className="content-wrap">
           {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, setNotice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId }} />}
           {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={authoritativeRating} leaderboard={hasSession ? persisted.publicLeaderboard : []} rankingPoolId={rankingPoolId} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
-          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
+          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, history: persisted.history, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
           {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={hasSession ? persisted.publicLeaderboard : []} rating={authoritativeRating} studentName={persisted.studentName} rankingPoolId={rankingPoolId} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={authoritativeRating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
@@ -1132,7 +1135,7 @@ function NavItem({ icon, label, active, onClick }) {
   return <button type="button" className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}><Icon name={icon} size={22} /><span>{label}</span></button>
 }
 
-function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, rankingPoolId, studentName, openLeaderboard, answerSyncSummary, retryAnswer, retryFailedAnswers }) {
+function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating, authoritativeRating, history, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, rankingPoolId, studentName, openLeaderboard, answerSyncSummary, retryAnswer, retryFailedAnswers }) {
   return <div className="practice-layout">
     <section className="practice-column">
       <div className="course-banner"><div><span className="course-banner-label">{course.eyebrow}</span><strong>{course.label}</strong><span className="course-banner-unit">{course.unit} / {course.name}</span></div><span className="course-stamp">STUDY</span></div>
@@ -1141,7 +1144,7 @@ function PracticeView({ course, question, queue, index, filter, setFilter, submi
       {answerSyncSummary.total > 0 && <div className={`sync-status ${answerSyncSummary.errors && !answerSyncSummary.pending ? 'has-error' : ''}`} role="status"><span>{answerSyncSummary.errors && !answerSyncSummary.pending ? `保存エラー ${answerSyncSummary.errors}問` : answerSyncSummary.errors ? `保存待ち ${answerSyncSummary.total}問（自動再送中）` : `保存待ち ${answerSyncSummary.total}問`}</span><small>解答と判定は画面に反映済みです。</small>{answerSyncSummary.errors > 0 && <button type="button" onClick={retryFailedAnswers}>再送する</button>}</div>}
       {isComplete && sessionAnswers.length === 0 ? <EmptyQuestionState restart={() => restart(filter)} /> : isComplete ? <CompleteCard {...{ score: sessionScore, queue, reviews: sessionAnswers, course, studentName, ratingStart: sessionRatingStart, ratingAfter: authoritativeRating, provisionalRating: rating, completedAt: sessionCompletedAt, restart: () => restart(filter) }} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting, retryAnswer }} />}
     </section>
-    <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} /><PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} poolLabel={poolLabel(rankingPoolId)} onOpen={openLeaderboard} /></div>
+    <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} history={history} rating={rating} /><PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} poolLabel={poolLabel(rankingPoolId)} onOpen={openLeaderboard} /></div>
   </div>
 }
 
@@ -1224,11 +1227,11 @@ function SessionPrintView({ reviews, score, course, studentName, ratingStart, ra
   return <section className="print-sheet"><header className="print-header"><p>GRAMMAR ARENA / SESSION REVIEW</p><h1>{course.label} ・ {course.name}</h1><div className="print-meta"><div><span>年月日</span><strong>{formatJapaneseDate(completedAt)}</strong></div><div><span>名前</span><strong>{studentName}</strong></div><div><span>正答数</span><strong>{score.correct} / {score.answered}</strong></div><div><span>正答率</span><strong>{percentage}%</strong></div><div><span>レート</span><strong>{ratingStart.toLocaleString()} → {ratingAfter.toLocaleString()}</strong></div></div></header><div className="print-list">{reviews.map((review, index) => <ReviewItem key={review.id || `${review.question.id}-${index}`} review={review} index={index} />)}</div><footer className="print-footer">GRAMMAR ARENA / {course.label} ・ {course.name}</footer></section>
 }
 
-function DailyRail({ correct, answered, seconds }) {
+function DailyRail({ correct, answered, seconds, history, rating }) {
   const incorrect = Math.max(0, answered - correct)
   const rate = answered ? `${Math.round((correct / answered) * 100)}%` : '—'
   const minutes = `${Math.max(1, Math.round(seconds / 60))}分`
-  return <aside className="daily-rail"><div className="rail-card"><div className="rail-title"><Icon name="calendar" size={21} /><h2>今日の記録</h2><span className="study-stamp">STUDY</span></div><div className="metric-list"><Metric icon="check" label="正解数" value={correct} /><Metric icon="close" label="不正解数" value={incorrect} /><Metric icon="chart" label="正答率" value={rate} /><Metric icon="clock" label="学習時間" value={minutes} /></div><div className="rail-divider" /><h3>レートの推移</h3><RatingChart /></div><div className="rail-note"><Icon name="chart" size={25} /><p>コツコツ積み重ねて、<br />もっと高いレベルへ。</p></div></aside>
+  return <aside className="daily-rail"><div className="rail-card"><div className="rail-title"><Icon name="calendar" size={21} /><h2>今日の記録</h2><span className="study-stamp">STUDY</span></div><div className="metric-list"><Metric icon="check" label="正解数" value={correct} /><Metric icon="close" label="不正解数" value={incorrect} /><Metric icon="chart" label="正答率" value={rate} /><Metric icon="clock" label="学習時間" value={minutes} /></div><div className="rail-divider" /><h3>レートの推移</h3><RatingChart history={history} rating={rating} /></div><div className="rail-note"><Icon name="chart" size={25} /><p>コツコツ積み重ねて、<br />もっと高いレベルへ。</p></div></aside>
 }
 
 function PublicLeaderboard({ players = [], currentName = '', courseLabel = '基礎講座', poolLabel: rankingLabel = '基礎講座', limit = 5, onOpen }) {
@@ -1249,8 +1252,9 @@ function Metric({ icon, label, value }) {
   return <div className="metric-row"><span className={`metric-icon metric-${icon}`}><Icon name={icon} size={16} /></span><span>{label}</span><strong>{value}</strong></div>
 }
 
-function RatingChart() {
-  return <div className="rating-chart"><svg viewBox="0 0 280 130" role="img" aria-label="レートの推移"><path d="M30 8v102h238" className="chart-axis" /><path d="M30 84H268M30 54H268M30 24H268" className="chart-grid" /><path d="M30 91 L69 73 L108 66 L147 54 L186 42 L225 31 L264 18 L264 110 L30 110Z" className="chart-area" /><path d="M30 91 L69 73 L108 66 L147 54 L186 42 L225 31 L264 18" className="chart-line" />{[[30,91],[69,73],[108,66],[147,54],[186,42],[225,31],[264,18]].map(([x,y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r="4.5" className="chart-dot" />)}<text x="0" y="112">1,000</text><text x="0" y="58">1,200</text><text x="0" y="12">1,300</text></svg></div>
+function RatingChart({ history, rating }) {
+  const model = buildRatingChartModel(history, rating)
+  return <div className="rating-chart"><svg viewBox="0 0 280 130" role="img" aria-label={`レートの推移。現在${model.currentRating.toLocaleString()}レート`}><path d="M30 10v100h238" className="chart-axis" />{model.grid.map((line) => <path key={line.value} d={line.path} className="chart-grid" />)}<path d={model.areaPath} className="chart-area" /><path d={model.linePath} className="chart-line" />{model.points.map((point, index) => <circle key={`${point.x}-${point.y}-${index}`} cx={point.x} cy={point.y} r="4.5" className="chart-dot" />)}{model.labels.map((label, index) => <text key={label.value} x="0" y={index === 0 ? 12 : index === 1 ? 62 : 114}>{label.text}</text>)}</svg></div>
 }
 
 function HistoryView({ history, rating }) {
