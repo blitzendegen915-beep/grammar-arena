@@ -1,11 +1,15 @@
 const COURSE_NAME = 'foundation-course'
 const RATING_MIN = 800
-const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash']
+const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash', 'grade', 'className', 'foundationMember']
 const ANSWER_HEADERS = ['playerKey', 'course', 'questionId', 'correct', 'delta', 'answeredAt']
 const COURSE_PROFILE_HEADERS = ['playerKey', 'course', 'rating', 'answered', 'updatedAt']
+const POOL_PROFILE_HEADERS = ['playerKey', 'course', 'poolId', 'rating', 'answered', 'updatedAt']
 const RATING_POINTS = { starter: 12, standard: 18, advanced: 26 }
 const RATING_LOSS = { starter: 7, standard: 11, advanced: 16 }
 const ALLOWED_COURSES = ['foundation-course', 'regular-english-practice']
+const ALLOWED_GRADES = ['1', '2', '3']
+const ALLOWED_CLASSES = 'ABCDEFGHIJKLM'.split('')
+const FOUNDATION_POOL_ID = 'foundation'
 const QUESTION_REGISTRY = {
   "l13-01": {
     "course": "foundation-course",
@@ -1392,7 +1396,7 @@ const QUESTION_REGISTRY = {
 function doGet(e) {
   const params = e && e.parameter ? e.parameter : {}
   if ((params.action || 'leaderboard') !== 'leaderboard') return json_({ ok: false, reason: 'post-required' }, params.callback)
-  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, params.callback)
+  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.callback)
 }
 
 function doPost(e) {
@@ -1401,8 +1405,9 @@ function doPost(e) {
   if (action === 'register') return registerPlayer_(params)
   if (action === 'login') return loginPlayer_(params)
   if (action === 'session') return sessionPlayer_(params)
+  if (action === 'update-profile') return updatePlayerProfile_(params)
   if (action === 'answer') return recordAnswer_(params)
-  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, params.callback)
+  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.callback)
 }
 
 function setup() {
@@ -1415,7 +1420,8 @@ function setup() {
   const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
   const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
   const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
-  return { spreadsheetUrl: book.getUrl(), players: players.getName(), answers: answers.getName(), courseProfiles: courseProfiles.getName() }
+  const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
+  return { spreadsheetUrl: book.getUrl(), players: players.getName(), answers: answers.getName(), courseProfiles: courseProfiles.getName(), poolProfiles: poolProfiles.getName() }
 }
 
 function getBook_() {
@@ -1442,7 +1448,11 @@ function registerPlayer_(params) {
   const playerKey = keyFor_(name)
   const pinHash = cleanPinHash_(params.pinHash)
   const course = cleanCourse_(params.course) || COURSE_NAME
+  const grade = cleanGrade_(params.grade)
+  const className = cleanClassName_(params.className)
+  const foundationMember = cleanBoolean_(params.foundationMember)
   if (!name || !playerKey || !pinHash) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
+  if (!grade || !className) return json_({ ok: false, reason: 'placement-required' }, params.callback)
 
   const lock = LockService.getScriptLock()
   lock.waitLock(10000)
@@ -1451,6 +1461,7 @@ function registerPlayer_(params) {
     const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
     const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
     const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
+    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
     const rows = players.getDataRange().getValues()
     const playerIndex = rows.findIndex((row, index) => index > 0 && row[0] === playerKey)
     const now = new Date()
@@ -1460,12 +1471,12 @@ function registerPlayer_(params) {
       if (String(rows[playerIndex][5] || '')) return json_({ ok: false, reason: 'already-registered' }, params.callback)
       const rating = Number(rows[playerIndex][2]) || 1240
       const answered = Number(rows[playerIndex][3]) || 0
-      players.getRange(playerIndex + 1, 2, 1, 6).setValues([[name, rating, answered, now, pinSecret, tokenHashFor_(token, playerKey)]])
-      return json_(profile_(players, answers, courseProfiles, playerIndex, playerKey, course, token), params.callback)
+      players.getRange(playerIndex + 1, 2, 1, 9).setValues([[name, rating, answered, now, pinSecret, tokenHashFor_(token, playerKey), grade, className, foundationMember]])
+      return json_(profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
     }
-    players.appendRow([playerKey, name, 1240, 0, now, pinSecret, tokenHashFor_(token, playerKey)])
+    players.appendRow([playerKey, name, 1240, 0, now, pinSecret, tokenHashFor_(token, playerKey), grade, className, foundationMember])
     const newIndex = players.getLastRow() - 1
-    return json_(profile_(players, answers, courseProfiles, newIndex, playerKey, course, token), params.callback)
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, newIndex, playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
   } finally {
     lock.releaseLock()
   }
@@ -1485,6 +1496,7 @@ function loginPlayer_(params) {
     const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
     const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
     const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
+    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
     const rows = players.getDataRange().getValues()
     const playerIndex = rows.findIndex((row, index) => index > 0 && row[0] === playerKey)
     if (playerIndex < 0) return json_({ ok: false, reason: 'not-found' }, params.callback)
@@ -1495,7 +1507,7 @@ function loginPlayer_(params) {
     const now = new Date()
     players.getRange(playerIndex + 1, 5).setValue(now)
     players.getRange(playerIndex + 1, 7).setValue(tokenHashFor_(token, playerKey))
-    return json_(profile_(players, answers, courseProfiles, playerIndex, playerKey, course, token), params.callback)
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
   } finally {
     lock.releaseLock()
   }
@@ -1514,25 +1526,66 @@ function sessionPlayer_(params) {
     const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
     const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
     const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
+    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
     const auth = authenticate_(players, name, token)
     if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
-    return json_(profile_(players, answers, courseProfiles, auth.playerIndex, auth.playerKey, course, token), params.callback)
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
   } finally {
     lock.releaseLock()
   }
 }
 
-function profile_(players, answers, courseProfiles, playerIndex, playerKey, course, token) {
+function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, requestedPool) {
   const row = players.getDataRange().getValues()[playerIndex]
-  const courseProfile = ensureCourseProfile_(courseProfiles, playerKey, course, Number(row[2]) || 1240, Number(row[3]) || 0)
+  const poolIds = playerPools_(row)
+  const profiles = poolIds.map((poolId) => ({
+    poolId,
+    ...ensurePoolProfile_(poolProfiles, courseProfiles, playerKey, course, poolId, Number(row[2]) || 1240, Number(row[3]) || 0),
+  }))
+  const activePool = poolIds.includes(requestedPool) ? requestedPool : poolIds[0]
+  const activeProfile = profiles.find((profile) => profile.poolId === activePool) || profiles[0]
+  const ratings = Object.fromEntries(profiles.map((profile) => [profile.poolId, { rating: profile.rating, answered: profile.answered }]))
   return {
     ok: true,
     name: String(row[1]),
-    rating: courseProfile.rating,
-    answered: courseProfile.answered,
+    rating: activeProfile.rating,
+    answered: activeProfile.answered,
     answeredIds: answeredIds_(answers, playerKey, course),
     authToken: token,
-    players: leaderboard_(players, courseProfiles, course),
+    grade: cleanGrade_(row[7]),
+    className: cleanClassName_(row[8]),
+    foundationMember: String(row[9] || '').toLowerCase() === 'true',
+    needsPlacement: !cleanGrade_(row[7]) || !cleanClassName_(row[8]),
+    poolId: activePool,
+    poolIds,
+    ratings,
+    players: leaderboard_(players, courseProfiles, poolProfiles, course, activePool),
+  }
+}
+
+function updatePlayerProfile_(params) {
+  const name = cleanName_(params.name)
+  const token = String(params.authToken || '')
+  const grade = cleanGrade_(params.grade)
+  const className = cleanClassName_(params.className)
+  if (!name || !token || !grade || !className) return json_({ ok: false, reason: 'placement-required' }, params.callback)
+
+  const lock = LockService.getScriptLock()
+  lock.waitLock(10000)
+  try {
+    const book = getBook_()
+    const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
+    const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
+    const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
+    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
+    const auth = authenticate_(players, name, token)
+    if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
+    const foundationMember = cleanBoolean_(params.foundationMember)
+    players.getRange(auth.playerIndex + 1, 8, 1, 3).setValues([[grade, className, foundationMember]])
+    const course = cleanCourse_(params.course) || COURSE_NAME
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
+  } finally {
+    lock.releaseLock()
   }
 }
 
@@ -1540,6 +1593,33 @@ function rankingCourses_(course) {
   const value = String(course || COURSE_NAME)
   if (value === 'foundation-course') return ['foundation-course', 'foundation-infinitive', 'foundation-gerund', 'foundation-participles']
   return [value]
+}
+
+function playerPools_(row) {
+  const grade = cleanGrade_(row[7])
+  const className = cleanClassName_(row[8])
+  if (!grade || !className) return [FOUNDATION_POOL_ID]
+  const pools = [grade + '-' + className]
+  if (String(row[9] || '').toLowerCase() === 'true') pools.push(FOUNDATION_POOL_ID)
+  return pools
+}
+
+function ensurePoolProfile_(poolSheet, legacySheet, playerKey, course, poolId, fallbackRating, fallbackAnswered) {
+  const rows = poolSheet.getDataRange().getValues()
+  const rowIndex = rows.findIndex((row, index) => index > 0 && row[0] === playerKey && row[1] === course && row[2] === poolId)
+  if (rowIndex >= 0) {
+    return {
+      sheetRow: rowIndex + 1,
+      rating: Number(rows[rowIndex][3]) || 1240,
+      answered: Number(rows[rowIndex][4]) || 0,
+    }
+  }
+  const legacyRows = legacySheet.getDataRange().getValues()
+  const legacy = legacyRows.find((row, index) => index > 0 && row[0] === playerKey && row[1] === course)
+  const rating = legacy ? Number(legacy[2]) || 1240 : Number(fallbackRating) || 1240
+  const answered = legacy ? Number(legacy[3]) || 0 : Number(fallbackAnswered) || 0
+  poolSheet.appendRow([playerKey, course, poolId, rating, answered, new Date()])
+  return { sheetRow: poolSheet.getLastRow(), rating, answered }
 }
 
 function ensureCourseProfile_(sheet, playerKey, course, fallbackRating, fallbackAnswered) {
@@ -1571,6 +1651,7 @@ function recordAnswer_(params) {
   const course = cleanCourse_(params.course)
   const questionId = String(params.questionId || '')
   const question = questionFor_(course, questionId)
+  const requestedPool = cleanPoolId_(params.poolId)
   if (!name || !course || !questionId || !question) return json_({ ok: false, reason: 'invalid-question' }, params.callback)
 
   const lock = LockService.getScriptLock()
@@ -1580,18 +1661,24 @@ function recordAnswer_(params) {
     const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
     const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
     const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
+    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
     const auth = authenticate_(players, name, String(params.authToken || ''))
     if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
     const playerKey = auth.playerKey
-    const rows = answers.getDataRange().getValues()
-    const duplicate = rows.slice(1).some((row) => row[0] === playerKey && rankingCourses_(course).includes(String(row[1])) && row[2] === questionId)
-
     const playerRows = players.getDataRange().getValues()
     const playerIndex = auth.playerIndex
-    const courseProfile = ensureCourseProfile_(courseProfiles, playerKey, course, Number(playerRows[playerIndex][2]) || 1240, Number(playerRows[playerIndex][3]) || 0)
+    const playerRow = playerRows[playerIndex]
+    const poolIds = playerPools_(playerRow)
+    const profiles = poolIds.map((poolId) => ({
+      poolId,
+      ...ensurePoolProfile_(poolProfiles, courseProfiles, playerKey, course, poolId, Number(playerRow[2]) || 1240, Number(playerRow[3]) || 0),
+    }))
+    const activePool = poolIds.includes(requestedPool) ? requestedPool : poolIds[0]
+    const activeProfile = profiles.find((profile) => profile.poolId === activePool) || profiles[0]
+    const rows = answers.getDataRange().getValues()
+    const duplicate = rows.slice(1).some((row) => row[0] === playerKey && rankingCourses_(course).includes(String(row[1])) && row[2] === questionId)
     // A retry may follow a lost response. Return the authoritative rating without scoring twice.
-    if (duplicate) return json_({ ok: false, reason: 'already-answered', rating: courseProfile.rating, delta: 0 }, params.callback)
-    const previousRating = courseProfile.rating
+    if (duplicate) return json_({ ok: false, reason: 'already-answered', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles) }, params.callback)
     const submittedAnswer = String(params.answer || '')
     // New clients send the answer text. Older queued answers only have the
     // browser's result, so retain a temporary compatibility path for them.
@@ -1600,42 +1687,62 @@ function recordAnswer_(params) {
     const safeDelta = serverValidated
       ? (correct ? RATING_POINTS[question.difficulty] : -RATING_LOSS[question.difficulty])
       : Math.max(-50, Math.min(50, Number(params.delta || 0)))
-    const rating = Math.max(RATING_MIN, previousRating + safeDelta)
     const now = new Date()
     answers.appendRow([playerKey, course, questionId, correct, safeDelta, now])
-    courseProfiles.getRange(courseProfile.sheetRow, 3, 1, 3).setValues([[rating, courseProfile.answered + 1, now]])
+    const updatedProfiles = profiles.map((profile) => {
+      const rating = Math.max(RATING_MIN, profile.rating + safeDelta)
+      poolProfiles.getRange(profile.sheetRow, 4, 1, 3).setValues([[rating, profile.answered + 1, now]])
+      return { ...profile, rating, answered: profile.answered + 1 }
+    })
+    const foundationProfile = updatedProfiles.find((profile) => profile.poolId === FOUNDATION_POOL_ID)
+    const legacyProfile = ensureCourseProfile_(courseProfiles, playerKey, course, Number(playerRow[2]) || 1240, Number(playerRow[3]) || 0)
+    if (foundationProfile) courseProfiles.getRange(legacyProfile.sheetRow, 3, 1, 3).setValues([[foundationProfile.rating, foundationProfile.answered, now]])
     players.getRange(playerIndex + 1, 2).setValue(name)
+    const primaryProfile = updatedProfiles[0]
+    players.getRange(playerIndex + 1, 3, 1, 2).setValues([[primaryProfile.rating, primaryProfile.answered]])
     players.getRange(playerIndex + 1, 5).setValue(now)
-    const result = { ok: true, rating, delta: safeDelta, correct, serverValidated }
-    if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, course)
+    const activeUpdated = updatedProfiles.find((profile) => profile.poolId === activePool) || primaryProfile
+    const result = { ok: true, rating: activeUpdated.rating, delta: safeDelta, correct, serverValidated, poolId: activePool, ratings: ratingsFromProfiles_(updatedProfiles) }
+    if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, poolProfiles, course, activePool)
     return json_(result, params.callback)
   } finally {
     lock.releaseLock()
   }
 }
 
-function getLeaderboard_(course, callback) {
+function getLeaderboard_(course, poolId, callback) {
   course = cleanCourse_(course) || COURSE_NAME
   const book = getBook_()
   const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
   const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
-  return json_({ ok: true, course, players: leaderboard_(players, courseProfiles, course) }, callback)
+  const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
+  const activePool = cleanPoolId_(poolId) || (course === COURSE_NAME ? FOUNDATION_POOL_ID : 'all')
+  return json_({ ok: true, course, poolId: activePool, players: leaderboard_(players, courseProfiles, poolProfiles, course, activePool) }, callback)
 }
 
-function leaderboard_(playersSheet, courseProfilesSheet, course) {
+function ratingsFromProfiles_(profiles) {
+  return Object.fromEntries(profiles.map((profile) => [profile.poolId, { rating: profile.rating, answered: profile.answered }]))
+}
+
+function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, course, poolId = 'all') {
   const playerRows = playersSheet.getDataRange().getValues().slice(1).filter((row) => row[0] && row[1])
-  const names = new Map(playerRows.map((row) => [String(row[0]), String(row[1])]))
   const rankingCourses = rankingCourses_(course)
-  const profileRows = courseProfilesSheet.getDataRange().getValues().slice(1)
-    .filter((row) => row[0] && rankingCourses.includes(String(row[1])))
-  const profileKeys = new Set(profileRows.map((row) => String(row[0])))
-  const ranked = profileRows.map((row) => ({ name: names.get(String(row[0])) || String(row[0]), rating: Number(row[2]) || 1240, answered: Number(row[3]) || 0 }))
-  if (course === 'foundation-course') {
-    playerRows.forEach((row) => {
-      const playerKey = String(row[0])
-      if (!profileKeys.has(playerKey)) ranked.push({ name: String(row[1]), rating: Number(row[2]) || 1240, answered: Number(row[3]) || 0 })
-    })
+  if (poolId === 'all') {
+    const profileRows = courseProfilesSheet.getDataRange().getValues().slice(1)
+      .filter((row) => row[0] && rankingCourses.includes(String(row[1])))
+    const names = new Map(playerRows.map((row) => [String(row[0]), String(row[1])]))
+    return profileRows.map((row) => ({ name: names.get(String(row[0])) || String(row[0]), rating: Number(row[2]) || 1240, answered: Number(row[3]) || 0 }))
+      .sort((a, b) => b.rating - a.rating || b.answered - a.answered || a.name.localeCompare(b.name, 'ja'))
   }
+  const profileRows = poolProfilesSheet.getDataRange().getValues().slice(1)
+    .filter((row) => row[0] && rankingCourses.includes(String(row[1])) && String(row[2]) === poolId)
+  const profiles = new Map(profileRows.map((row) => [String(row[0]), { rating: Number(row[3]) || 1240, answered: Number(row[4]) || 0 }]))
+  const ranked = playerRows
+    .filter((row) => playerPools_(row).includes(poolId))
+    .map((row) => {
+      const profile = profiles.get(String(row[0]))
+      return { name: String(row[1]), rating: profile?.rating ?? (poolId === FOUNDATION_POOL_ID ? Number(row[2]) || 1240 : 1240), answered: profile?.answered ?? (poolId === FOUNDATION_POOL_ID ? Number(row[3]) || 0 : 0) }
+    })
   return ranked
     .sort((a, b) => b.rating - a.rating || b.answered - a.answered || a.name.localeCompare(b.name, 'ja'))
 }
@@ -1648,6 +1755,27 @@ function cleanCourse_(value) {
   const course = String(value || '').trim()
   if (['foundation-infinitive', 'foundation-gerund', 'foundation-participles'].includes(course)) return 'foundation-course'
   return ALLOWED_COURSES.includes(course) ? course : ''
+}
+
+function cleanGrade_(value) {
+  const grade = String(value || '').trim()
+  return ALLOWED_GRADES.includes(grade) ? grade : ''
+}
+
+function cleanClassName_(value) {
+  const className = String(value || '').trim().toUpperCase()
+  return ALLOWED_CLASSES.includes(className) ? className : ''
+}
+
+function cleanPoolId_(value) {
+  const poolId = String(value || '').trim().toLowerCase()
+  if (poolId === FOUNDATION_POOL_ID || poolId === 'all') return poolId
+  const match = poolId.match(/^([1-3])-([a-m])$/)
+  return match ? match[1] + '-' + match[2].toUpperCase() : ''
+}
+
+function cleanBoolean_(value) {
+  return String(value || '').toLowerCase() === 'true'
 }
 
 function questionFor_(course, questionId) {

@@ -37,7 +37,14 @@ const DEFAULT_PERSISTED = {
   answeredIds: [],
   publicLeaderboard: [],
   ratingsByCourse: {},
+  ratingsByScope: {},
   authoritativeRatingsBySyncKey: {},
+  authoritativeRatingsByScope: {},
+  rankingPoolId: 'foundation',
+  poolIds: [],
+  grade: '',
+  className: '',
+  foundationMember: false,
   answerSyncQueue: [],
   studyTimeByDate: {},
   modeId: DEFAULT_MODE_ID,
@@ -216,6 +223,13 @@ const COURSE_DETAILS = {
   'regular-english-practice': { label: '英語演習', eyebrow: 'ENGLISH PRACTICE', unit: 'REGULAR CLASS', name: '平常授業', title: '平常授業を、解いて、理解する。', rankingId: 'regular-english-practice' },
 }
 
+const GRADE_OPTIONS = ['1', '2', '3']
+const CLASS_OPTIONS = 'ABCDEFGHIJKLM'.split('')
+const RANKING_POOL_OPTIONS = [
+  { id: 'foundation', label: '基礎講座' },
+  ...GRADE_OPTIONS.flatMap((grade) => CLASS_OPTIONS.map((className) => ({ id: `${grade}-${className}`, label: `${grade}-${className}` }))),
+]
+
 const QUESTION_BANKS = {
   'foundation-infinitive': FOUNDATION_QUESTIONS,
   'foundation-gerund': GERUND_QUESTIONS,
@@ -302,7 +316,32 @@ function localDateKey(value = new Date()) {
   return `${values.year}-${values.month}-${values.day}`
 }
 
-function getAuthoritativeRating(profile, syncKey) {
+function ratingScopeKey(course, poolId) {
+  return `${course}::${poolId || 'foundation'}`
+}
+
+function poolLabel(poolId) {
+  return RANKING_POOL_OPTIONS.find((pool) => pool.id === poolId)?.label || 'ランキング'
+}
+
+function classPoolId(grade, className) {
+  return grade && className ? `${grade}-${className}` : ''
+}
+
+function preferredPoolId({ grade = '', className = '', foundationMember = false } = {}) {
+  return foundationMember ? 'foundation' : classPoolId(grade, className) || 'foundation'
+}
+
+function ratingsToScopeMap(ratings = {}, course, existing = {}) {
+  return Object.entries(ratings).reduce((next, [poolId, value]) => {
+    const rating = Number(value?.rating)
+    return Number.isFinite(rating) ? { ...next, [ratingScopeKey(course, poolId)]: rating } : next
+  }, { ...existing })
+}
+
+function getAuthoritativeRating(profile, syncKey, poolId) {
+  const scopedRating = Number(profile.authoritativeRatingsByScope?.[`${syncKey}::${poolId || 'foundation'}`])
+  if (Number.isFinite(scopedRating)) return scopedRating
   const rating = Number(profile.authoritativeRatingsBySyncKey?.[syncKey])
   return Number.isFinite(rating) ? rating : Number(profile.rating) || DEFAULT_RATING
 }
@@ -368,6 +407,10 @@ function App() {
     const initial = readPersisted()
     return COURSE_DETAILS[initial.modeId] ? initial.modeId : DEFAULT_MODE_ID
   })
+  const [rankingPoolId, setRankingPoolId] = useState(() => {
+    const initial = readPersisted()
+    return initial.rankingPoolId || preferredPoolId(initial)
+  })
   const [filter, setFilter] = useState('all')
   const [queue, setQueue] = useState(() => {
     const initial = readPersisted()
@@ -390,6 +433,10 @@ function App() {
   const [authMode, setAuthMode] = useState('login')
   const [authName, setAuthName] = useState(() => readPersisted().studentName || '')
   const [authPin, setAuthPin] = useState('')
+  const [authGrade, setAuthGrade] = useState(() => readPersisted().grade || '1')
+  const [authClassName, setAuthClassName] = useState(() => readPersisted().className || 'A')
+  const [authFoundationMember, setAuthFoundationMember] = useState(() => Boolean(readPersisted().foundationMember))
+  const [placementSetup, setPlacementSetup] = useState(null)
   const [authBusy, setAuthBusy] = useState(false)
   const leaderboardRequestRef = useRef(0)
   const answerSyncRunningRef = useRef(false)
@@ -398,7 +445,7 @@ function App() {
   const todaySecondsRef = useRef(todaySeconds)
   todaySecondsRef.current = todaySeconds
   const activeRef = useRef(null)
-  activeRef.current = { name: persisted.studentName, token: persisted.authToken, course: getRankingCourseId(modeId) }
+  activeRef.current = { name: persisted.studentName, token: persisted.authToken, course: getRankingCourseId(modeId), poolId: rankingPoolId }
   const submitLock = useRef(false)
   const submitting = false
 
@@ -412,7 +459,7 @@ function App() {
   } : null
   const answerSyncKey = answerSyncIdentity ? getSyncKey(answerSyncIdentity) : ''
   const answerSyncSummary = getAnswerSyncSummary(persisted.answerSyncQueue, answerSyncKey)
-  const authoritativeRating = hasSession ? getAuthoritativeRating(persisted, answerSyncKey) : DEFAULT_RATING
+  const authoritativeRating = hasSession ? getAuthoritativeRating(persisted, answerSyncKey, rankingPoolId) : DEFAULT_RATING
   const provisionalDelta = hasSession ? persisted.rating - authoritativeRating : 0
   const hasActivePractice = hasSession && view === 'practice' && !isComplete
   const student = { name: hasSession ? persisted.studentName : '未ログイン', grade: hasSession ? 'STUDENT' : 'NAME REQUIRED' }
@@ -453,27 +500,83 @@ function App() {
   const todayCorrect = todaySessions.reduce((sum, item) => sum + item.correct, 0) + (sessionCompletedAt ? 0 : sessionScore.correct)
   const todayRate = todayAnswered ? Math.round((todayCorrect / todayAnswered) * 100) : 0
 
+  const applyAuthResult = (result, fallbackName) => {
+    const rankingId = getRankingCourseId(modeId)
+    const nextAuthToken = String(result.authToken || '')
+    const nextName = result.name || fallbackName
+    const serverAnsweredIds = Array.isArray(result.answeredIds) ? result.answeredIds : []
+    const migratedQueue = rekeyAnswersForAuth(persisted.answerSyncQueue, {
+      name: fallbackName,
+      newAuthToken: nextAuthToken,
+    }).filter((entry) => !(entry.name.toLowerCase() === fallbackName.toLowerCase() && entry.course === rankingId && serverAnsweredIds.includes(entry.questionId)))
+    const nextPoolId = result.poolId || preferredPoolId(result)
+    const nextSyncKey = getSyncKey({ name: nextName, authToken: nextAuthToken, course: rankingId })
+    const serverRating = Number(result.rating) || DEFAULT_RATING
+    const displayedRating = applyProvisionalRating(serverRating, migratedQueue, nextSyncKey)
+    const serverScopeRatings = ratingsToScopeMap(result.ratings, rankingId)
+    serverScopeRatings[ratingScopeKey(rankingId, nextPoolId)] = serverRating
+    const authoritativeScopeRatings = Object.entries(result.ratings || {}).reduce((next, [poolId, value]) => {
+      const rating = Number(value?.rating)
+      return Number.isFinite(rating) ? { ...next, [`${nextSyncKey}::${poolId}`]: rating } : next
+    }, {})
+    authoritativeScopeRatings[`${nextSyncKey}::${nextPoolId}`] = serverRating
+    const nextAnsweredIds = [...new Set([...serverAnsweredIds, ...migratedQueue.filter((entry) => entry.syncKey === nextSyncKey).map((entry) => entry.questionId)])]
+    setPersisted((current) => ({
+      ...current,
+      studentName: nextName,
+      authToken: nextAuthToken,
+      rating: displayedRating,
+      grade: result.grade || current.grade,
+      className: result.className || current.className,
+      foundationMember: typeof result.foundationMember === 'boolean' ? result.foundationMember : current.foundationMember,
+      rankingPoolId: nextPoolId,
+      poolIds: Array.isArray(result.poolIds) ? result.poolIds : current.poolIds,
+      ratingsByCourse: { ...(current.ratingsByCourse || {}), [rankingId]: displayedRating },
+      ratingsByScope: { ...(current.ratingsByScope || {}), ...serverScopeRatings },
+      authoritativeRatingsBySyncKey: { ...(current.authoritativeRatingsBySyncKey || {}), [nextSyncKey]: serverRating },
+      authoritativeRatingsByScope: { ...(current.authoritativeRatingsByScope || {}), ...authoritativeScopeRatings },
+      answerSyncQueue: migratedQueue,
+      answeredIds: nextAnsweredIds,
+      answeredByCourse: { ...(current.studentName?.toLowerCase() === fallbackName.toLowerCase() ? current.answeredByCourse : {}), [rankingId]: nextAnsweredIds },
+      publicLeaderboard: Array.isArray(result.players) ? result.players : current.publicLeaderboard,
+    }))
+    setRankingPoolId(nextPoolId)
+    setAuthName(nextName)
+    setAuthPin('')
+    setSessionRatingStart(serverRating)
+    return { name: nextName, token: nextAuthToken, needsPlacement: Boolean(result.needsPlacement) }
+  }
+
   const submitAuth = async () => {
-    const name = cleanStudentName(authName)
+    const isPlacement = Boolean(placementSetup)
+    const name = cleanStudentName(placementSetup?.name || authName)
     if (!name) {
       setNotice('生徒名を入力してください。')
       return
     }
-    if (!/^\d{4,8}$/.test(authPin)) {
+    if (!isPlacement && !/^\d{4,8}$/.test(authPin)) {
       setNotice('暗証番号は4〜8桁の数字で設定してください。')
+      return
+    }
+    if ((isPlacement || authMode === 'register') && (!GRADE_OPTIONS.includes(authGrade) || !CLASS_OPTIONS.includes(authClassName))) {
+      setNotice('学年とクラスを選択してください。')
       return
     }
     setAuthBusy(true)
     setNotice('')
     try {
-      const pinHash = await hashPin(authPin)
-      const result = await requestScoreApi({ action: authMode, course: getRankingCourseId(modeId), name, pinHash })
+      const params = isPlacement
+        ? { action: 'update-profile', course: getRankingCourseId(modeId), name, authToken: placementSetup.token, grade: authGrade, className: authClassName, foundationMember: String(authFoundationMember), poolId: preferredPoolId({ grade: authGrade, className: authClassName, foundationMember: authFoundationMember }) }
+        : { action: authMode, course: getRankingCourseId(modeId), name, pinHash: await hashPin(authPin), ...(authMode === 'register' ? { grade: authGrade, className: authClassName, foundationMember: String(authFoundationMember), poolId: preferredPoolId({ grade: authGrade, className: authClassName, foundationMember: authFoundationMember }) } : {}) }
+      const result = await requestScoreApi(params)
       if (!result.ok) {
         const messages = {
           'already-registered': 'この生徒名は登録済みです。ログインを選んでください。',
           'not-found': '登録されていない生徒名です。初回登録を選んでください。',
           'not-registered': 'この生徒名には暗証番号が設定されていません。初回登録を選んでください。',
           'wrong-pin': '暗証番号が一致しません。',
+          'placement-required': '学年とクラスを選択してください。',
+          'invalid-session': '登録情報を確認できませんでした。もう一度ログインしてください。',
         }
         setNotice(messages[result.reason] || 'ログインできませんでした。入力内容を確認してください。')
         return
@@ -482,31 +585,17 @@ function App() {
         setNotice('ログイン情報を受け取れませんでした。管理者がApps Scriptを更新してから再試行してください。')
         return
       }
-      const serverAnsweredIds = Array.isArray(result.answeredIds) ? result.answeredIds : []
-      const rankingId = getRankingCourseId(modeId)
-      const nextAuthToken = String(result.authToken)
-      const migratedQueue = rekeyAnswersForAuth(persisted.answerSyncQueue, {
-        name,
-        newAuthToken: nextAuthToken,
-      }).filter((entry) => !(entry.name.toLowerCase() === name.toLowerCase() && entry.course === rankingId && serverAnsweredIds.includes(entry.questionId)))
-      const nextSyncKey = getSyncKey({ name: result.name || name, authToken: nextAuthToken, course: rankingId })
-      const serverRating = Number(result.rating) || DEFAULT_RATING
-      const displayedRating = applyProvisionalRating(serverRating, migratedQueue, nextSyncKey)
-      setPersisted((current) => ({
-        ...current,
-        studentName: result.name,
-        authToken: nextAuthToken,
-        rating: displayedRating,
-        ratingsByCourse: { ...(current.ratingsByCourse || {}), [rankingId]: displayedRating },
-        authoritativeRatingsBySyncKey: { ...(current.authoritativeRatingsBySyncKey || {}), [nextSyncKey]: serverRating },
-        answerSyncQueue: migratedQueue,
-        answeredIds: [...new Set([...serverAnsweredIds, ...migratedQueue.filter((entry) => entry.syncKey === nextSyncKey).map((entry) => entry.questionId)])],
-        answeredByCourse: { ...(current.studentName?.toLowerCase() === name.toLowerCase() ? current.answeredByCourse : {}), [rankingId]: [...new Set([...serverAnsweredIds, ...migratedQueue.filter((entry) => entry.syncKey === nextSyncKey).map((entry) => entry.questionId)])] },
-        publicLeaderboard: Array.isArray(result.players) ? result.players : current.publicLeaderboard,
-      }))
-      setAuthName(result.name)
-      setAuthPin('')
-      setSessionRatingStart(serverRating)
+      const applied = applyAuthResult(result, name)
+      if (applied.needsPlacement) {
+        setPlacementSetup({ name: applied.name, token: applied.token })
+        setAuthGrade(result.grade || '1')
+        setAuthClassName(result.className || 'A')
+        setAuthFoundationMember(Boolean(result.foundationMember))
+        setNotice('所属情報を設定すると、クラスランキングに参加できます。')
+        setView('landing')
+        return
+      }
+      setPlacementSetup(null)
       setNotice('')
       setView('lobby')
     } catch {
@@ -531,13 +620,16 @@ function App() {
     const nextAnsweredIds = answeredIdsForCourse(nextModeId)
     const currentRankingId = getRankingCourseId(modeId)
     const nextRankingId = getRankingCourseId(nextModeId)
+    const currentScope = ratingScopeKey(currentRankingId, rankingPoolId)
+    const nextScope = ratingScopeKey(nextRankingId, rankingPoolId)
     const ratingsByCourse = { ...(persisted.ratingsByCourse || {}), [currentRankingId]: persisted.rating }
-    const nextRating = ratingsByCourse[nextRankingId] || DEFAULT_RATING
+    const ratingsByScope = { ...(persisted.ratingsByScope || {}), [currentScope]: persisted.rating }
+    const nextRating = ratingsByScope[nextScope] || ratingsByCourse[nextRankingId] || DEFAULT_RATING
     setModeId(nextModeId)
     const nextSyncKey = hasSession ? getSyncKey({ name: persisted.studentName, authToken: persisted.authToken, course: nextRankingId }) : ''
-    const storedAuthoritative = Number(persisted.authoritativeRatingsBySyncKey?.[nextSyncKey])
+    const storedAuthoritative = getAuthoritativeRating({ ...persisted, rating: nextRating }, nextSyncKey, rankingPoolId)
     const nextSessionRating = Number.isFinite(storedAuthoritative) ? storedAuthoritative : nextRating
-    setPersisted((current) => ({ ...current, modeId: nextModeId, rating: nextRating, ratingsByCourse, answeredIds: nextAnsweredIds, publicLeaderboard: [] }))
+    setPersisted((current) => ({ ...current, modeId: nextModeId, rating: nextRating, ratingsByCourse, ratingsByScope, answeredIds: nextAnsweredIds, publicLeaderboard: [] }))
     setSessionRatingStart(nextSessionRating)
     setFilter('all')
     setQueue(buildQueue('all', nextAnsweredIds, getQuestionBank(nextModeId)))
@@ -551,6 +643,36 @@ function App() {
     setSessionCompletedAt('')
     setNotice('')
     setView(hasSession ? 'lobby' : 'landing')
+  }
+
+  const changeRankingPool = (nextPoolId) => {
+    if (!RANKING_POOL_OPTIONS.some((pool) => pool.id === nextPoolId) || nextPoolId === rankingPoolId) return
+    if (hasActivePractice && !window.confirm('進行中の10問を破棄してランキング対象を変更しますか？')) return
+    const currentCourse = getRankingCourseId(modeId)
+    const currentScope = ratingScopeKey(currentCourse, rankingPoolId)
+    const nextScope = ratingScopeKey(currentCourse, nextPoolId)
+    const ratingsByScope = { ...(persisted.ratingsByScope || {}), [currentScope]: persisted.rating }
+    const nextBaseRating = Number(ratingsByScope[nextScope]) || DEFAULT_RATING
+    const nextSyncKey = hasSession ? getSyncKey({ name: persisted.studentName, authToken: persisted.authToken, course: currentCourse }) : ''
+    const nextAuthoritative = hasSession ? getAuthoritativeRating({ ...persisted, rating: nextBaseRating }, nextSyncKey, nextPoolId) : DEFAULT_RATING
+    const nextDisplayedRating = hasSession ? applyProvisionalRating(nextBaseRating, persisted.answerSyncQueue, nextSyncKey) : DEFAULT_RATING
+    setRankingPoolId(nextPoolId)
+    setPersisted((current) => ({ ...current, rankingPoolId: nextPoolId, rating: nextDisplayedRating, ratingsByScope, publicLeaderboard: [] }))
+    setSessionRatingStart(nextAuthoritative)
+    setNotice('')
+    if (hasSession && !isComplete) {
+      setFilter('all')
+      setQueue(buildQueue('all', answeredIdsForCourse(modeId), getQuestionBank(modeId)))
+      setIndex(0)
+      setSelected('')
+      setTokens([])
+      setInput('')
+      setSubmitted(null)
+      setSessionScore({ correct: 0, answered: 0 })
+      setSessionAnswers([])
+      setSessionCompletedAt('')
+      setView('lobby')
+    }
   }
 
   const restart = (nextFilter = filter) => {
@@ -586,6 +708,11 @@ function App() {
       setView('landing')
       return
     }
+    if (Array.isArray(persisted.poolIds) && persisted.poolIds.length && !persisted.poolIds.includes(rankingPoolId)) {
+      setNotice(`この生徒は${poolLabel(rankingPoolId)}ランキングに参加していません。所属ランキングを選択してください。`)
+      setView('lobby')
+      return
+    }
     restart('all')
     setView('practice')
   }
@@ -601,7 +728,14 @@ function App() {
       answeredIds: [],
       answeredByCourse: {},
       ratingsByCourse: {},
+      ratingsByScope: {},
       authoritativeRatingsBySyncKey: {},
+      authoritativeRatingsByScope: {},
+      rankingPoolId: 'foundation',
+      poolIds: [],
+      grade: '',
+      className: '',
+      foundationMember: false,
       publicLeaderboard: [],
     }))
     setAuthName('')
@@ -621,7 +755,7 @@ function App() {
     const requestId = ++leaderboardRequestRef.current
     const rankingId = getRankingCourseId(modeId)
     try {
-      const data = await requestScoreApi({ action: 'leaderboard', course: rankingId })
+      const data = await requestScoreApi({ action: 'leaderboard', course: rankingId, poolId: rankingPoolId })
       if (requestId !== leaderboardRequestRef.current) return
       if (data.ok && Array.isArray(data.players)) setPersisted((current) => ({ ...current, publicLeaderboard: data.players }))
     } catch {
@@ -631,15 +765,15 @@ function App() {
 
   useEffect(() => {
     if (SCORE_API_URL) refreshLeaderboard()
-  }, [modeId])
+  }, [modeId, rankingPoolId])
 
   useEffect(() => {
     if (!SCORE_API_URL || !hasSession || !answerSyncIdentity) return undefined
     const identity = { ...answerSyncIdentity }
     const controller = typeof AbortController === 'undefined' ? null : new AbortController()
-    requestScoreApi({ action: 'session', course: identity.course, name: identity.name, authToken: identity.authToken }, { signal: controller?.signal })
+    requestScoreApi({ action: 'session', course: identity.course, poolId: rankingPoolId, name: identity.name, authToken: identity.authToken }, { signal: controller?.signal })
       .then((result) => {
-        if (!result.ok || activeRef.current.token !== identity.authToken || activeRef.current.course !== identity.course) return
+        if (!result.ok || activeRef.current.token !== identity.authToken || activeRef.current.course !== identity.course || activeRef.current.poolId !== rankingPoolId) return
         const serverRating = Number(result.rating) || DEFAULT_RATING
         const syncKey = getSyncKey(identity)
         setPersisted((current) => {
@@ -649,7 +783,13 @@ function App() {
             ...current,
             rating: displayedRating,
             ratingsByCourse: { ...(current.ratingsByCourse || {}), [identity.course]: displayedRating },
+            ratingsByScope: { ...(current.ratingsByScope || {}), ...ratingsToScopeMap(result.ratings, identity.course, { [ratingScopeKey(identity.course, rankingPoolId)]: displayedRating }) },
             authoritativeRatingsBySyncKey: { ...(current.authoritativeRatingsBySyncKey || {}), [syncKey]: serverRating },
+            authoritativeRatingsByScope: { ...(current.authoritativeRatingsByScope || {}), ...Object.entries(result.ratings || {}).reduce((next, [poolId, value]) => Number.isFinite(Number(value?.rating)) ? { ...next, [`${syncKey}::${poolId}`]: Number(value.rating) } : next, {}) },
+            grade: result.grade || current.grade,
+            className: result.className || current.className,
+            foundationMember: typeof result.foundationMember === 'boolean' ? result.foundationMember : current.foundationMember,
+            poolIds: Array.isArray(result.poolIds) ? result.poolIds : current.poolIds,
             answeredIds: identity.course === 'foundation-course' ? serverAnsweredIds : current.answeredIds,
             answeredByCourse: { ...(current.answeredByCourse || {}), [identity.course]: serverAnsweredIds },
             publicLeaderboard: Array.isArray(result.players) ? result.players : current.publicLeaderboard,
@@ -658,7 +798,7 @@ function App() {
       })
       .catch(() => {})
     return () => controller?.abort()
-  }, [answerSyncKey, hasSession, modeId])
+  }, [answerSyncKey, hasSession, modeId, rankingPoolId])
 
   const setSubmittedSync = (questionId, patch) => {
     setSubmitted((current) => current?.questionId === questionId ? { ...current, ...patch } : current)
@@ -721,6 +861,7 @@ function App() {
         legacyCorrect: String(entry.correct),
         correct: String(entry.correct),
         delta: String(entry.delta),
+        poolId: rankingPoolId,
       }, { signal }),
       onChange: (nextQueue) => setPersisted((current) => current.authToken !== answerSyncIdentity.authToken ? current : ({
         ...current,
@@ -740,12 +881,19 @@ function App() {
           if (!hasAuthoritativeRating) return { ...current, answerSyncQueue: mergedQueue }
           const serverRating = Number(result.rating)
           const displayedRating = applyProvisionalRating(serverRating, mergedQueue, entry.syncKey)
+          const resultPoolId = result.poolId || rankingPoolId
+          const resultScopeRatings = ratingsToScopeMap(result.ratings, entry.course)
+          if (Number.isFinite(serverRating)) resultScopeRatings[ratingScopeKey(entry.course, resultPoolId)] = serverRating
+          const resultAuthoritative = Object.entries(result.ratings || {}).reduce((next, [poolId, value]) => Number.isFinite(Number(value?.rating)) ? { ...next, [`${entry.syncKey}::${poolId}`]: Number(value.rating) } : next, {})
+          resultAuthoritative[`${entry.syncKey}::${resultPoolId}`] = serverRating
           return {
             ...current,
             answerSyncQueue: mergedQueue,
-            rating: activeRef.current.course === entry.course ? displayedRating : current.rating,
+            rating: activeRef.current.course === entry.course && activeRef.current.poolId === resultPoolId ? displayedRating : current.rating,
             ratingsByCourse: { ...(current.ratingsByCourse || {}), [entry.course]: displayedRating },
+            ratingsByScope: { ...(current.ratingsByScope || {}), ...resultScopeRatings },
             authoritativeRatingsBySyncKey: { ...(current.authoritativeRatingsBySyncKey || {}), [entry.syncKey]: serverRating },
+            authoritativeRatingsByScope: { ...(current.authoritativeRatingsByScope || {}), ...resultAuthoritative },
           }
         })
         if (activeRef.current.token !== entry.authToken || activeRef.current.course !== entry.course) return
@@ -763,7 +911,7 @@ function App() {
     })
 
     return undefined
-  }, [answerSyncKey, answerSyncSummary.blocked, answerSyncSummary.errors, answerSyncSummary.nextAttemptAt, answerSyncSummary.pending, answerSyncSummary.total, answerSyncTick, hasSession, modeId, persisted.answerSyncQueue])
+  }, [answerSyncKey, answerSyncSummary.blocked, answerSyncSummary.errors, answerSyncSummary.nextAttemptAt, answerSyncSummary.pending, answerSyncSummary.total, answerSyncTick, hasSession, modeId, rankingPoolId, persisted.answerSyncQueue])
 
   const currentAnswer = () => {
     if (question.type === 'reorder') return tokens.join(' ')
@@ -789,6 +937,7 @@ function App() {
     const nextRating = rated ? Math.max(800, persisted.rating + delta) : persisted.rating
     const nextState = rated ? addAnsweredId({ ...persisted, rating: nextRating,
       ratingsByCourse: { ...persisted.ratingsByCourse, [answerSyncIdentity.course]: nextRating },
+      ratingsByScope: { ...(persisted.ratingsByScope || {}), [ratingScopeKey(answerSyncIdentity.course, rankingPoolId)]: nextRating },
       streak: correct ? persisted.streak + 1 : 0,
       answerSyncQueue: enqueueAnswer(persisted.answerSyncQueue, entry),
     }, answerSyncIdentity.course, question.id) : persisted
@@ -870,16 +1019,17 @@ function App() {
           <div className="top-stat streak-stat"><Icon name="streak" size={27} /><div><span>連続正解</span><strong>{persisted.streak}</strong></div></div>
           <div className="topbar-spacer" />
           <div className="selector-stack name-stack"><label htmlFor="student-name">生徒</label><div id="student-name" className="name-display">{persisted.studentName || '未ログイン'}</div><span>{hasSession ? 'ログイン中 / ランキングに表示' : '暗証番号でログイン'}</span></div>
-          <div className="selector-stack course-switcher"><label htmlFor="course-selector">講座</label><select id="course-selector" value={modeId} onChange={(event) => changeMode(event.target.value)}>{COURSE_MODES.map((course) => <option key={course.id} value={course.id} disabled={!course.available}>{course.label}</option>)}</select><span>講座ごとにランキングが分かれます</span></div>
+          <div className="selector-stack course-switcher"><label htmlFor="course-selector">講座</label><select id="course-selector" value={modeId} onChange={(event) => changeMode(event.target.value)}>{COURSE_MODES.map((course) => <option key={course.id} value={course.id} disabled={!course.available}>{course.label}</option>)}</select><span>講座と所属別にランキングが分かれます</span></div>
+          <div className="selector-stack pool-switcher"><label htmlFor="ranking-pool-selector">ランキング</label><select id="ranking-pool-selector" value={rankingPoolId} onChange={(event) => changeRankingPool(event.target.value)}>{RANKING_POOL_OPTIONS.map((pool) => <option key={pool.id} value={pool.id}>{pool.label}</option>)}</select><span>{poolLabel(rankingPoolId)}の参加者を表示</span></div>
           {hasSession && <button type="button" className="logout-button" onClick={logout}>ログアウト</button>}
           <div className="profile-orb" aria-hidden="true">{student.name.slice(0, 1)}</div>
         </header>
 
         <div className="content-wrap">
-          {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard: persisted.publicLeaderboard }} />}
-          {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={authoritativeRating} leaderboard={persisted.publicLeaderboard} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
-          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
-          {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={persisted.publicLeaderboard} rating={authoritativeRating} studentName={persisted.studentName} refresh={refreshLeaderboard} notice={notice} />}
+          {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, leaderboard: persisted.publicLeaderboard, rankingPoolId }} />}
+          {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={authoritativeRating} leaderboard={persisted.publicLeaderboard} rankingPoolId={rankingPoolId} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
+          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
+          {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={persisted.publicLeaderboard} rating={authoritativeRating} studentName={persisted.studentName} rankingPoolId={rankingPoolId} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={authoritativeRating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
         </div>
@@ -890,35 +1040,45 @@ function App() {
   )
 }
 
-function LandingView({ course, authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, submitAuth, authBusy, notice, leaderboard }) {
+function LandingView({ course, authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, leaderboard, rankingPoolId }) {
   return <div className="landing-view">
     <div className="landing-layout">
       <section className="landing-hero">
         <div className="landing-eyebrow"><span className="landing-mark"><Icon name="practice" size={25} /></span><span>WELCOME TO GRAMMAR ARENA</span></div>
       <p className="section-kicker">{course.eyebrow} / {course.unit}</p>
         <h1>レートを確認して、<br /><em>対戦を始める。</em></h1>
-        <p className="landing-copy">表示名と暗証番号でログインすると、現在レートを確認してから{course.label}・{course.name}の10問対戦を始められます。</p>
-        <div className="auth-tabs" role="tablist" aria-label="アカウント操作">
+        <p className="landing-copy">{placementSetup ? '所属情報を登録すると、クラスごとのランキングに参加できます。' : `表示名と暗証番号で確認してから、${course.label}・${course.name}の10問対戦を始められます。`}</p>
+        {!placementSetup && <div className="auth-tabs" role="tablist" aria-label="アカウント操作">
           <button type="button" className={authMode === 'login' ? 'selected' : ''} onClick={() => { setAuthMode('login'); setNotice('') }}>ログイン</button>
           <button type="button" className={authMode === 'register' ? 'selected' : ''} onClick={() => { setAuthMode('register'); setNotice('') }}>初回登録</button>
-        </div>
+        </div>}
         <form className="landing-form" onSubmit={(event) => { event.preventDefault(); submitAuth() }}>
-          <label htmlFor="landing-student-name">表示名（ランキングに表示）</label>
-          <input id="landing-student-name" value={authName} onChange={(event) => setAuthName(event.target.value)} placeholder="例：山田 太郎" maxLength={20} autoComplete="username" />
-          <label htmlFor="landing-pin">暗証番号（4〜8桁）</label>
-          <input id="landing-pin" type="password" inputMode="numeric" value={authPin} onChange={(event) => setAuthPin(event.target.value.replace(/\D/g, '').slice(0, 8))} placeholder="数字のみ" maxLength={8} autoComplete={authMode === 'login' ? 'current-password' : 'new-password'} />
+          {!placementSetup && <>
+            <label htmlFor="landing-student-name">表示名（ランキングに表示）</label>
+            <input id="landing-student-name" value={authName} onChange={(event) => setAuthName(event.target.value)} placeholder="例：山田 太郎" maxLength={20} autoComplete="username" />
+            <label htmlFor="landing-pin">暗証番号（4〜8桁）</label>
+            <input id="landing-pin" type="password" inputMode="numeric" value={authPin} onChange={(event) => setAuthPin(event.target.value.replace(/\D/g, '').slice(0, 8))} placeholder="数字のみ" maxLength={8} autoComplete={authMode === 'login' ? 'current-password' : 'new-password'} />
+          </>}
+          {(placementSetup || authMode === 'register') && <>
+            <div className="placement-grid">
+              <div><label htmlFor="landing-grade">学年</label><select id="landing-grade" value={authGrade} onChange={(event) => setAuthGrade(event.target.value)}>{GRADE_OPTIONS.map((grade) => <option key={grade} value={grade}>{grade}年</option>)}</select></div>
+              <div><label htmlFor="landing-class">クラス</label><select id="landing-class" value={authClassName} onChange={(event) => setAuthClassName(event.target.value)}>{CLASS_OPTIONS.map((className) => <option key={className} value={className}>{className}組</option>)}</select></div>
+            </div>
+            <label className="placement-check"><input type="checkbox" checked={authFoundationMember} onChange={(event) => setAuthFoundationMember(event.target.checked)} /><span>基礎講座受講中</span></label>
+            <p className="placement-help">クラスランキングには全員参加。チェックを入れると基礎講座ランキングにも参加します。</p>
+          </>}
           {notice && <p className="auth-notice" role="alert">{notice}</p>}
-          <button type="submit" className="primary-button landing-start" disabled={authBusy}>{authBusy ? '確認中…' : authMode === 'login' ? 'ログインしてレート確認' : '登録してレート対戦へ'}<Icon name="arrow" size={21} /></button>
-          <p className="landing-note">本名ではなく、授業で使うニックネームや出席番号の利用を推奨します。暗証番号は画面に表示されず、照合用の情報だけを保存します。</p>
+          <button type="submit" className="primary-button landing-start" disabled={authBusy}>{authBusy ? '確認中…' : placementSetup ? '所属情報を保存して開始' : authMode === 'login' ? 'ログインしてレート確認' : '登録してレート対戦へ'}<Icon name="arrow" size={21} /></button>
+          {!placementSetup && <p className="landing-note">本名ではなく、授業で使うニックネームや出席番号の利用を推奨します。暗証番号は画面に表示されず、照合用の情報だけを保存します。</p>}
         </form>
       </section>
-      <PublicLeaderboard players={leaderboard} currentName={authName} courseLabel={course.label} limit={5} />
+      <PublicLeaderboard players={leaderboard} currentName={authName} courseLabel={course.label} poolLabel={poolLabel(rankingPoolId)} limit={5} />
     </div>
-    <div className="landing-footer"><span>NOW PLAYING</span><strong>{course.label} - {course.name}</strong><span className="landing-footer-muted">講座ごとにランキングが分かれます</span></div>
+    <div className="landing-footer"><span>NOW PLAYING</span><strong>{course.label} - {course.name}</strong><span className="landing-footer-muted">講座と所属別にランキングが分かれます</span></div>
   </div>
 }
 
-function LobbyView({ course, studentName, rating, leaderboard, startPractice, openLeaderboard }) {
+function LobbyView({ course, studentName, rating, leaderboard, rankingPoolId, startPractice, openLeaderboard }) {
   return <div className="lobby-view">
     <section className="lobby-card">
       <div className="landing-eyebrow"><span className="landing-mark"><Icon name="leaderboard" size={25} /></span><span>READY FOR RATED MATCH</span></div>
@@ -927,7 +1087,7 @@ function LobbyView({ course, studentName, rating, leaderboard, startPractice, op
       <div className="lobby-rate"><span>YOUR CURRENT RATE</span><strong>{rating.toLocaleString()}</strong><small>{studentName} の現在レート / {course.name}</small></div>
       <button type="button" className="primary-button lobby-start" onClick={startPractice}>レート対戦を始める<Icon name="arrow" size={21} /></button>
     </section>
-    <PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} limit={5} onOpen={openLeaderboard} />
+    <PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} poolLabel={poolLabel(rankingPoolId)} limit={5} onOpen={openLeaderboard} />
   </div>
 }
 
@@ -935,7 +1095,7 @@ function NavItem({ icon, label, active, onClick }) {
   return <button type="button" className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}><Icon name={icon} size={22} /><span>{label}</span></button>
 }
 
-function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, studentName, openLeaderboard, answerSyncSummary, retryAnswer, retryFailedAnswers }) {
+function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, rankingPoolId, studentName, openLeaderboard, answerSyncSummary, retryAnswer, retryFailedAnswers }) {
   return <div className="practice-layout">
     <section className="practice-column">
       <div className="course-banner"><div><span className="course-banner-label">{course.eyebrow}</span><strong>{course.label}</strong><span className="course-banner-unit">{course.unit} / {course.name}</span></div><span className="course-stamp">STUDY</span></div>
@@ -944,7 +1104,7 @@ function PracticeView({ course, question, queue, index, filter, setFilter, submi
       {answerSyncSummary.total > 0 && <div className={`sync-status ${answerSyncSummary.errors && !answerSyncSummary.pending ? 'has-error' : ''}`} role="status"><span>{answerSyncSummary.errors && !answerSyncSummary.pending ? `保存エラー ${answerSyncSummary.errors}問` : answerSyncSummary.errors ? `保存待ち ${answerSyncSummary.total}問（自動再送中）` : `保存待ち ${answerSyncSummary.total}問`}</span><small>解答と判定は画面に反映済みです。</small>{answerSyncSummary.errors > 0 && <button type="button" onClick={retryFailedAnswers}>再送する</button>}</div>}
       {isComplete && sessionAnswers.length === 0 ? <EmptyQuestionState restart={() => restart(filter)} /> : isComplete ? <CompleteCard {...{ score: sessionScore, queue, reviews: sessionAnswers, course, studentName, ratingStart: sessionRatingStart, ratingAfter: authoritativeRating, provisionalRating: rating, completedAt: sessionCompletedAt, restart: () => restart(filter) }} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting, retryAnswer }} />}
     </section>
-    <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} /><PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} onOpen={openLeaderboard} /></div>
+    <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} /><PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} poolLabel={poolLabel(rankingPoolId)} onOpen={openLeaderboard} /></div>
   </div>
 }
 
@@ -1034,14 +1194,14 @@ function DailyRail({ correct, answered, seconds }) {
   return <aside className="daily-rail"><div className="rail-card"><div className="rail-title"><Icon name="calendar" size={21} /><h2>今日の記録</h2><span className="study-stamp">STUDY</span></div><div className="metric-list"><Metric icon="check" label="正解数" value={correct} /><Metric icon="close" label="不正解数" value={incorrect} /><Metric icon="chart" label="正答率" value={rate} /><Metric icon="clock" label="学習時間" value={minutes} /></div><div className="rail-divider" /><h3>レートの推移</h3><RatingChart /></div><div className="rail-note"><Icon name="chart" size={25} /><p>コツコツ積み重ねて、<br />もっと高いレベルへ。</p></div></aside>
 }
 
-function PublicLeaderboard({ players = [], currentName = '', courseLabel = '基礎講座', limit = 5, onOpen }) {
+function PublicLeaderboard({ players = [], currentName = '', courseLabel = '基礎講座', poolLabel: rankingLabel = '基礎講座', limit = 5, onOpen }) {
   const visiblePlayers = players.length ? players.slice(0, limit) : [{ name: 'まだ参加者はいません', rating: '—', answered: 0 }]
-  return <section className="leaderboard-card"><div className="leaderboard-head"><div><span className="section-kicker">PUBLIC RATE / {courseLabel}</span><h2>みんなのレート</h2></div><span className="leaderboard-live">LIVE</span></div><p className="leaderboard-copy">{courseLabel}に参加している生徒の現在レート</p><div className="leaderboard-list">{visiblePlayers.map((player, index) => <div className={`leaderboard-row ${player.name === currentName ? 'current' : ''}`} key={`${player.name}-${index}`}><span className="leaderboard-rank">{String(index + 1).padStart(2, '0')}</span><span className="leaderboard-name">{player.name}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div>{onOpen && <button type="button" className="leaderboard-link" onClick={onOpen}>全体ランキングを見る <Icon name="arrow" size={16} /></button>}</section>
+  return <section className="leaderboard-card"><div className="leaderboard-head"><div><span className="section-kicker">PUBLIC RATE / {rankingLabel}</span><h2>みんなのレート</h2></div><span className="leaderboard-live">LIVE</span></div><p className="leaderboard-copy">{courseLabel}・{rankingLabel}に参加している生徒の現在レート</p><div className="leaderboard-list">{visiblePlayers.map((player, index) => <div className={`leaderboard-row ${player.name === currentName ? 'current' : ''}`} key={`${player.name}-${index}`}><span className="leaderboard-rank">{String(index + 1).padStart(2, '0')}</span><span className="leaderboard-name">{player.name}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div>{onOpen && <button type="button" className="leaderboard-link" onClick={onOpen}>全体ランキングを見る <Icon name="arrow" size={16} /></button>}</section>
 }
 
-function LeaderboardView({ course, players = [], rating, studentName, refresh, notice }) {
+function LeaderboardView({ course, players = [], rating, studentName, rankingPoolId, refresh, notice }) {
   return <div className="leaderboard-page">
-    <div className="leaderboard-page-head"><div><p className="section-kicker">PUBLIC RATEBOARD / {course.label}</p><h1>{course.label}のランキング</h1><p className="subcopy">{course.label}に参加している生徒のレートを確認できます。</p></div><button type="button" className="secondary-button leaderboard-refresh" onClick={refresh}><Icon name="history" size={18} />ランキングを更新</button></div>
+    <div className="leaderboard-page-head"><div><p className="section-kicker">PUBLIC RATEBOARD / {poolLabel(rankingPoolId)}</p><h1>{course.label}・{poolLabel(rankingPoolId)}のランキング</h1><p className="subcopy">講座と所属プールを切り替えて、生徒のレートを確認できます。</p></div><button type="button" className="secondary-button leaderboard-refresh" onClick={refresh}><Icon name="history" size={18} />ランキングを更新</button></div>
     {notice && <div className="app-notice" role="status">{notice}</div>}
     <div className="leaderboard-overview"><div className="leaderboard-you"><span>YOUR RATE</span><strong>{rating.toLocaleString()}</strong><small>{studentName ? `${studentName} の現在レート` : '名前を入力すると参加できます'}</small></div><div className="leaderboard-rule"><span>RANKING RULE</span><strong>正答で上昇 / 不正解で下降</strong><small>問題ごとに1回だけレートへ反映されます。</small></div></div>
     <section className="leaderboard-table-card"><div className="leaderboard-table-head"><h2>参加者一覧</h2><span>{players.length ? `${players.length}人` : '共有データなし'}</span></div>{players.length ? <div className="leaderboard-table"><div className="leaderboard-table-row leaderboard-table-label"><span>RANK</span><span>PLAYER</span><span>ANSWERED</span><span>RATE</span></div>{players.map((player, index) => <div className={`leaderboard-table-row ${player.name === studentName ? 'current' : ''}`} key={`${player.name}-${index}`}><strong>{String(index + 1).padStart(2, '0')}</strong><span>{player.name}</span><span>{player.answered ?? 0}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div> : <div className="leaderboard-empty"><Icon name="leaderboard" size={34} /><h3>まだ共有ランキングがありません。</h3><p>共有サーバーに接続すると、他の生徒のレートがここに表示されます。</p></div>}</section>
