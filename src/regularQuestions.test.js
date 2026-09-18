@@ -26,6 +26,17 @@ test('英語演習I 2中の二学期範囲を全問収録している', () => {
   )
 })
 
+test('訳問題は正答1つとダミー3つの4択になっている', () => {
+  const translationQuestions = REGULAR_QUESTIONS.filter(({ prompt }) => prompt === '下線部に注意して、正しい日本語訳を選びなさい。')
+  assert.equal(translationQuestions.length, 21)
+  for (const question of translationQuestions) {
+    assert.equal(question.type, 'choice', question.id)
+    assert.equal(question.choices.length, 4, question.id)
+    assert.equal(new Set(question.choices).size, 4, question.id)
+    assert.ok(question.choices.includes(question.answer), question.id)
+  }
+})
+
 test('平常授業バンクは出題に必要な正答を持つ', () => {
   for (const question of REGULAR_QUESTIONS) {
     assert.ok(question.answer, question.id)
@@ -34,11 +45,9 @@ test('平常授業バンクは出題に必要な正答を持つ', () => {
   }
 })
 
-test('日本語訳問題は同じ意味の自然な訳を複数正答として持てる', () => {
+test('訳問題は正答を選択肢として明示する', () => {
   const question = REGULAR_QUESTIONS.find(({ id }) => id === 'reg27-29')
-  assert.deepEqual(question.accepted, [
-    '彼女は昨夜とても忙しかったのかもしれない。',
-    '彼女は昨日の夜とても忙しかったのかもしれない。',
-    '彼女は昨晩とても忙しかったのかもしれない。',
-  ])
+  assert.equal(question.answer, '彼女は昨夜とても忙しかったのかもしれない。')
+  assert.ok(question.choices.includes(question.answer))
+  assert.equal(question.choices.length, 4)
 })

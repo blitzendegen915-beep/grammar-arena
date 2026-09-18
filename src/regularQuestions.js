@@ -13,7 +13,7 @@ const make = (id, lesson, topic, difficulty, type, data) => ({
 const choice = (id, lesson, topic, difficulty, sentence, choices, answer, explanation, japanese = '') => make(id, lesson, topic, difficulty, 'choice', { sentence, choices, answer, answerLabel: answer, explanation, japanese, translation: japanese })
 const fill = (id, lesson, topic, difficulty, sentence, answer, explanation, japanese = '', accepted = [answer]) => make(id, lesson, topic, difficulty, 'input', { sentence, answer, accepted, answerLabel: answer, explanation, translation: japanese })
 const reorder = (id, lesson, topic, difficulty, japanese, words, answer, explanation) => make(id, lesson, topic, difficulty, 'reorder', { japanese, words, answer, answerLabel: answer, explanation, translation: japanese })
-const translate = (id, lesson, topic, difficulty, sentence, answer, explanation, accepted = [answer]) => make(id, lesson, topic, difficulty, 'input', { prompt: '下線部に注意して、次の英文を日本語に直しなさい。', sentence, answer, accepted, answerLabel: answer, explanation })
+const translateChoice = (id, lesson, topic, difficulty, sentence, answer, explanation, choices) => make(id, lesson, topic, difficulty, 'choice', { prompt: '下線部に注意して、正しい日本語訳を選びなさい。', sentence, choices, answer, answerLabel: answer, explanation })
 
 export const REGULAR_QUESTIONS = [
   // Lesson 27: 助動詞
@@ -44,10 +44,10 @@ export const REGULAR_QUESTIONS = [
   choice('reg27-25', 'Lesson 27', '助動詞', 'advanced', 'She knows the movie well. She [must watch / must have watched] it many times.', ['must watch', 'must have watched'], 'must have watched', '過去の経験への推量なので must have watched です。'),
   choice('reg27-26', 'Lesson 27', '助動詞', 'starter', 'He will arrive soon, so you [might as well / as might well] wait for him.', ['might as well', 'as might well'], 'might as well', 'might as well は「〜したほうがよい」を表します。'),
   choice('reg27-27', 'Lesson 27', '助動詞', 'starter', 'The bicycle is mine, so you [must / can] use it.', ['must', 'can'], 'can', 'can は許可「〜してよい」を表します。'),
-  translate('reg27-28', 'Lesson 27', '助動詞', 'starter', 'He could beat my sister at the party.', '彼はパーティーで私の姉（妹）を負かすことができた。', 'could は過去の能力や可能を表します。', ['彼はパーティーで私の姉を負かすことができた。', '彼はパーティーで妹を負かすことができた。']),
-  translate('reg27-29', 'Lesson 27', '助動詞', 'standard', 'She may have been very busy last night.', '彼女は昨夜とても忙しかったのかもしれない。', 'may have been は過去の推量です。', ['彼女は昨夜とても忙しかったのかもしれない。', '彼女は昨日の夜とても忙しかったのかもしれない。', '彼女は昨晩とても忙しかったのかもしれない。']),
-  translate('reg27-30', 'Lesson 27', '助動詞', 'starter', 'We used to talk with each other about our dreams for the future.', '私たちは以前、将来の夢についてお互いに話したものだ。', 'used to は過去の習慣を表します。'),
-  translate('reg27-31', 'Lesson 27', '助動詞', 'standard', 'I suggest that we start the meeting without him.', '私は彼なしで会議を始めることを提案します。', 'suggest that の後ろでは should を省略した原形が使われます。'),
+  translateChoice('reg27-28', 'Lesson 27', '助動詞', 'starter', 'He could beat my sister at the party.', '彼はパーティーで私の姉（妹）を負かすことができた。', 'could は過去の能力や可能を表します。', ['彼はパーティーで私の姉（妹）を負かすことができた。', '彼はパーティーで私の姉（妹）に負かされた。', '彼はパーティーで私の姉（妹）を負かすべきだった。', '彼はパーティーで私の姉（妹）に会えなかった。']),
+  translateChoice('reg27-29', 'Lesson 27', '助動詞', 'standard', 'She may have been very busy last night.', '彼女は昨夜とても忙しかったのかもしれない。', 'may have been は過去の推量です。', ['彼女は昨夜とても忙しかったのかもしれない。', '彼女は昨夜とても忙しくなければならなかった。', '彼女は昨夜とても忙しかったに違いない。', '彼女は昨夜とても忙しいだろう。']),
+  translateChoice('reg27-30', 'Lesson 27', '助動詞', 'starter', 'We used to talk with each other about our dreams for the future.', '私たちは以前、将来の夢についてお互いに話したものだ。', 'used to は過去の習慣を表します。', ['私たちは以前、将来の夢についてお互いに話したものだ。', '私たちは今、将来の夢についてお互いに話している。', '私たちは将来の夢についてお互いに話したい。', '私たちは以前、将来の夢についてお互いに話さなかった。']),
+  translateChoice('reg27-31', 'Lesson 27', '助動詞', 'standard', 'I suggest that we start the meeting without him.', '私は彼なしで会議を始めることを提案します。', 'suggest that の後ろでは should を省略した原形が使われます。', ['私は彼なしで会議を始めることを提案します。', '私は彼と一緒に会議を始めることを提案します。', '私は彼なしで会議を終えることを提案しました。', '私は彼なしで会議に出席することを提案します。']),
   fill('reg27-32', 'Lesson 27', '助動詞', 'standard', '彼は一生懸命勉強しなければならなかった。', 'He had to study hard.', '過去の義務は had to で表します。'),
   fill('reg27-33', 'Lesson 27', '助動詞', 'standard', '彼女は私のことを心配しているに違いない。', 'She must be worried about me.', '現在の強い推量は must be です。'),
   fill('reg27-34', 'Lesson 27', '助動詞', 'advanced', '君はそこへ行く必要はなかった。', 'You need not have gone there.', 'need not have + 過去分詞は「実際には行ったが、その必要はなかった」です。', '', ['You need not have gone there.', 'You needn\'t have gone there.']),
@@ -62,19 +62,19 @@ export const REGULAR_QUESTIONS = [
   fill('reg13-06', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'Bob bought a book (　　　) (　　　) on the bus.', 'to read', 'to read が「読むための本」という意味で book を修飾します。', 'ボブはバスの中で読む本を買いました。'),
   fill('reg13-07', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'She has the ability (　　　) (　　　) the work.', 'to do', 'ability to do は「〜する能力」です。', '彼女にはその仕事をする能力があります。'),
   fill('reg13-08', 'Lesson 13', '不定詞・形容詞的用法', 'starter', "He's looking for a house (　　　) (　　　) (　　　).", 'to live in', 'live in の in を残して「住むための家」とします。', '彼は住む家を探しています。', ['to live in', 'to live in it']),
-  translate('reg13-09', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'He is not a person to tell a lie.', '彼はうそをつくような人ではありません。', 'to tell a lie が person を修飾しています。'),
-  translate('reg13-10', 'Lesson 13', '不定詞・名詞的用法', 'standard', 'To study a language is to know a different culture.', '言語を学ぶことは、異なる文化を知ることです。', '文頭の to study が主語、to know が補語です。'),
-  translate('reg13-11', 'Lesson 13', '不定詞・名詞的用法', 'starter', 'He decided to join the soccer team.', '彼はサッカーチームに入ることを決めました。', 'decide to do は「〜することを決める」です。'),
-  translate('reg13-12', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'I have a lot of homework to hand in next Monday.', '私は来週の月曜日に提出する宿題がたくさんあります。', 'to hand in が homework を修飾します。'),
-  translate('reg13-13', 'Lesson 13', '不定詞・形容詞的用法', 'starter', "I'm hungry. I want something to eat.", 'お腹が空きました。何か食べるものが欲しいです。', 'something to eat は「食べるもの」です。'),
+  translateChoice('reg13-09', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'He is not a person to tell a lie.', '彼はうそをつくような人ではありません。', 'to tell a lie が person を修飾しています。', ['彼はうそをつくような人ではありません。', '彼はうそをつく人を知りません。', '彼はうそをつくように言われた人ではありません。', '彼はうそをつかない人だと話しました。']),
+  translateChoice('reg13-10', 'Lesson 13', '不定詞・名詞的用法', 'standard', 'To study a language is to know a different culture.', '言語を学ぶことは、異なる文化を知ることです。', '文頭の to study が主語、to know が補語です。', ['言語を学ぶことは、異なる文化を知ることです。', '言語を学ぶことは、異なる文化を教えることです。', '異なる文化を知ることは、言語を学ぶことです。', '言語を学んだので、異なる文化を知りました。']),
+  translateChoice('reg13-11', 'Lesson 13', '不定詞・名詞的用法', 'starter', 'He decided to join the soccer team.', '彼はサッカーチームに入ることを決めました。', 'decide to do は「〜することを決める」です。', ['彼はサッカーチームに入ることを決めました。', '彼はサッカーチームに入ることを忘れました。', '彼はサッカーチームに入るように決められました。', '彼はサッカーチームに入っていると決めました。']),
+  translateChoice('reg13-12', 'Lesson 13', '不定詞・形容詞的用法', 'starter', 'I have a lot of homework to hand in next Monday.', '私は来週の月曜日に提出する宿題がたくさんあります。', 'to hand in が homework を修飾します。', ['私は来週の月曜日に提出する宿題がたくさんあります。', '私は来週の月曜日に提出した宿題がたくさんありました。', '私は来週の月曜日に宿題を提出することを決めました。', '私は来週の月曜日に提出する宿題が一つあります。']),
+  translateChoice('reg13-13', 'Lesson 13', '不定詞・形容詞的用法', 'starter', "I'm hungry. I want something to eat.", 'お腹が空きました。何か食べるものが欲しいです。', 'something to eat は「食べるもの」です。', ['お腹が空きました。何か食べるものが欲しいです。', 'お腹が空きました。何かを食べている人が欲しいです。', 'お腹がいっぱいです。何か食べるものが欲しいです。', 'お腹が空きました。何も食べたくありません。']),
   fill('reg13-14', 'Lesson 13', '不定詞・名詞的用法', 'standard', '英語を話すことはとても難しい。', 'It is difficult to speak English.', '仮主語 It を使って「〜することは難しい」と表します。', '', ['It is difficult to speak English.', 'To speak English is very difficult.']),
 
   // Lesson 14: 不定詞 (2)
-  translate('reg14-01', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'I went to Harajuku to buy some clothes yesterday.', '私は昨日、服を買うために原宿へ行きました。', 'to buy は目的「〜するために」を表します。'),
-  translate('reg14-02', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'He grew up to be a lawyer.', '彼は成長して弁護士になりました。', 'grow up to be は結果「成長して〜になる」です。'),
-  translate('reg14-03', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'She is very kind to help them.', '彼女は親切にも彼らを助けてあげました。', '形容詞 + to不定詞で判断の理由を表します。'),
-  translate('reg14-04', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'I was sad to hear the news.', '私はその知らせを聞いて悲しかった。', '感情の原因を to hear が表します。'),
-  translate('reg14-05', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'He was very happy to get the job.', '彼はその仕事を得てとても幸せでした。', 'happy の原因を to get が表します。'),
+  translateChoice('reg14-01', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'I went to Harajuku to buy some clothes yesterday.', '私は昨日、服を買うために原宿へ行きました。', 'to buy は目的「〜するために」を表します。', ['私は昨日、服を買うために原宿へ行きました。', '私は昨日、服を買ったあとで原宿へ行きました。', '私は昨日、服を買うために原宿から帰りました。', '私は昨日、服を買わずに原宿へ行きました。']),
+  translateChoice('reg14-02', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'He grew up to be a lawyer.', '彼は成長して弁護士になりました。', 'grow up to be は結果「成長して〜になる」です。', ['彼は成長して弁護士になりました。', '彼は弁護士になるために成長しました。', '彼は弁護士を成長させました。', '彼は成長した弁護士に会いました。']),
+  translateChoice('reg14-03', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'She is very kind to help them.', '彼女は親切にも彼らを助けてあげました。', '形容詞 + to不定詞で判断の理由を表します。', ['彼女は親切にも彼らを助けてあげました。', '彼女は彼らを助けるのを親切に思いました。', '彼女は彼らを助けてもらって親切でした。', '彼女は彼らを助けるほど冷たかった。']),
+  translateChoice('reg14-04', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'I was sad to hear the news.', '私はその知らせを聞いて悲しかった。', '感情の原因を to hear が表します。', ['私はその知らせを聞いて悲しかった。', '私はその知らせを聞くと嬉しかった。', '私はその知らせを聞いて驚きました。', '私はその知らせを聞かないで悲しかった。']),
+  translateChoice('reg14-05', 'Lesson 14', '不定詞・副詞的用法', 'standard', 'He was very happy to get the job.', '彼はその仕事を得てとても幸せでした。', 'happy の原因を to get が表します。', ['彼はその仕事を得てとても幸せでした。', '彼はその仕事を得るためにとても幸せでした。', '彼はその仕事を失ってとても幸せでした。', '彼はその仕事を得た人をとても幸せにしました。']),
   fill('reg14-06', 'Lesson 14', 'SVO + 不定詞', 'standard', 'I (　　　) (　　　) (　　　) (　　　) the role.', 'want him to take', 'want + 人 + to do は「人に〜してほしい」です。', '私は彼にその役を演じてほしい。', ['want him to take', 'want him to play']),
   fill('reg14-07', 'Lesson 14', 'SVO + 不定詞', 'standard', 'The police officer (　　　) (　　　) (　　　) (　　　) home.', 'told us to go', 'tell + 人 + to do は「人に〜するように言う」です。', 'その警官は私たちに家に帰るように言いました。'),
   fill('reg14-08', 'Lesson 14', 'SVO + 不定詞', 'standard', 'My parents (　　　) (　　　) (　　　) (　　　) a telescope.', 'allowed me to use', 'allow + 人 + to do は「人が〜するのを許す」です。', '両親は私が望遠鏡を使うのを許してくれました。'),
@@ -104,8 +104,8 @@ export const REGULAR_QUESTIONS = [
   fill('reg15-16', 'Lesson 15', '知覚動詞', 'standard', 'なぜ昨日パーティーに来なかったの？ お父さんが私に宿題をさせたんだ。', 'My father made me do my homework.', 'make + O + 動詞の原形で「Oに〜させる」です。', '', ['My father made me do my homework.', 'My father made me study.']),
 
   // Plus: 不定詞
-  translate('regplus-01', 'Plus', '不定詞・独立不定詞', 'advanced', 'We happened to know each other.', '私たちはたまたまお互いを知ることになった。', 'happen to do は「たまたま〜する」です。', ['私たちはたまたま知り合った。', '私たちはたまたまお互いを知っていた。']),
-  translate('regplus-02', 'Plus', '不定詞・be to', 'advanced', 'Satoshi came to understand Italian culture while he was in Rome.', 'サトシはローマにいる間に、イタリア文化を理解するようになった。', 'come to do は「〜するようになる」です。'),
+  translateChoice('regplus-01', 'Plus', '不定詞・独立不定詞', 'advanced', 'We happened to know each other.', '私たちはたまたま知り合った。', 'happen to do は「たまたま〜する」です。', ['私たちはたまたま知り合った。', '私たちはお互いを知ろうと努力した。', '私たちは以前からお互いを知っていた。', '私たちはたまたまお互いを避けた。']),
+  translateChoice('regplus-02', 'Plus', '不定詞・be to', 'advanced', 'Satoshi came to understand Italian culture while he was in Rome.', 'サトシはローマにいる間に、イタリア文化を理解するようになった。', 'come to do は「〜するようになる」です。', ['サトシはローマにいる間に、イタリア文化を理解するようになった。', 'サトシはローマにいる間、イタリア文化を教えるようになった。', 'サトシはローマに行く前にイタリア文化を理解していた。', 'サトシはローマでイタリア文化を理解できなかった。']),
   reorder('regplus-03', 'Plus', '不定詞・be to', 'advanced', 'フランス大統領は来月、日本を訪問する予定です。', ['The', 'French', 'President', 'is', 'to', 'visit', 'Japan', 'next', 'month.'], 'The French President is to visit Japan next month.', 'be to do は公的な予定を表します。'),
   reorder('regplus-04', 'Plus', '不定詞・be to', 'advanced', '空には雲一つ見えなかった。', ['Not', 'a', 'cloud', 'was', 'to', 'be', 'seen', 'in', 'the', 'sky.'], 'Not a cloud was to be seen in the sky.', 'be to be seen は「見える・見られる」を表す受動表現です。'),
   reorder('regplus-05', 'Plus', '不定詞・be to', 'advanced', '外出する前に宿題をしなさい。', ['You', 'are', 'to', 'do', 'your', 'homework', 'before', 'you', 'go', 'out.'], 'You are to do your homework before you go out.', 'be to do は命令・義務も表します。'),
@@ -165,11 +165,11 @@ export const REGULAR_QUESTIONS = [
   reorder('regopt4-08', 'Option 4', '無生物主語', 'standard', '私はプライドのせいで、友だちに助けを求めることができなかった。', ['My', 'pride', 'kept', 'me', 'from', 'asking', 'my', 'friends', 'for', 'help.'], 'My pride kept me from asking my friends for help.', 'keep + O + from -ing は「Oが〜するのを妨げる」です。'),
   reorder('regopt4-09', 'Option 4', '無生物主語', 'standard', '事故のせいで、私たちは時間どおりに駅に到着できなかった。', ['The', 'accident', 'prevented', 'us', 'from', 'arriving', 'at', 'the', 'station', 'on', 'time.'], 'The accident prevented us from arriving at the station on time.', 'prevent + O + from -ing の形です。'),
   reorder('regopt4-10', 'Option 4', '無生物主語', 'standard', '彼の手紙には、彼が4月に私たちを訪れると書いてあった。', ['His', 'letter', 'said', 'that', 'he', 'would', 'visit', 'us', 'in', 'April.'], 'His letter said that he would visit us in April.', '無生物主語の say は「〜と書いてある」です。'),
-  translate('regopt4-11', 'Option 4', '名詞構文', 'starter', 'Let me have a look at that.', 'それをちょっと見せてください。', 'have a look は take a look と同じ「見る」です。'),
-  translate('regopt4-12', 'Option 4', '名詞構文', 'starter', 'My sister is an early riser.', '私の姉（妹）は早起きです。', 'early riser は「早起きする人」です。', ['私の姉は早起きです。', '私の妹は早起きです。']),
-  translate('regopt4-13', 'Option 4', '無生物主語', 'standard', 'The Internet allows us to get a lot of information.', 'インターネットのおかげで、私たちは多くの情報を得ることができます。', 'allow + O + to do は「Oが〜するのを可能にする」です。'),
-  translate('regopt4-14', 'Option 4', '無生物主語', 'standard', 'The typhoon stopped us from going fishing in the sea.', '台風のため、私たちは海へ釣りに行けませんでした。', 'stop + O + from -ing は「Oが〜するのを妨げる」です。'),
-  translate('regopt4-15', 'Option 4', '無生物主語', 'starter', 'Will this bus take us to the airport?', 'このバスで空港へ行けますか。', '無生物主語の take は「連れていく」を表します。'),
+  translateChoice('regopt4-11', 'Option 4', '名詞構文', 'starter', 'Let me have a look at that.', 'それをちょっと見せてください。', 'have a look は take a look と同じ「見る」です。', ['それをちょっと見せてください。', 'それを少し聞かせてください。', 'それをちょっと貸してください。', 'それをもう一度説明してください。']),
+  translateChoice('regopt4-12', 'Option 4', '名詞構文', 'starter', 'My sister is an early riser.', '私の姉（妹）は早起きです。', 'early riser は「早起きする人」です。', ['私の姉（妹）は早起きです。', '私の姉（妹）は夜更かしです。', '私の姉（妹）は早く走ります。', '私の姉（妹）は朝食を作ります。']),
+  translateChoice('regopt4-13', 'Option 4', '無生物主語', 'standard', 'The Internet allows us to get a lot of information.', 'インターネットのおかげで、私たちは多くの情報を得ることができます。', 'allow + O + to do は「Oが〜するのを可能にする」です。', ['インターネットのおかげで、私たちは多くの情報を得ることができます。', 'インターネットのおかげで、私たちは多くの情報を失います。', 'インターネットは私たちに多くの情報を教えることを許しません。', '私たちはインターネットを使わずに多くの情報を得られます。']),
+  translateChoice('regopt4-14', 'Option 4', '無生物主語', 'standard', 'The typhoon stopped us from going fishing in the sea.', '台風のため、私たちは海へ釣りに行けませんでした。', 'stop + O + from -ing は「Oが〜するのを妨げる」です。', ['台風のため、私たちは海へ釣りに行けませんでした。', '台風のおかげで、私たちは海へ釣りに行きました。', '台風のため、私たちは海で釣りを楽しみました。', '台風は私たちに海へ釣りに行くよう促しました。']),
+  translateChoice('regopt4-15', 'Option 4', '無生物主語', 'starter', 'Will this bus take us to the airport?', 'このバスで空港へ行けますか。', '無生物主語の take は「連れていく」を表します。', ['このバスで空港へ行けますか。', 'このバスは空港から来ますか。', 'このバスで空港へ行く人を見ましたか。', 'このバスは空港へ行かずに停まりますか。']),
 
   // Option 7: 前置詞
   fill('regopt7-01', 'Option 7', 'at / in / on', 'starter', 'Please pick me up (　　　) the station.', 'at', 'at は場所の一点を表します。', '駅で私を拾ってください。'),
