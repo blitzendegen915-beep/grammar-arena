@@ -1026,7 +1026,7 @@ function App() {
         </header>
 
         <div className="content-wrap">
-          {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, leaderboard: persisted.publicLeaderboard, rankingPoolId }} />}
+          {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, setNotice, leaderboard: persisted.publicLeaderboard, rankingPoolId }} />}
           {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={authoritativeRating} leaderboard={persisted.publicLeaderboard} rankingPoolId={rankingPoolId} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
           {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: persisted.publicLeaderboard, rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
           {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={persisted.publicLeaderboard} rating={authoritativeRating} studentName={persisted.studentName} rankingPoolId={rankingPoolId} refresh={refreshLeaderboard} notice={notice} />}
@@ -1040,7 +1040,7 @@ function App() {
   )
 }
 
-function LandingView({ course, authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, leaderboard, rankingPoolId }) {
+function LandingView({ course, authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, setNotice, leaderboard, rankingPoolId }) {
   return <div className="landing-view">
     <div className="landing-layout">
       <section className="landing-hero">
