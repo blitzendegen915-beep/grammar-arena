@@ -45,7 +45,7 @@ export const REGULAR_QUESTIONS = [
   choice('reg27-26', 'Lesson 27', '助動詞', 'starter', 'He will arrive soon, so you [might as well / as might well] wait for him.', ['might as well', 'as might well'], 'might as well', 'might as well は「〜したほうがよい」を表します。'),
   choice('reg27-27', 'Lesson 27', '助動詞', 'starter', 'The bicycle is mine, so you [must / can] use it.', ['must', 'can'], 'can', 'can は許可「〜してよい」を表します。'),
   translate('reg27-28', 'Lesson 27', '助動詞', 'starter', 'He could beat my sister at the party.', '彼はパーティーで私の姉（妹）を負かすことができた。', 'could は過去の能力や可能を表します。', ['彼はパーティーで私の姉を負かすことができた。', '彼はパーティーで妹を負かすことができた。']),
-  translate('reg27-29', 'Lesson 27', '助動詞', 'standard', 'She may have been very busy last night.', '彼女は昨夜とても忙しかったのかもしれない。', 'may have been は過去の推量です。'),
+  translate('reg27-29', 'Lesson 27', '助動詞', 'standard', 'She may have been very busy last night.', '彼女は昨夜とても忙しかったのかもしれない。', 'may have been は過去の推量です。', ['彼女は昨夜とても忙しかったのかもしれない。', '彼女は昨日の夜とても忙しかったのかもしれない。', '彼女は昨晩とても忙しかったのかもしれない。']),
   translate('reg27-30', 'Lesson 27', '助動詞', 'starter', 'We used to talk with each other about our dreams for the future.', '私たちは以前、将来の夢についてお互いに話したものだ。', 'used to は過去の習慣を表します。'),
   translate('reg27-31', 'Lesson 27', '助動詞', 'standard', 'I suggest that we start the meeting without him.', '私は彼なしで会議を始めることを提案します。', 'suggest that の後ろでは should を省略した原形が使われます。'),
   fill('reg27-32', 'Lesson 27', '助動詞', 'standard', '彼は一生懸命勉強しなければならなかった。', 'He had to study hard.', '過去の義務は had to で表します。'),

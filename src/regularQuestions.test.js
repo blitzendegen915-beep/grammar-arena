@@ -14,3 +14,12 @@ test('平常授業バンクは出題に必要な正答を持つ', () => {
     if (question.type === 'reorder') assert.ok(question.words.length > 1, question.id)
   }
 })
+
+test('日本語訳問題は同じ意味の自然な訳を複数正答として持てる', () => {
+  const question = REGULAR_QUESTIONS.find(({ id }) => id === 'reg27-29')
+  assert.deepEqual(question.accepted, [
+    '彼女は昨夜とても忙しかったのかもしれない。',
+    '彼女は昨日の夜とても忙しかったのかもしれない。',
+    '彼女は昨晩とても忙しかったのかもしれない。',
+  ])
+})
