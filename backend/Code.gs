@@ -1568,7 +1568,7 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
     poolId: activePool,
     poolIds,
     ratings,
-    players: activePool ? leaderboard_(players, courseProfiles, poolProfiles, course, activePool) : [],
+    players: activePool ? leaderboard_(players, courseProfiles, poolProfiles, course, activePool, playerKey) : [],
   }
 }
 
@@ -1714,7 +1714,7 @@ function recordAnswer_(params) {
     players.getRange(playerIndex + 1, 5).setValue(now)
     const activeUpdated = updatedProfiles.find((profile) => profile.poolId === activePool) || primaryProfile
     const result = { ok: true, rating: activeUpdated.rating, delta: safeDelta, correct, serverValidated, poolId: activePool, ratings: ratingsFromProfiles_(updatedProfiles) }
-    if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, poolProfiles, course, activePool)
+    if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, poolProfiles, course, activePool, playerKey)
     return json_(result, params.callback)
   } finally {
     lock.releaseLock()
@@ -1732,22 +1732,26 @@ function getLeaderboard_(course, poolId, name, authToken, callback) {
   const memberPools = playerPools_(players.getDataRange().getValues()[auth.playerIndex])
   const activePool = cleanPoolId_(poolId) || memberPools[0] || ''
   if (!activePool || !memberPools.includes(activePool)) return json_({ ok: false, reason: 'pool-forbidden', poolId: activePool, allowedPoolId: memberPools[0] || '', players: [] }, callback)
-  return json_({ ok: true, course, poolId: activePool, players: leaderboard_(players, courseProfiles, poolProfiles, course, activePool) }, callback)
+  return json_({ ok: true, course, poolId: activePool, players: leaderboard_(players, courseProfiles, poolProfiles, course, activePool, auth.playerKey) }, callback)
 }
 
 function ratingsFromProfiles_(profiles) {
   return Object.fromEntries(profiles.map((profile) => [profile.poolId, { rating: profile.rating, answered: profile.answered }]))
 }
 
-function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, course, poolId = 'all') {
+function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, course, poolId = 'all', viewerPlayerKey = '') {
   const playerRows = playersSheet.getDataRange().getValues().slice(1).filter((row) => row[0] && row[1])
   const rankingCourses = rankingCourses_(course)
   if (poolId === 'all') {
     const profileRows = courseProfilesSheet.getDataRange().getValues().slice(1)
       .filter((row) => row[0] && rankingCourses.includes(String(row[1])))
     const names = new Map(playerRows.map((row) => [String(row[0]), String(row[1])]))
-    return profileRows.map((row) => ({ name: names.get(String(row[0])) || String(row[0]), rating: Number(row[2]) || 1240, answered: Number(row[3]) || 0 }))
-      .sort((a, b) => b.rating - a.rating || b.answered - a.answered || a.name.localeCompare(b.name, 'ja'))
+    return profileRows.map((row) => {
+      const playerKey = String(row[0])
+      const player = { name: names.get(playerKey) || playerKey, rating: Number(row[2]) || 1240 }
+      if (playerKey === String(viewerPlayerKey || '')) player.answered = Number(row[3]) || 0
+      return player
+    }).sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name, 'ja'))
   }
   const profileRows = poolProfilesSheet.getDataRange().getValues().slice(1)
     .filter((row) => row[0] && rankingCourses.includes(String(row[1])) && String(row[2]) === poolId)
@@ -1756,10 +1760,13 @@ function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, cour
     .filter((row) => playerPools_(row).includes(poolId))
     .map((row) => {
       const profile = profiles.get(String(row[0]))
-      return { name: String(row[1]), rating: profile?.rating ?? (poolId === FOUNDATION_POOL_ID ? Number(row[2]) || 1240 : 1240), answered: profile?.answered ?? (poolId === FOUNDATION_POOL_ID ? Number(row[3]) || 0 : 0) }
+      const playerKey = String(row[0])
+      const player = { name: String(row[1]), rating: profile?.rating ?? (poolId === FOUNDATION_POOL_ID ? Number(row[2]) || 1240 : 1240) }
+      if (playerKey === String(viewerPlayerKey || '')) player.answered = profile?.answered ?? (poolId === FOUNDATION_POOL_ID ? Number(row[3]) || 0 : 0)
+      return player
     })
   return ranked
-    .sort((a, b) => b.rating - a.rating || b.answered - a.answered || a.name.localeCompare(b.name, 'ja'))
+    .sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name, 'ja'))
 }
 
 function cleanName_(value) {
