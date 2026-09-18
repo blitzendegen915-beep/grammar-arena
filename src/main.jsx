@@ -930,7 +930,7 @@ function App() {
         })
         if (activeRef.current.token !== entry.authToken || activeRef.current.course !== entry.course) return
         if (type === 'invalid-session') setNotice('回答は端末に保管されています。再ログインして保存を再開してください。')
-        if (type === 'blocked') setNotice('不適切な表現を含む解答は保存できません。表現を見直してください。')
+        if (type === 'blocked') setNotice(MODERATION_NOTICE)
         setSubmittedSync(entry.questionId, {
           ...(result?.serverValidated === true && typeof result.correct === 'boolean' ? { correct: result.correct } : {}),
           syncStatus,
@@ -962,7 +962,7 @@ function App() {
     const userAnswer = currentAnswer()
     if (!userAnswer.trim()) return
     if (isModerationBlocked(userAnswer)) {
-      setNotice('不適切な表現は解答として送信できません。表現を見直してください。')
+      setNotice(MODERATION_NOTICE)
       return
     }
     const correct = isCorrectAnswer(question, userAnswer)
