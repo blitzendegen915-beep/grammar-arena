@@ -1608,9 +1608,10 @@ function rankingCourses_(course) {
 function playerPools_(row) {
   const grade = cleanGrade_(row[7])
   const className = cleanClassName_(row[8])
-  if (String(row[9] || '').toLowerCase() === 'true') return [FOUNDATION_POOL_ID]
-  if (!grade || !className) return []
-  return [grade + '-' + className]
+  const classPool = grade && className ? grade + '-' + className : ''
+  const foundationMember = String(row[9] || '').toLowerCase() === 'true'
+  if (foundationMember) return classPool ? [FOUNDATION_POOL_ID, classPool] : [FOUNDATION_POOL_ID]
+  return classPool ? [classPool] : []
 }
 
 function ensurePoolProfile_(poolSheet, legacySheet, playerKey, course, poolId, fallbackRating, fallbackAnswered) {

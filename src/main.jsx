@@ -279,13 +279,16 @@ function readPersisted() {
     if (!raw) return { ...DEFAULT_PERSISTED }
     const parsed = JSON.parse(raw)
     const restored = { ...DEFAULT_PERSISTED, ...parsed }
-    const restoredPoolId = restored.grade && restored.className ? preferredPoolId(restored) : ''
+    const restoredPoolIds = restored.grade && restored.className ? preferredPoolIds(restored) : []
+    const restoredPoolId = restoredPoolIds.includes(restored.rankingPoolId)
+      ? restored.rankingPoolId
+      : restoredPoolIds[0] || 'foundation'
     return {
       ...restored,
       // Never render a cached name list before the authenticated pool is re-read.
       publicLeaderboard: [],
-      poolIds: restoredPoolId ? [restoredPoolId] : [],
-      rankingPoolId: restoredPoolId || 'foundation',
+      poolIds: restoredPoolIds,
+      rankingPoolId: restoredPoolId,
       answerSyncQueue: recoverAnswerQueue(Array.isArray(parsed.answerSyncQueue) ? parsed.answerSyncQueue : []),
     }
   } catch { return { ...DEFAULT_PERSISTED } }
@@ -337,6 +340,12 @@ function classPoolId(grade, className) {
 
 function preferredPoolId({ grade = '', className = '', foundationMember = false } = {}) {
   return foundationMember ? 'foundation' : classPoolId(grade, className) || 'foundation'
+}
+
+function preferredPoolIds({ grade = '', className = '', foundationMember = false } = {}) {
+  const classPool = classPoolId(grade, className)
+  if (foundationMember) return classPool ? ['foundation', classPool] : ['foundation']
+  return classPool ? [classPool] : []
 }
 
 function ratingsToScopeMap(ratings = {}, course, existing = {}) {
