@@ -1,8 +1,8 @@
 import { StrictMode, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
-import { FOUNDATION_TRANSLATIONS, GERUND_QUESTIONS, PARTICIPLE_QUESTIONS } from './questionBanks'
-import { REGULAR_QUESTIONS } from './regularQuestions'
+import { FOUNDATION_TRANSLATIONS } from './foundationTranslations'
+import { loadQuestionBank } from './questionBankLoader'
 import { isBlankPlaceholder, withBlankCount } from './questionQuality'
 import { getQuestionTranslation } from './questionPresentation'
 import { isModerationBlocked, MODERATION_NOTICE } from './contentModeration'
@@ -232,17 +232,6 @@ const RANKING_POOL_OPTIONS = [
   ...GRADE_OPTIONS.flatMap((grade) => CLASS_OPTIONS.map((className) => ({ id: `${grade}-${className}`, label: `${grade}-${className}` }))),
 ]
 
-const QUESTION_BANKS = {
-  'foundation-infinitive': FOUNDATION_QUESTIONS,
-  'foundation-gerund': GERUND_QUESTIONS,
-  'foundation-participles': PARTICIPLE_QUESTIONS,
-  'regular-english-practice': REGULAR_QUESTIONS,
-}
-
-function getQuestionBank(modeId) {
-  return QUESTION_BANKS[modeId] || FOUNDATION_QUESTIONS
-}
-
 function getCourseDetails(modeId) {
   return COURSE_DETAILS[modeId] || COURSE_DETAILS['foundation-infinitive']
 }
@@ -430,8 +419,11 @@ function App() {
   const [filter, setFilter] = useState('all')
   const [queue, setQueue] = useState(() => {
     const initial = readPersisted()
-    return buildQueue('all', initial.answeredIds, getQuestionBank('foundation-infinitive'))
+    return buildQueue('all', initial.answeredIds, FOUNDATION_QUESTIONS)
   })
+  const [questionBank, setQuestionBank] = useState(() => FOUNDATION_QUESTIONS)
+  const [loadedBankModeId, setLoadedBankModeId] = useState(DEFAULT_MODE_ID)
+  const [bankLoading, setBankLoading] = useState(false)
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState('')
   const [tokens, setTokens] = useState([])
@@ -455,6 +447,7 @@ function App() {
   const [placementSetup, setPlacementSetup] = useState(null)
   const [authBusy, setAuthBusy] = useState(false)
   const leaderboardRequestRef = useRef(0)
+  const bankRequestRef = useRef(0)
   const answerSyncRunningRef = useRef(false)
   const answerSyncTimerRef = useRef(null)
   const [answerSyncTick, setAnswerSyncTick] = useState(0)
@@ -638,6 +631,32 @@ function App() {
     return stored.length ? stored : (rankingId === 'foundation-course' ? persisted.answeredIds : [])
   }
 
+  const loadBankForMode = async (nextModeId, nextFilter = 'all', nextAnsweredIds = answeredIdsForCourse(nextModeId)) => {
+    const requestId = ++bankRequestRef.current
+    if (loadedBankModeId === nextModeId && questionBank.length) {
+      setQueue(buildQueue(nextFilter, nextAnsweredIds, questionBank))
+      return
+    }
+    setBankLoading(true)
+    setQueue([])
+    try {
+      const bank = await loadQuestionBank(nextModeId, FOUNDATION_QUESTIONS)
+      if (requestId !== bankRequestRef.current) return
+      setQuestionBank(bank)
+      setLoadedBankModeId(nextModeId)
+      setQueue(buildQueue(nextFilter, nextAnsweredIds, bank))
+    } catch {
+      if (requestId !== bankRequestRef.current) return
+      setNotice('この単元の問題を読み込めませんでした。通信状態を確認して再試行してください。')
+    } finally {
+      if (requestId === bankRequestRef.current) setBankLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadBankForMode(modeId, 'all', answeredIdsForCourse(modeId))
+  }, [modeId])
+
   const changeMode = (nextModeId) => {
     if (nextModeId === modeId) return
     if (hasActivePractice && !window.confirm('進行中の10問を破棄して講座を変更しますか？')) return
@@ -656,7 +675,7 @@ function App() {
     setPersisted((current) => ({ ...current, modeId: nextModeId, rating: nextRating, ratingsByCourse, ratingsByScope, answeredIds: nextAnsweredIds, publicLeaderboard: [] }))
     setSessionRatingStart(nextSessionRating)
     setFilter('all')
-    setQueue(buildQueue('all', nextAnsweredIds, getQuestionBank(nextModeId)))
+    setQueue([])
     setIndex(0)
     setSelected('')
     setTokens([])
@@ -690,7 +709,7 @@ function App() {
     setNotice('')
     if (hasSession && !isComplete) {
       setFilter('all')
-      setQueue(buildQueue('all', answeredIdsForCourse(modeId), getQuestionBank(modeId)))
+      void loadBankForMode(modeId, 'all', answeredIdsForCourse(modeId))
       setIndex(0)
       setSelected('')
       setTokens([])
@@ -706,7 +725,7 @@ function App() {
   const restart = (nextFilter = filter) => {
     if (nextFilter !== filter && hasActivePractice && !window.confirm('進行中の10問を破棄して難易度を変更しますか？')) return
     setFilter(nextFilter)
-    setQueue(buildQueue(nextFilter, answeredIdsForCourse(modeId), getQuestionBank(modeId)))
+    void loadBankForMode(modeId, nextFilter, answeredIdsForCourse(modeId))
     setIndex(0)
     setSelected('')
     setTokens([])
@@ -1077,7 +1096,7 @@ function App() {
         <div className="content-wrap">
           {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, setNotice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId }} />}
           {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={authoritativeRating} leaderboard={hasSession ? persisted.publicLeaderboard : []} rankingPoolId={rankingPoolId} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
-          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, history: persisted.history, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
+          {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, bankLoading, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, history: persisted.history, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
           {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={hasSession ? persisted.publicLeaderboard : []} rating={authoritativeRating} studentName={persisted.studentName} rankingPoolId={rankingPoolId} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={authoritativeRating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
@@ -1144,14 +1163,14 @@ function NavItem({ icon, label, active, onClick }) {
   return <button type="button" className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}><Icon name={icon} size={22} /><span>{label}</span></button>
 }
 
-function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating, authoritativeRating, history, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, rankingPoolId, studentName, openLeaderboard, answerSyncSummary, retryAnswer, retryFailedAnswers }) {
+function PracticeView({ course, question, queue, index, filter, setFilter, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, isComplete, bankLoading, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating, authoritativeRating, history, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard, rankingPoolId, studentName, openLeaderboard, answerSyncSummary, retryAnswer, retryFailedAnswers }) {
   return <div className="practice-layout">
     <section className="practice-column">
       <div className="course-banner"><div><span className="course-banner-label">{course.eyebrow}</span><strong>{course.label}</strong><span className="course-banner-unit">{course.unit} / {course.name}</span></div><span className="course-stamp">STUDY</span></div>
       <div className="section-heading"><div><p className="section-kicker">{course.label} / {course.name}</p><h1>{course.title}</h1><p className="session-hint">1セッション {SESSION_LENGTH}問 / {filter === 'all' ? '全レベルミックス' : `${DIFFICULTY[filter].label}を優先して出題`}</p></div><div className="difficulty-tabs" role="tablist" aria-label="難易度"><DifficultyTab value="all" current={filter} onClick={setFilter} label="すべて" /><DifficultyTab value="starter" current={filter} onClick={setFilter} label="基礎" /><DifficultyTab value="standard" current={filter} onClick={setFilter} label="標準" /><DifficultyTab value="advanced" current={filter} onClick={setFilter} label="発展" /></div></div>
       {notice && <div className="app-notice" role="status">{notice}</div>}
       {answerSyncSummary.total > 0 && <div className={`sync-status ${answerSyncSummary.errors && !answerSyncSummary.pending ? 'has-error' : ''}`} role="status"><span>{answerSyncSummary.errors && !answerSyncSummary.pending ? `保存エラー ${answerSyncSummary.errors}問` : answerSyncSummary.errors ? `保存待ち ${answerSyncSummary.total}問（自動再送中）` : `保存待ち ${answerSyncSummary.total}問`}</span><small>解答と判定は画面に反映済みです。</small>{answerSyncSummary.errors > 0 && <button type="button" onClick={retryFailedAnswers}>再送する</button>}</div>}
-      {isComplete && sessionAnswers.length === 0 ? <EmptyQuestionState restart={() => restart(filter)} /> : isComplete ? <CompleteCard {...{ score: sessionScore, queue, reviews: sessionAnswers, course, studentName, ratingStart: sessionRatingStart, ratingAfter: authoritativeRating, provisionalRating: rating, completedAt: sessionCompletedAt, restart: () => restart(filter) }} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting, retryAnswer }} />}
+      {bankLoading ? <LoadingQuestionState /> : isComplete && sessionAnswers.length === 0 ? <EmptyQuestionState restart={() => restart(filter)} /> : isComplete ? <CompleteCard {...{ score: sessionScore, queue, reviews: sessionAnswers, course, studentName, ratingStart: sessionRatingStart, ratingAfter: authoritativeRating, provisionalRating: rating, completedAt: sessionCompletedAt, restart: () => restart(filter) }} /> : <QuestionCard {...{ question, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting, retryAnswer }} />}
     </section>
     <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} history={history} rating={rating} /><PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} poolLabel={poolLabel(rankingPoolId)} onOpen={openLeaderboard} /></div>
   </div>
@@ -1163,6 +1182,10 @@ function DifficultyTab({ value, current, onClick, label }) {
 
 function EmptyQuestionState({ restart }) {
   return <article className="empty-question-state"><Icon name="history" size={32} /><h2>出題できる問題がありません。</h2><p>この講座の未回答問題がなくなりました。復習問題を追加するか、別の講座を選んでください。</p><button type="button" className="primary-button" onClick={restart}>もう一度確認する<Icon name="arrow" size={21} /></button></article>
+}
+
+function LoadingQuestionState() {
+  return <article className="empty-question-state"><Icon name="clock" size={32} /><h2>問題を読み込んでいます。</h2><p>この単元の問題を準備しています。少しだけお待ちください。</p></article>
 }
 
 function QuestionCard({ question: sourceQuestion, queue, index, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, input, setInput, answerPreview, submitting, retryAnswer }) {
