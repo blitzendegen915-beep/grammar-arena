@@ -7,7 +7,7 @@ test('問題バンクは単元を選んだときに読み込める', async () =>
   const gerund = await loadQuestionBank('foundation-gerund')
   const participles = await loadQuestionBank('foundation-participles')
 
-  assert.equal(regular.length, 154)
+  assert.equal(regular.length, 155)
   assert.equal(gerund.length, 12)
   assert.equal(participles.length, 12)
   assert.equal(regular[0].id, 'reg27-01')

@@ -3,8 +3,27 @@ import assert from 'node:assert/strict'
 import { REGULAR_QUESTIONS } from './regularQuestions.js'
 
 test('平常授業バンクは全問題を一意なIDで持つ', () => {
-  assert.ok(REGULAR_QUESTIONS.length >= 100)
+  assert.equal(REGULAR_QUESTIONS.length, 155)
   assert.equal(new Set(REGULAR_QUESTIONS.map((question) => question.id)).size, REGULAR_QUESTIONS.length)
+})
+
+test('英語演習I 2中の二学期範囲を全問収録している', () => {
+  const expectedByLesson = {
+    'Lesson 27': 35,
+    'Lesson 13': 14,
+    'Lesson 14': 14,
+    'Lesson 15': 16,
+    Plus: 16,
+    'Lesson 16': 13,
+    'Lesson 17': 16,
+    'Option 4': 15,
+    'Option 7': 16,
+  }
+  const actualByLesson = Object.groupBy(REGULAR_QUESTIONS, ({ lesson }) => lesson)
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(actualByLesson).map(([lesson, questions]) => [lesson, questions.length])),
+    expectedByLesson,
+  )
 })
 
 test('平常授業バンクは出題に必要な正答を持つ', () => {
