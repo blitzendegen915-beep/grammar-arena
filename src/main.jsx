@@ -29,6 +29,16 @@ const SCORE_API_URL = import.meta.env.VITE_SCORE_API_URL || 'https://script.goog
 const DEFAULT_RATING = 1240
 const SESSION_LENGTH = 10
 const DEFAULT_MODE_ID = 'foundation-infinitive'
+const DEFAULT_THEME_ID = 'ascention'
+
+const THEME_OPTIONS = [
+  { id: 'ascention', label: 'Ascention', description: 'イエローとブラックの現在のテーマ' },
+  { id: 'moon', label: 'Moon', description: '深い青と月明かりのスタイリッシュテーマ' },
+]
+
+function normalizeThemeId(value) {
+  return THEME_OPTIONS.some((theme) => theme.id === value) ? value : DEFAULT_THEME_ID
+}
 
 const DEFAULT_PERSISTED = {
   rating: DEFAULT_RATING,
@@ -51,6 +61,7 @@ const DEFAULT_PERSISTED = {
   answerSyncQueue: [],
   studyTimeByDate: {},
   modeId: DEFAULT_MODE_ID,
+  themeId: DEFAULT_THEME_ID,
 }
 
 const QUESTIONS = [
@@ -456,6 +467,7 @@ function App() {
     const initial = readPersisted()
     return COURSE_DETAILS[initial.modeId] ? initial.modeId : DEFAULT_MODE_ID
   })
+  const [themeId, setThemeId] = useState(() => normalizeThemeId(readPersisted().themeId))
   const [rankingPoolId, setRankingPoolId] = useState(() => {
     const initial = readPersisted()
     return initial.rankingPoolId || preferredPoolId(initial)
@@ -528,6 +540,10 @@ function App() {
   useEffect(() => {
     setPersisted((current) => current.modeId === modeId ? current : { ...current, modeId })
   }, [modeId])
+
+  useEffect(() => {
+    setPersisted((current) => current.themeId === themeId ? current : { ...current, themeId })
+  }, [themeId])
 
   useEffect(() => {
     if (!hasSession || view !== 'practice' || isComplete) return undefined
@@ -789,7 +805,7 @@ function App() {
   }
 
   const selectNav = (nextView) => {
-    if (['practice', 'history', 'settings'].includes(nextView) && !hasSession) {
+    if (['practice', 'history'].includes(nextView) && !hasSession) {
       setNotice('この画面を使うには、先に生徒名と暗証番号でログインしてください。')
       setView('landing')
       return
@@ -1132,7 +1148,7 @@ function App() {
 
   return (
     <>
-    <div className="app-shell">
+    <div className={`app-shell theme-${themeId}`} data-theme={themeId}>
       <aside className="sidebar">
         <div className="brand-block">
           <div className="brand-mark"><Icon name="practice" size={30} /></div>
@@ -1142,7 +1158,7 @@ function App() {
           <NavItem icon="practice" label="演習" active={view === 'practice' || view === 'landing' || view === 'lobby'} onClick={() => selectNav('practice')} />
           <NavItem icon="leaderboard" label="ランキング" active={view === 'leaderboard'} onClick={() => selectNav('leaderboard')} />
           <NavItem icon="history" label="履歴" active={view === 'history'} onClick={() => selectNav('history')} />
-          <NavItem icon="settings" label="出題設定" active={view === 'settings'} onClick={() => selectNav('settings')} />
+          <NavItem icon="settings" label="設定" active={view === 'settings'} onClick={() => selectNav('settings')} />
         </nav>
         <div className="sidebar-footer"><div className="footer-line" /><div className="footer-message"><span className="footer-cap">◆</span><span>学びが、未来をつくる。</span></div></div>
       </aside>
@@ -1166,7 +1182,7 @@ function App() {
           {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, inputParts, setInputParts, answerPreview, isComplete, bankLoading, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, history: persisted.history, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
           {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={hasSession ? persisted.publicLeaderboard : []} rating={authoritativeRating} studentName={persisted.studentName} rankingPoolId={rankingPoolId} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={authoritativeRating} />}
-          {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} />}
+          {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} themeId={themeId} setThemeId={setThemeId} />}
         </div>
       </main>
     </div>
@@ -1418,8 +1434,8 @@ function HistoryView({ history, rating }) {
   return <div className="simple-view"><div className="section-heading"><div><p className="section-kicker">YOUR PROGRESS</p><h1>学習履歴</h1><p className="subcopy">解いた記録を見返して、伸び方をつかもう。</p></div><div className="history-current"><span>現在レート</span><strong>{rating.toLocaleString()}</strong></div></div><div className="history-panel"><div className="history-panel-head"><h2>最近のセッション</h2><span>{history.length}件</span></div>{history.length ? <div className="history-list">{history.map((item) => <div className="history-row" key={item.id}><div className="history-date"><span>{item.date.replaceAll('-', '.')}</span><strong>{item.label}</strong></div><div className="history-result"><strong>{item.correct} / {item.total}</strong><span>正答</span></div><div className="history-change"><strong className={item.ratingDelta >= 0 ? 'up' : 'down'}>{item.ratingDelta >= 0 ? '+' : ''}{item.ratingDelta}</strong><span>レート変動</span></div><div className="history-after"><span>終了時</span><strong>{item.ratingAfter.toLocaleString()}</strong></div></div>)}</div> : <div className="empty-history"><Icon name="history" size={34} /><h3>まだ履歴がありません。</h3><p>演習を終えると、ここにレートと正答数が記録されます。</p></div>}</div></div>
 }
 
-function SettingsView({ filter, setFilter, autoExplanation, setAutoExplanation }) {
-  return <div className="simple-view"><div className="section-heading"><div><p className="section-kicker">PRACTICE SETTINGS</p><h1>出題設定</h1><p className="subcopy">今の理解度に合わせて、取り組み方を変えられます。</p></div></div><div className="settings-grid"><section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? 'Lesson 13〜15・Plus' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section><section className="settings-panel"><h2>学習の表示</h2><p>解答後の画面の見え方を設定します。</p><label className="toggle-row"><span><strong>解説を自動で表示</strong><small>正誤判定のあとに解説を開きます</small></span><button type="button" className={`toggle ${autoExplanation ? 'on' : ''}`} aria-pressed={autoExplanation} onClick={() => setAutoExplanation(!autoExplanation)}><span /></button></label><div className="rule-note"><Icon name="document" size={19} /><span>正答数に応じてレートが変動し、履歴に保存されます。</span></div></section></div></div>
+function SettingsView({ filter, setFilter, autoExplanation, setAutoExplanation, themeId, setThemeId }) {
+  return <div className="simple-view"><div className="section-heading"><div><p className="section-kicker">SETTINGS</p><h1>設定</h1><p className="subcopy">出題レベル、表示方法、テーマを自分の学習スタイルに合わせて変更できます。</p></div></div><div className="settings-grid"><section className="settings-panel"><h2>テーマ変更</h2><p>演習画面の色と雰囲気を切り替えます。選択はこの端末に保存されます。</p><div className="theme-options" role="radiogroup" aria-label="テーマ変更">{THEME_OPTIONS.map((theme) => <button type="button" role="radio" aria-checked={theme.id === themeId} key={theme.id} className={`theme-option theme-option-${theme.id} ${theme.id === themeId ? 'selected' : ''}`} onClick={() => setThemeId(theme.id)}><span className="theme-preview" aria-hidden="true"><span /></span><span className="theme-option-copy"><strong>{theme.label}</strong><small>{theme.description}</small></span><span className="theme-radio" aria-hidden="true" /></button>)}</div></section><section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? 'Lesson 13〜15・Plus' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section><section className="settings-panel settings-panel-display"><h2>学習の表示</h2><p>解答後の画面の見え方を設定します。</p><label className="toggle-row"><span><strong>解説を自動で表示</strong><small>正誤判定のあとに解説を開きます</small></span><button type="button" className={`toggle ${autoExplanation ? 'on' : ''}`} aria-pressed={autoExplanation} onClick={() => setAutoExplanation(!autoExplanation)}><span /></button></label><div className="rule-note"><Icon name="document" size={19} /><span>正答数に応じてレートが変動し、履歴に保存されます。</span></div></section></div></div>
 }
 
 createRoot(document.getElementById('root')).render(<StrictMode><App /></StrictMode>)
