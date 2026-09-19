@@ -1,6 +1,6 @@
 import { StrictMode, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { flushSync } from 'react-dom'
+import { createPortal, flushSync } from 'react-dom'
 import './styles.css'
 import { FOUNDATION_TRANSLATIONS } from './foundationTranslations'
 import { loadQuestionBank } from './questionBankLoader'
@@ -1509,7 +1509,7 @@ function SessionPdfPicker({ reviews = [], course, studentName, ratingStart, rati
   return <>
     <button type="button" className="secondary-button pdf-picker-trigger" onClick={openPicker} disabled={!reviews.length}><Icon name="document" size={19} />PDFを選ぶ</button>
     {open && <div className="pdf-picker" role="dialog" aria-modal="true" aria-label="PDFにする問題を選択"><div className="pdf-picker-head"><div><p className="section-kicker">PDF EXPORT</p><h3>出力する問題を選択</h3><p>必要な問題だけにチェックを入れてPDF化できます。</p></div><button type="button" className="pdf-picker-close" onClick={() => setOpen(false)} aria-label="閉じる">×</button></div><div className="pdf-picker-actions"><button type="button" className="text-button" onClick={() => setSelectedIds(reviews.map(reviewKey))}>すべて選択</button><button type="button" className="text-button" onClick={() => setSelectedIds([])}>すべて解除</button><span>{selectedReviews.length} / {reviews.length}問を選択中</span></div><div className="pdf-picker-list">{reviews.map((review, index) => { const id = reviewKey(review, index); return <label key={id} className="pdf-picker-row"><input type="checkbox" checked={selectedIds.includes(id)} onChange={() => toggleReview(id)} /><span>QUESTION {String(index + 1).padStart(2, '0')}</span><strong>{review.question.lesson} ・ {review.question.topic}</strong><small>{review.correct ? '正解' : '不正解'}</small></label> })}</div><div className="pdf-picker-footer"><button type="button" className="secondary-button" onClick={() => setOpen(false)}>キャンセル</button><button type="button" className="primary-button" disabled={!selectedReviews.length} onClick={printSelectedReviews}><Icon name="document" size={19} />選択した{selectedReviews.length}問をPDF出力</button></div></div>}
-    {printReviews?.length > 0 && <SessionPrintView reviews={printReviews} score={selectedScore} course={course} studentName={studentName} ratingStart={ratingStart} ratingAfter={ratingAfter} completedAt={completedAt} />}
+    {printReviews?.length > 0 && createPortal(<SessionPrintView reviews={printReviews} score={selectedScore} course={course} studentName={studentName} ratingStart={ratingStart} ratingAfter={ratingAfter} completedAt={completedAt} />, document.body)}
   </>
 }
 
