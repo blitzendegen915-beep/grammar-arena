@@ -2,8 +2,16 @@ import { countSentenceBlanks } from './questionQuality.js'
 
 const SOURCE = '英語演習I 2中・平常授業'
 
+const REWRITE_QUESTION_IDS = new Set([
+  'reg27-07', 'reg27-08', 'reg27-09', 'reg27-10', 'reg27-11',
+  'reg15-07', 'reg15-08', 'reg15-09', 'reg15-10',
+  'regplus-06', 'regplus-07', 'regplus-08',
+  'regopt4-01', 'regopt4-02', 'regopt4-03', 'regopt4-04', 'regopt4-05',
+])
+
 const make = (id, lesson, topic, difficulty, type, data) => ({
   id, lesson, topic, difficulty, type,
+  rewrite: REWRITE_QUESTION_IDS.has(id),
   prompt: type === 'reorder' ? '日本語の意味に合うように、語句を並べかえなさい。' : type === 'choice' ? '空所に入る最も適切なものを選びなさい。' : '空所に入る語句を入力しなさい。',
   source: `${SOURCE}・${lesson}`,
   blankCount: countSentenceBlanks(data.sentence || ''),
@@ -19,6 +27,7 @@ const fill = (id, lesson, topic, difficulty, sentence, answer, explanation, japa
   explanation,
   translation: japanese,
   ...(countSentenceBlanks(sentence) === 0 ? { prompt: '日本語に合う英文を入力しなさい。' } : {}),
+  ...(REWRITE_QUESTION_IDS.has(id) ? { prompt: '次の2文が同じ意味になるように、空所に入る語句を入力しなさい。' } : {}),
 })
 const reorder = (id, lesson, topic, difficulty, japanese, words, answer, explanation) => make(id, lesson, topic, difficulty, 'reorder', { japanese, words, answer, answerLabel: answer, explanation, translation: japanese })
 const translateChoice = (id, lesson, topic, difficulty, sentence, answer, explanation, choices) => make(id, lesson, topic, difficulty, 'choice', { prompt: '下線部に注意して、正しい日本語訳を選びなさい。', sentence, choices, answer, answerLabel: answer, explanation })
