@@ -1448,6 +1448,111 @@ function setup() {
   return { spreadsheetUrl: book.getUrl(), players: players.getName(), answers: answers.getName(), courseProfiles: courseProfiles.getName(), poolProfiles: poolProfiles.getName() }
 }
 
+// Repair only answer rows that are already stored in Answers but were not
+// reflected in a profile. This is intentionally additive: it never lowers a
+// student's current rating when the profile has more attempts than the ledger,
+// and it does not guess about old retries that were rejected before being saved.
+function repairRatingsFromAnswers() {
+  const lock = LockService.getScriptLock()
+  lock.waitLock(30000)
+  try {
+    const book = getBook_()
+    const { players, answers, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
+    const playerRows = players.getDataRange().getValues()
+    const answerRows = answers.getDataRange().getValues().slice(1).map((row, index) => ({
+      row,
+      index,
+      playerKey: String(row[0] || '').trim(),
+      course: cleanCourse_(row[1]),
+      questionId: String(row[2] || '').trim(),
+      delta: Number(row[4]) || 0,
+      answeredAt: row[5] instanceof Date ? row[5].getTime() : index,
+    })).filter((item) => item.playerKey && item.course && item.questionId)
+
+    const playersByKey = new Map(playerRows.slice(1).filter((row) => row[0]).map((row) => [String(row[0]), row]))
+    const answersByPlayer = new Map()
+    answerRows.forEach((item) => {
+      if (!answersByPlayer.has(item.playerKey)) answersByPlayer.set(item.playerKey, [])
+      answersByPlayer.get(item.playerKey).push(item)
+    })
+    answersByPlayer.forEach((items) => items.sort((left, right) => left.answeredAt - right.answeredAt || left.index - right.index))
+
+    const report = {
+      playersChecked: 0,
+      profilesChecked: 0,
+      profilesRepaired: 0,
+      recoveredAttempts: 0,
+      recoveredDelta: 0,
+      overcountProfiles: 0,
+      missingPlayers: 0,
+    }
+
+    // Ensure every current pool represented by an existing answer has a
+    // profile row before reconciling it. This also covers students who first
+    // answered before PoolProfiles was introduced.
+    playerRows.slice(1).forEach((row) => {
+      const playerKey = String(row[0] || '').trim()
+      if (!playerKey) return
+      report.playersChecked += 1
+      const poolIds = playerPools_(row)
+      const courses = [...new Set((answersByPlayer.get(playerKey) || []).map((item) => item.course))]
+      courses.forEach((course) => poolIds.forEach((poolId) => {
+        ensurePoolProfile_(poolProfiles, courseProfiles, playerKey, course, poolId, Number(row[2]) || 1240, Number(row[3]) || 0)
+      }))
+    })
+
+    const poolRows = poolProfiles.getDataRange().getValues()
+    poolRows.slice(1).forEach((row, index) => {
+      const playerKey = String(row[0] || '').trim()
+      const profileCourse = cleanCourse_(row[1])
+      if (!playerKey || !profileCourse || !playersByKey.has(playerKey)) {
+        if (playerKey && !playersByKey.has(playerKey)) report.missingPlayers += 1
+        return
+      }
+      report.profilesChecked += 1
+      const relevant = (answersByPlayer.get(playerKey) || []).filter((item) => {
+        if (profileCourse === 'foundation-course') return rankingCourses_(profileCourse).includes(item.course)
+        return item.course === profileCourse
+      })
+      const applied = Math.max(0, Number(row[4]) || 0)
+      if (relevant.length <= applied) {
+        if (relevant.length < applied) report.overcountProfiles += 1
+        return
+      }
+      const missing = relevant.slice(applied)
+      const recoveredDelta = missing.reduce((sum, item) => sum + item.delta, 0)
+      const currentRating = Number(row[3]) || 1240
+      const repairedRating = Math.max(RATING_MIN, currentRating + recoveredDelta)
+      const repairedAnswered = applied + missing.length
+      const sheetRow = index + 2
+      poolProfiles.getRange(sheetRow, 4, 1, 3).setValues([[repairedRating, repairedAnswered, new Date()]])
+      report.profilesRepaired += 1
+      report.recoveredAttempts += missing.length
+      report.recoveredDelta += recoveredDelta
+    })
+
+    // Keep the legacy aggregate rows in sync so older clients and the all-pool
+    // leaderboard see the same repaired values as PoolProfiles.
+    const courseRows = courseProfiles.getDataRange().getValues()
+    courseRows.slice(1).forEach((row, index) => {
+      const playerKey = String(row[0] || '').trim()
+      const course = cleanCourse_(row[1])
+      const player = playersByKey.get(playerKey)
+      if (!playerKey || !course || !player) return
+      const primaryPool = playerPools_(player)[0]
+      if (!primaryPool) return
+      const poolRow = poolRows.find((profile, profileIndex) => profileIndex > 0 && String(profile[0]) === playerKey && String(profile[1]) === course && String(profile[2]) === primaryPool)
+      if (!poolRow) return
+      courseProfiles.getRange(index + 2, 3, 1, 3).setValues([[Number(poolRow[3]) || 1240, Number(poolRow[4]) || 0, new Date()]])
+    })
+
+    console.log(JSON.stringify(report))
+    return report
+  } finally {
+    lock.releaseLock()
+  }
+}
+
 function getBook_() {
   const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID')
   if (!id) {
