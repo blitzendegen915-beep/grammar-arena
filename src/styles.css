@@ -1114,11 +1114,10 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 /* Light surfaces keep a deep-violet ink color for readable Crystallium text. */
 .theme-crystallium .leaderboard-card { color: #2b1642; }
 .theme-crystallium .leaderboard-card .section-kicker { color: #7b3e9d; }
-.theme-crystallium .leaderboard-card .leaderboard-head { border-bottom-color: #cbb1cf; }
 .theme-crystallium .leaderboard-card .leaderboard-head h2 { color: #2b1642; }
 .theme-crystallium .leaderboard-card .leaderboard-live { color: #c22f8b; border-color: #c22f8b; }
 .theme-crystallium .leaderboard-card .leaderboard-copy { color: #574266; }
-.theme-crystallium .leaderboard-card .leaderboard-row { color: #4a315b; border-bottom-color: #cbb1cf; }
+.theme-crystallium .leaderboard-card .leaderboard-row { color: #4a315b; }
 .theme-crystallium .leaderboard-card .leaderboard-row.current { color: #9a246f; }
 .theme-crystallium .leaderboard-card .leaderboard-row strong { color: inherit; }
 .theme-crystallium .leaderboard-card .leaderboard-link { color: #187eaa; }
