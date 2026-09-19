@@ -608,7 +608,7 @@ function App() {
     const serverRating = Number(result.rating) || DEFAULT_RATING
     const displayedRating = applyProvisionalRating(serverRating, migratedQueue, nextSyncKey)
     const nextUnlockedThemes = normalizeUnlockedThemes(result.unlockedThemes)
-    const newUnlock = nextUnlockedThemes.find((themeId) => !persisted.unlockedThemes.includes(themeId))
+    const newUnlock = nextUnlockedThemes.find((themeId) => !normalizeUnlockedThemes(persisted.unlockedThemes).includes(themeId))
     const newUnlockSeenKey = newUnlock ? unlockSeenKey(nextName, newUnlock) : ''
     const shouldCelebrateUnlock = Boolean(newUnlock && !persisted.unlockCelebrationSeen?.[newUnlockSeenKey])
     if (shouldCelebrateUnlock && !celebratedUnlocksRef.current.has(newUnlockSeenKey)) {
