@@ -1111,6 +1111,20 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 .theme-option-crystallium .theme-preview::before { background: rgba(255, 117, 197, .75); clip-path: polygon(0 0, 74% 0, 32% 100%, 0 100%); transform: none; }
 .theme-option-crystallium .theme-preview::after { right: 8px; bottom: 7px; width: 15px; height: 24px; background: var(--blue); clip-path: polygon(50% 0, 100% 39%, 69% 100%, 30% 100%, 0 39%); transform: none; box-shadow: none; }
 .theme-option-crystallium .theme-preview span { left: 6px; bottom: 6px; width: 25px; height: 2px; background: var(--sun); box-shadow: 0 -6px 0 var(--blue); transform: rotate(-27deg); }
+/* Light surfaces keep a deep-violet ink color for readable Crystallium text. */
+.theme-crystallium .leaderboard-card { color: #2b1642; }
+.theme-crystallium .leaderboard-card .section-kicker { color: #7b3e9d; }
+.theme-crystallium .leaderboard-card .leaderboard-head { border-bottom-color: #cbb1cf; }
+.theme-crystallium .leaderboard-card .leaderboard-head h2 { color: #2b1642; }
+.theme-crystallium .leaderboard-card .leaderboard-live { color: #c22f8b; border-color: #c22f8b; }
+.theme-crystallium .leaderboard-card .leaderboard-copy { color: #574266; }
+.theme-crystallium .leaderboard-card .leaderboard-row { color: #4a315b; border-bottom-color: #cbb1cf; }
+.theme-crystallium .leaderboard-card .leaderboard-row.current { color: #9a246f; }
+.theme-crystallium .leaderboard-card .leaderboard-row strong { color: inherit; }
+.theme-crystallium .leaderboard-card .leaderboard-link { color: #187eaa; }
+.theme-crystallium .sync-status { color: #2b1642; }
+.theme-crystallium .sync-status small { color: #5d496c; }
+.theme-crystallium .app-notice { color: #2b1642; }
 @keyframes crystallium-aura {
   from { opacity: .72; transform: translate3d(-1%, 0, 0) scale(1); }
   to { opacity: 1; transform: translate3d(1%, -1%, 0) scale(1.025); }
