@@ -32,9 +32,9 @@ const DEFAULT_MODE_ID = 'foundation-infinitive'
 const DEFAULT_THEME_ID = 'ascention'
 
 const THEME_OPTIONS = [
-  { id: 'crystallium', label: 'クリスタリウム', description: '結晶の光と夜空をまとった幻想的なテーマ' },
-  { id: 'ascention', label: 'Ascention', description: 'イエローとブラックの現在のテーマ' },
-  { id: 'moon', label: 'Moon', description: '深い青と月明かりのスタイリッシュテーマ' },
+  { id: 'ascention', label: 'Ascention', description: 'The original yellow and black theme' },
+  { id: 'moon', label: 'Moon', description: 'Midnight blue with a cool cyan glow' },
+  { id: 'crystallium', label: 'Crystallium', description: 'Pearl light, prism facets, and jewel tones' },
 ]
 
 function normalizeThemeId(value) {

@@ -761,3 +761,111 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
   .theme-preview { width: 40px; height: 40px; }
   .theme-option-copy strong { font-size: 14px; }
 }
+
+/* Crystallium refinement: luminous mineral surfaces, clearly separate from Moon. */
+.theme-crystallium {
+  --sun: #c7b8ff;
+  --ink: #171a38;
+  --cream: #fbfcff;
+  --paper: #ffffff;
+  --signal: #e84e9b;
+  --blue: #7052d6;
+  --line: #171a38;
+  color: #252847;
+  background: #eef0ff;
+}
+.theme-crystallium .sidebar { background: #f7f5ff; border-right-color: var(--ink); }
+.theme-crystallium .brand-mark, .theme-crystallium .footer-cap { color: var(--blue); }
+.theme-crystallium .brand-name { color: var(--ink); }
+.theme-crystallium .nav-item { color: #545879; }
+.theme-crystallium .nav-item:hover { color: var(--ink); background: #eeeaff; }
+.theme-crystallium .nav-item.active { color: var(--ink); background: var(--sun); }
+.theme-crystallium .nav-item.active::after { color: var(--ink); }
+.theme-crystallium .sidebar-footer { color: #717593; }
+.theme-crystallium .footer-line { background: #c8c2f2; }
+.theme-crystallium .main-area { background-color: #eef0ff; background-image: linear-gradient(124deg, transparent 0 46%, rgba(112,82,214,.12) 46% 47%, transparent 47%), linear-gradient(32deg, transparent 0 70%, rgba(232,78,155,.08) 70% 71%, transparent 71%); }
+.theme-crystallium .topbar { color: var(--ink); background: #fff; border-bottom-color: var(--ink); }
+.theme-crystallium .top-stat, .theme-crystallium .top-stat strong, .theme-crystallium .top-stat span:not(.rating-delta), .theme-crystallium .top-greeting { color: var(--ink); }
+.theme-crystallium .rating-delta { color: var(--signal) !important; }
+.theme-crystallium .top-divider { background: #bdb3ee; }
+.theme-crystallium .profile-orb { color: var(--ink); background: var(--sun); }
+.theme-crystallium .selector-stack label, .theme-crystallium .selector-stack span { color: #5c6081; }
+.theme-crystallium .selector-stack select { color: var(--ink); background-color: #fff; border-color: var(--ink); }
+.theme-crystallium .content-wrap::before { background: repeating-linear-gradient(-45deg, rgba(112,82,214,.12) 0 10px, transparent 10px 27px); }
+.theme-crystallium .section-kicker { color: var(--blue); }
+.theme-crystallium h1 { color: var(--ink); }
+.theme-crystallium .subcopy { color: #626685; }
+.theme-crystallium .difficulty-tabs { border-bottom-color: #c8c2f2; }
+.theme-crystallium .difficulty-tab { color: #626685; }
+.theme-crystallium .difficulty-tab:hover, .theme-crystallium .difficulty-tab.selected { color: var(--blue); }
+.theme-crystallium .difficulty-tab.selected { background: #f0edff; border-bottom-color: var(--blue); }
+.theme-crystallium .question-card, .theme-crystallium .complete-card, .theme-crystallium .rail-card, .theme-crystallium .history-panel, .theme-crystallium .settings-panel, .theme-crystallium .leaderboard-table-card, .theme-crystallium .leaderboard-you, .theme-crystallium .leaderboard-rule, .theme-crystallium .lobby-card, .theme-crystallium .landing-hero, .theme-crystallium .empty-question-state { color: #252847; background: #fff; border-color: var(--ink); box-shadow: 9px 9px 0 var(--ink); }
+.theme-crystallium .question-head, .theme-crystallium .history-panel-head, .theme-crystallium .leaderboard-table-head { border-color: #dddaf4; }
+.theme-crystallium .lesson-label, .theme-crystallium .rail-title, .theme-crystallium .leaderboard-link, .theme-crystallium .leaderboard-empty svg { color: var(--blue); }
+.theme-crystallium .lesson-label span, .theme-crystallium .question-type, .theme-crystallium .progress-block, .theme-crystallium .prompt, .theme-crystallium .history-panel-head span { color: #737795; }
+.theme-crystallium .progress-track { background: #dedcff; }
+.theme-crystallium .progress-track span { background: var(--blue); }
+.theme-crystallium .japanese-prompt, .theme-crystallium .sentence, .theme-crystallium .rail-title h2, .theme-crystallium .rail-card h3, .theme-crystallium .history-panel-head h2 { color: var(--ink); }
+.theme-crystallium .input-translation span { color: var(--blue); }
+.theme-crystallium .sentence-blank, .theme-crystallium .answer-line { border-color: var(--blue); }
+.theme-crystallium .choice-button, .theme-crystallium .secondary-button, .theme-crystallium .setting-option { color: var(--ink); background: #f7f5ff; border-color: #8d8eb8; }
+.theme-crystallium .choice-button:hover, .theme-crystallium .secondary-button:hover, .theme-crystallium .setting-option:hover, .theme-crystallium .setting-option.selected { color: var(--ink); background: #eeeaff; border-color: var(--blue); }
+.theme-crystallium .choice-button.chosen { border-color: var(--blue); background: #e4dcff; }
+.theme-crystallium .choice-letter { color: var(--ink); background: var(--sun); }
+.theme-crystallium .choice-button svg { color: var(--blue); }
+.theme-crystallium .token { color: var(--ink); background: #f1efff; border-color: #a5a0d0; }
+.theme-crystallium .token:hover, .theme-crystallium .selected-token { background: #e2dbff; border-color: var(--blue); }
+.theme-crystallium .input-wrap input { color: var(--ink); }
+.theme-crystallium .input-wrap, .theme-crystallium .input-wrap-multi input { border-color: var(--blue); }
+.theme-crystallium .input-wrap > span, .theme-crystallium .answer-placeholder { color: #8588a7; }
+.theme-crystallium .primary-button { color: var(--ink); background: var(--sun); box-shadow: 0 5px 0 var(--ink); }
+.theme-crystallium .primary-button:hover { background: #dfd5ff; }
+.theme-crystallium .secondary-button:hover { color: var(--ink); }
+.theme-crystallium .logout-button { color: var(--ink); background: var(--sun); border-color: var(--ink); }
+.theme-crystallium .feedback-correct { background: #e1f8f1; border-color: #42b99f; }
+.theme-crystallium .feedback-wrong { background: #ffe8f2; border-color: var(--signal); }
+.theme-crystallium .feedback-title, .theme-crystallium .feedback p, .theme-crystallium .correction strong, .theme-crystallium .translation p { color: var(--ink); }
+.theme-crystallium .feedback-wrong .feedback-title { color: #b62f6e; }
+.theme-crystallium .translation { background: #f1efff; border-left-color: var(--blue); }
+.theme-crystallium .translation span, .theme-crystallium .correction span, .theme-crystallium .feedback small { color: #737795; }
+.theme-crystallium .metric-row, .theme-crystallium .metric-row strong, .theme-crystallium .rail-note p { color: var(--ink); }
+.theme-crystallium .metric-icon, .theme-crystallium .chart-line, .theme-crystallium .chart-dot { color: var(--blue); stroke: var(--blue); }
+.theme-crystallium .chart-axis, .theme-crystallium .chart-grid { stroke: #a5a0d0; }
+.theme-crystallium .chart-area { fill: rgba(112,82,214,.12); }
+.theme-crystallium .rating-chart text { fill: #737795; }
+.theme-crystallium .rail-note { color: var(--blue); background: #f1efff; }
+.theme-crystallium .history-current, .theme-crystallium .leaderboard-table-label { background: #eeeaff; }
+.theme-crystallium .history-current span, .theme-crystallium .history-row span, .theme-crystallium .empty-history p, .theme-crystallium .empty-history { color: #737795; }
+.theme-crystallium .history-current strong, .theme-crystallium .history-change strong.up, .theme-crystallium .empty-history svg { color: var(--blue); }
+.theme-crystallium .history-row, .theme-crystallium .leaderboard-table-row { border-color: #dddaf4; }
+.theme-crystallium .history-row strong, .theme-crystallium .leaderboard-table-head h2, .theme-crystallium .leaderboard-table-row { color: var(--ink); }
+.theme-crystallium .leaderboard-table-row.current { color: var(--ink); background: var(--sun); }
+.theme-crystallium .leaderboard-table-label { color: #626685; }
+.theme-crystallium .leaderboard-rule { color: var(--ink); background: #fff; border-color: var(--blue); }
+.theme-crystallium .leaderboard-rule strong, .theme-crystallium .leaderboard-rule small { color: var(--ink); }
+.theme-crystallium .leaderboard-empty h3 { color: var(--ink); }
+.theme-crystallium .landing-hero, .theme-crystallium .lobby-card { background: #fff; color: var(--ink); }
+.theme-crystallium .landing-hero h1, .theme-crystallium .lobby-card h1, .theme-crystallium .landing-copy, .theme-crystallium .landing-form label, .theme-crystallium .landing-footer, .theme-crystallium .session-hint { color: var(--ink); }
+.theme-crystallium .landing-mark { color: var(--ink); background: var(--sun); }
+.theme-crystallium .landing-hero .section-kicker, .theme-crystallium .landing-footer > span:first-child { color: var(--blue); }
+.theme-crystallium .landing-form input, .theme-crystallium .landing-form select { color: var(--ink); background: #fff; border-color: var(--ink); }
+.theme-crystallium .auth-tabs { border-color: var(--ink); }
+.theme-crystallium .auth-tabs button { color: #626685; }
+.theme-crystallium .auth-tabs button.selected { color: var(--ink); background: var(--sun); }
+.theme-crystallium .landing-note, .theme-crystallium .placement-help { color: #626685; }
+.theme-crystallium .course-banner { color: var(--ink); background: var(--sun); border-color: var(--ink); }
+.theme-crystallium .settings-panel h2, .theme-crystallium .settings-panel > p, .theme-crystallium .theme-option-copy strong { color: var(--ink); }
+.theme-crystallium .settings-panel > p, .theme-crystallium .theme-option-copy small { color: #737795; }
+.theme-crystallium .theme-option { color: var(--ink); background: #fff; border-color: #8d8eb8; }
+.theme-crystallium .theme-option:hover, .theme-crystallium .theme-option.selected { background: #eeeaff; border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.theme-crystallium .setting-radio { border-color: #8588a7; }
+.theme-crystallium .setting-option.selected .setting-radio::after { background: var(--blue); }
+.theme-crystallium .toggle-row { border-color: #dddaf4; }
+.theme-crystallium .toggle-row small, .theme-crystallium .rule-note { color: #737795; }
+.theme-crystallium .toggle.on { background: var(--blue); }
+.theme-crystallium .rule-note { background: #f1efff; }
+.theme-crystallium .rule-note svg { color: var(--blue); }
+.theme-option-crystallium .theme-preview { background: #fff; border-color: #171a38; }
+.theme-option-crystallium .theme-preview::before { background: #c7b8ff; clip-path: polygon(0 0, 74% 0, 32% 100%, 0 100%); transform: none; }
+.theme-option-crystallium .theme-preview::after { right: 8px; bottom: 7px; width: 15px; height: 24px; background: #e84e9b; clip-path: polygon(50% 0, 100% 39%, 69% 100%, 30% 100%, 0 39%); transform: none; box-shadow: none; }
+.theme-option-crystallium .theme-preview span { left: 6px; bottom: 6px; width: 25px; height: 2px; background: #7052d6; box-shadow: 0 -6px 0 #46c9b2; transform: rotate(-27deg); }
