@@ -131,7 +131,7 @@ export const REGULAR_QUESTIONS = [
   fill('regplus-08', 'Plus', 'too ... to', 'advanced', "The coat was so expensive that Kevin couldn't buy it. The coat was (　　　) (　　　) for Kevin (　　　) buy.", 'too expensive to', 'too ... for 人 to do は「人が〜できないほど…すぎる」です。', 'そのコートはケビンには高すぎて買えませんでした。'),
   fill('regplus-09', 'Plus', 'so ... as to', 'advanced', 'The man was so kind as (　　　) (　　　) me the way.', 'to show', 'so kind as to do は「親切にも〜する」です。', 'その男性は親切にも私に駅への道を教えてくれました。'),
   fill('regplus-10', 'Plus', 'enough to', 'advanced', 'He is tall (　　　) (　　　) reach the ceiling.', 'enough to', '形容詞 + enough to do は「〜するのに十分…」です。', '彼は天井に手が届くほど背が高い。'),
-  fill('regplus-11', 'Plus', '独立不定詞', 'advanced', '(　　　) (　　　), I\'m not very good at math.', 'To begin with', 'To begin with は「まず第一に」という独立不定詞です。', '正直に言って、私は数学があまり得意ではありません。'),
+  fill('regplus-11', 'Plus', '独立不定詞', 'advanced', '(　　　) (　　　), I\'m not very good at math.', 'To be honest', 'To be honest は「正直に言って」という独立不定詞です。', '正直に言って、私は数学があまり得意ではありません。'),
   fill('regplus-12', 'Plus', '独立不定詞', 'advanced', 'I don\'t (　　　) (　　　) be an adult.', 'want to', 'want to do は「〜したい」です。', '私は大人になりたくありません。'),
   fill('regplus-13', 'Plus', 'so as to', 'advanced', 'Keiko is saving money so (　　　) (　　　) travel all over the world.', 'as to', 'so as to do は「〜するために」を表します。', 'ケイコは世界中を旅行するためにお金を貯めています。'),
   fill('regplus-14', 'Plus', 'in order to', 'standard', 'I went to the station by taxi in order (　　　) (　　　) miss the train.', 'not to', 'in order not to do は「〜しないために」です。', '電車に乗り遅れないように、私はタクシーで駅まで行きました。'),

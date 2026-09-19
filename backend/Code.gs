@@ -936,7 +936,7 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice",
     "difficulty": "advanced",
     "accepted": [
-      "To begin with"
+      "To be honest"
     ]
   },
   "regplus-12": {

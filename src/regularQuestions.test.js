@@ -51,3 +51,10 @@ test('訳問題は正答を選択肢として明示する', () => {
   assert.ok(question.choices.includes(question.answer))
   assert.equal(question.choices.length, 4)
 })
+
+test('regplus-11 has an answer matching its Japanese translation', () => {
+  const question = REGULAR_QUESTIONS.find(({ id }) => id === 'regplus-11')
+  assert.equal(question.answer, 'To be honest')
+  assert.match(question.explanation, /To be honest/)
+  assert.match(question.translation, /正直に言って/)
+})
