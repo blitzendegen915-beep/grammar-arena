@@ -388,9 +388,10 @@ function shuffleDifferent(items) {
 }
 
 function buildQueue(filter, answeredIds = [], questionBank = FOUNDATION_QUESTIONS) {
-  const available = questionBank.filter((question) => !answeredIds.includes(question.id))
-  const preferred = filter === 'all' ? [] : shuffle(available.filter((question) => question.difficulty === filter))
-  const supplemental = filter === 'all' ? shuffle(available) : shuffle(available.filter((question) => question.difficulty !== filter))
+  // Answer history is for statistics only. Every session may draw from the
+  // complete bank so repeated practice can continue to affect the rating.
+  const preferred = filter === 'all' ? shuffle(questionBank) : shuffle(questionBank.filter((question) => question.difficulty === filter))
+  const supplemental = filter === 'all' ? [] : shuffle(questionBank.filter((question) => question.difficulty !== filter))
   const selected = [...preferred, ...supplemental].slice(0, SESSION_LENGTH)
   if (selected.length >= SESSION_LENGTH || !questionBank.length) return selected
   const repeatPool = shuffle(filter === 'all'
@@ -398,7 +399,7 @@ function buildQueue(filter, answeredIds = [], questionBank = FOUNDATION_QUESTION
     : [...questionBank.filter((question) => question.difficulty === filter), ...questionBank.filter((question) => question.difficulty !== filter)])
   const repeats = Array.from({ length: SESSION_LENGTH - selected.length }, (_, index) => {
     const source = repeatPool[index % repeatPool.length]
-    return { ...source, practiceOnly: true, reviewInstance: `${source.id}-${Date.now()}-${index}` }
+    return { ...source, reviewInstance: `${source.id}-${Date.now()}-${index}` }
   })
   return [...selected, ...repeats]
 }
@@ -448,6 +449,7 @@ function App() {
   const [placementSetup, setPlacementSetup] = useState(null)
   const [authBusy, setAuthBusy] = useState(false)
   const leaderboardRequestRef = useRef(0)
+  const leaderboardInFlightRef = useRef(false)
   const bankRequestRef = useRef(0)
   const answerSyncRunningRef = useRef(false)
   const answerSyncTimerRef = useRef(null)
@@ -521,7 +523,7 @@ function App() {
     const migratedQueue = rekeyAnswersForAuth(persisted.answerSyncQueue, {
       name: fallbackName,
       newAuthToken: nextAuthToken,
-    }).filter((entry) => !(entry.name.toLowerCase() === fallbackName.toLowerCase() && entry.course === rankingId && serverAnsweredIds.includes(entry.questionId)))
+    })
     const nextPoolId = result.poolId || preferredPoolId(result)
     const nextSyncKey = getSyncKey({ name: nextName, authToken: nextAuthToken, course: rankingId })
     const serverRating = Number(result.rating) || DEFAULT_RATING
@@ -812,6 +814,8 @@ function App() {
       setPersisted((current) => current.publicLeaderboard.length ? { ...current, publicLeaderboard: [] } : current)
       return
     }
+    if (leaderboardInFlightRef.current) return
+    leaderboardInFlightRef.current = true
     const requestId = ++leaderboardRequestRef.current
     const rankingId = getRankingCourseId(modeId)
     try {
@@ -821,6 +825,8 @@ function App() {
       else setPersisted((current) => ({ ...current, publicLeaderboard: [] }))
     } catch {
       if (requestId === leaderboardRequestRef.current) setNotice('公開ランキングを読み込めませんでした。')
+    } finally {
+      leaderboardInFlightRef.current = false
     }
   }
 
@@ -828,6 +834,14 @@ function App() {
     if (SCORE_API_URL && hasSession) refreshLeaderboard()
     if (!hasSession) setPersisted((current) => current.publicLeaderboard.length ? { ...current, publicLeaderboard: [] } : current)
   }, [modeId, rankingPoolId, hasSession, persisted.studentName, persisted.authToken, persisted.poolIds])
+
+  useEffect(() => {
+    if (!SCORE_API_URL || !hasSession || view !== 'leaderboard') return undefined
+    const timer = window.setInterval(() => {
+      if (!document.hidden) void refreshLeaderboard()
+    }, 20000)
+    return () => window.clearInterval(timer)
+  }, [view, modeId, rankingPoolId, hasSession, persisted.studentName, persisted.authToken])
 
   useEffect(() => {
     if (!SCORE_API_URL || !hasSession || !answerSyncIdentity) return undefined
@@ -923,6 +937,7 @@ function App() {
         authToken: entry.authToken,
         questionId: entry.questionId,
         answer: entry.answer || '',
+        answerId: entry.answerId || '',
         legacyCorrect: String(entry.correct),
         correct: String(entry.correct),
         delta: String(entry.delta),

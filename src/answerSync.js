@@ -11,16 +11,18 @@ export function getSyncKey({ name = '', authToken = '', course = '' } = {}) {
   return JSON.stringify([normalizedName(name), String(authToken), String(course)])
 }
 
-export function createPendingAnswer({ name, authToken, course, poolId = '', questionId, answer = '', correct, delta }, now = Date.now()) {
+export function createPendingAnswer({ name, authToken, course, poolId = '', questionId, answer = '', correct, delta, attemptId = '' }, now = Date.now()) {
   const syncKey = getSyncKey({ name, authToken, course })
+  const answerId = String(attemptId || `${Number(now) || Date.now()}-${Math.random().toString(36).slice(2)}`)
   return {
-    id: JSON.stringify([syncKey, String(questionId)]),
+    id: JSON.stringify([syncKey, String(questionId), answerId]),
     syncKey,
     name: String(name || '').trim(),
     authToken: String(authToken || ''),
     course: String(course || ''),
     poolId: String(poolId || ''),
     questionId: String(questionId || ''),
+    answerId,
     answer: String(answer || ''),
     correct: Boolean(correct),
     delta: Number(delta) || 0,
@@ -46,7 +48,7 @@ export function recoverAnswerQueue(queue = [], now = Date.now()) {
 
 export function getAnswerForQuestion(queue = [], identity, questionId) {
   const syncKey = typeof identity === 'string' ? identity : getSyncKey(identity)
-  return queue.find((item) => item.syncKey === syncKey && item.questionId === String(questionId)) || null
+  return [...queue].reverse().find((item) => item.syncKey === syncKey && item.questionId === String(questionId)) || null
 }
 
 export function applyProvisionalRating(baseRating, queue = [], identity) {
@@ -105,9 +107,10 @@ export function rekeyAnswersForAuth(queue = [], { name, oldAuthToken = '', newAu
     if (normalizedName(item.name) !== normalizedName(name)) return item
     if (oldAuthToken && item.authToken !== oldAuthToken) return item
     const syncKey = getSyncKey({ name, authToken: newAuthToken, course: item.course })
+    const answerId = String(item.answerId || '')
     return {
       ...item,
-      id: JSON.stringify([syncKey, item.questionId]),
+      id: answerId ? JSON.stringify([syncKey, item.questionId, answerId]) : JSON.stringify([syncKey, item.questionId]),
       syncKey,
       name: String(name).trim(),
       authToken: String(newAuthToken),

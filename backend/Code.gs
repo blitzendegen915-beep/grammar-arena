@@ -1,7 +1,7 @@
 const COURSE_NAME = 'foundation-course'
 const RATING_MIN = 800
 const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash', 'grade', 'className', 'foundationMember']
-const ANSWER_HEADERS = ['playerKey', 'course', 'questionId', 'correct', 'delta', 'answeredAt']
+const ANSWER_HEADERS = ['playerKey', 'course', 'questionId', 'correct', 'delta', 'answeredAt', 'answerId']
 const COURSE_PROFILE_HEADERS = ['playerKey', 'course', 'rating', 'answered', 'updatedAt']
 const POOL_PROFILE_HEADERS = ['playerKey', 'course', 'poolId', 'rating', 'answered', 'updatedAt']
 const RATING_POINTS = { starter: 12, standard: 18, advanced: 26 }
@@ -1691,6 +1691,7 @@ function recordAnswer_(params) {
   const name = cleanName_(params.name)
   const course = cleanCourse_(params.course)
   const questionId = String(params.questionId || '')
+  const answerId = String(params.answerId || '').trim()
   const question = questionFor_(course, questionId)
   const requestedPool = cleanPoolId_(params.poolId)
   if (!name || !course || !questionId || !question) return json_({ ok: false, reason: 'invalid-question' }, params.callback)
@@ -1717,7 +1718,14 @@ function recordAnswer_(params) {
     const submittedAnswer = String(params.answer || '')
     if (isInappropriateContent_(submittedAnswer)) return json_({ ok: false, reason: 'inappropriate-content', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles) }, params.callback)
     const rows = answers.getDataRange().getValues()
-    const duplicate = rows.slice(1).some((row) => row[0] === playerKey && rankingCourses_(course).includes(String(row[1])) && row[2] === questionId)
+    const duplicate = rows.slice(1).some((row) => {
+      const sameQuestion = row[0] === playerKey && rankingCourses_(course).includes(String(row[1])) && row[2] === questionId
+      if (!sameQuestion) return false
+      // New clients identify each attempt. Retries of that attempt are
+      // idempotent, while a new attempt on the same question is scoreable.
+      // Legacy clients without an attempt ID retain the old one-question rule.
+      return answerId ? String(row[6] || '') === answerId : true
+    })
     // A retry may follow a lost response. Return the authoritative rating without scoring twice.
     if (duplicate) return json_({ ok: false, reason: 'already-answered', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles) }, params.callback)
     // New clients send the answer text. Older queued answers only have the
@@ -1728,7 +1736,7 @@ function recordAnswer_(params) {
       ? (correct ? RATING_POINTS[question.difficulty] : -RATING_LOSS[question.difficulty])
       : Math.max(-50, Math.min(50, Number(params.delta || 0)))
     const now = new Date()
-    answers.appendRow([playerKey, course, questionId, correct, safeDelta, now])
+    answers.appendRow([playerKey, course, questionId, correct, safeDelta, now, answerId])
     const updatedProfiles = profiles.map((profile) => {
       const rating = Math.max(RATING_MIN, profile.rating + safeDelta)
       poolProfiles.getRange(profile.sheetRow, 4, 1, 3).setValues([[rating, profile.answered + 1, now]])

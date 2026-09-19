@@ -25,15 +25,16 @@ function answer(overrides = {}) {
   }, 1000)
 }
 
-test('answer keys are durable and duplicate enqueue is idempotent', () => {
-  const first = answer({ poolId: '1-L' })
-  const second = answer()
-  const queue = enqueueAnswer(enqueueAnswer([], first), second)
+test('同じ問題でも試行IDが違えば別の解答として保存できる', () => {
+  const first = answer({ poolId: '1-L', attemptId: 'attempt-a' })
+  const second = answer({ attemptId: 'attempt-b' })
+  const duplicate = answer({ attemptId: 'attempt-a' })
+  const queue = enqueueAnswer(enqueueAnswer(enqueueAnswer([], first), second), duplicate)
 
-  assert.equal(queue.length, 1)
+  assert.equal(queue.length, 2)
   assert.equal(queue[0].id, first.id)
   assert.equal(queue[0].poolId, '1-L')
-  assert.equal(getAnswerSyncSummary(queue, getSyncKey(first)).provisionalDelta, 12)
+  assert.equal(getAnswerSyncSummary(queue, getSyncKey(first)).provisionalDelta, 24)
 })
 
 test('provisional rating applies every queued delta in order with the 800 floor', () => {
