@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { countSentenceBlanks, withBlankCount } from './questionQuality.js'
+import { countSentenceBlanks, inputSlotCount, withBlankCount } from './questionQuality.js'
 import { GERUND_QUESTIONS, PARTICIPLE_QUESTIONS } from './questionBanks.js'
 import { REGULAR_QUESTIONS } from './regularQuestions.js'
 
@@ -44,4 +44,15 @@ test('regular-class source blank counts are exhaustive and reviewed', () => {
   )
   assert.deepEqual(Object.keys(actual).sort(), Object.keys(REGULAR_SOURCE_BLANK_COUNTS).sort())
   assert.deepEqual(actual, REGULAR_SOURCE_BLANK_COUNTS)
+})
+
+test('input questions render one input field per visible blank', () => {
+  const inputQuestions = [...FOUNDATION_QUESTIONS, ...GERUND_QUESTIONS, ...PARTICIPLE_QUESTIONS, ...REGULAR_QUESTIONS]
+    .filter((question) => question.type === 'input')
+  for (const question of inputQuestions) {
+    assert.equal(inputSlotCount(question), Math.max(1, question.blankCount), question.id)
+  }
+
+  const soAs = REGULAR_QUESTIONS.find((question) => question.id === 'regplus-13')
+  assert.equal(inputSlotCount(soAs), 2)
 })

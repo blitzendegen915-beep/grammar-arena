@@ -14,3 +14,8 @@ export function withBlankCount(question) {
     blankCount: countSentenceBlanks(question.sentence || ''),
   }
 }
+
+// Input drills use one field for each visible blank.
+export function inputSlotCount(question) {
+  return Math.max(1, Number(question?.blankCount) || 0)
+}
