@@ -11,7 +11,7 @@ export function getSyncKey({ name = '', authToken = '', course = '' } = {}) {
   return JSON.stringify([normalizedName(name), String(authToken), String(course)])
 }
 
-export function createPendingAnswer({ name, authToken, course, questionId, answer = '', correct, delta }, now = Date.now()) {
+export function createPendingAnswer({ name, authToken, course, poolId = '', questionId, answer = '', correct, delta }, now = Date.now()) {
   const syncKey = getSyncKey({ name, authToken, course })
   return {
     id: JSON.stringify([syncKey, String(questionId)]),
@@ -19,6 +19,7 @@ export function createPendingAnswer({ name, authToken, course, questionId, answe
     name: String(name || '').trim(),
     authToken: String(authToken || ''),
     course: String(course || ''),
+    poolId: String(poolId || ''),
     questionId: String(questionId || ''),
     answer: String(answer || ''),
     correct: Boolean(correct),
@@ -211,6 +212,19 @@ export async function flushAnswerQueue({
         onChange(working)
         onResult({ type: 'blocked', entry, result, queue: working })
         continue
+      }
+      if (['invalid-question', 'pool-forbidden', 'placement-required'].includes(result?.reason)) {
+        const rejectedEntry = {
+          ...entry,
+          status: 'error',
+          attempt: maxAttempts,
+          nextAttemptAt: null,
+          lastError: String(result.reason),
+        }
+        working = replaceEntry(working, entry.id, rejectedEntry)
+        onChange(working)
+        onResult({ type: 'rejected', entry: rejectedEntry, result, queue: working })
+        break
       }
       throw new Error(result?.reason || 'score-api-rejected')
     } catch (error) {

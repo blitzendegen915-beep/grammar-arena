@@ -26,12 +26,13 @@ function answer(overrides = {}) {
 }
 
 test('answer keys are durable and duplicate enqueue is idempotent', () => {
-  const first = answer()
+  const first = answer({ poolId: '1-L' })
   const second = answer()
   const queue = enqueueAnswer(enqueueAnswer([], first), second)
 
   assert.equal(queue.length, 1)
   assert.equal(queue[0].id, first.id)
+  assert.equal(queue[0].poolId, '1-L')
   assert.equal(getAnswerSyncSummary(queue, getSyncKey(first)).provisionalDelta, 12)
 })
 
@@ -154,6 +155,27 @@ test('permanent moderation rejection is removed without retrying', async () => {
 
   assert.deepEqual(result, [])
   assert.deepEqual(events, ['blocked'])
+})
+
+test('deterministic server rejection stops without wasting retry attempts', async () => {
+  const pending = answer()
+  const events = []
+  let calls = 0
+  const result = await flushAnswerQueue({
+    queue: [pending],
+    identity: pending.syncKey,
+    send: async () => {
+      calls += 1
+      return { ok: false, reason: 'invalid-question' }
+    },
+    onResult: (event) => events.push(event.type),
+  })
+
+  assert.equal(calls, 1)
+  assert.deepEqual(events, ['rejected'])
+  assert.equal(result[0].status, 'error')
+  assert.equal(result[0].nextAttemptAt, null)
+  assert.equal(result[0].lastError, 'invalid-question')
 })
 
 test('pending answers can move to a freshly issued auth token without crossing names', () => {

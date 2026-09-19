@@ -491,6 +491,7 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice",
     "difficulty": "starter",
     "accepted": [
+      "彼はパーティーで私の姉（妹）を負かすことができた。",
       "彼はパーティーで私の姉を負かすことができた。",
       "彼はパーティーで妹を負かすことができた。"
     ]
@@ -948,7 +949,7 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice",
     "difficulty": "advanced",
     "accepted": [
-      "as not to"
+      "as to"
     ]
   },
   "regplus-14": {
@@ -963,6 +964,13 @@ const QUESTION_REGISTRY = {
     "difficulty": "advanced",
     "accepted": [
       "mind"
+    ]
+  },
+  "regplus-16": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "begin with"
     ]
   },
   "reg16-01": {
@@ -1257,6 +1265,7 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice",
     "difficulty": "starter",
     "accepted": [
+      "私の姉（妹）は早起きです。",
       "私の姉は早起きです。",
       "私の妹は早起きです。"
     ]

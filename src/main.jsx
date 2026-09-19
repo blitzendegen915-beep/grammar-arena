@@ -921,7 +921,7 @@ function App() {
         legacyCorrect: String(entry.correct),
         correct: String(entry.correct),
         delta: String(entry.delta),
-        poolId: rankingPoolId,
+        poolId: entry.poolId || rankingPoolId,
       }, { signal }),
       onChange: (nextQueue) => setPersisted((current) => current.authToken !== answerSyncIdentity.authToken ? current : ({
         ...current,
@@ -935,7 +935,7 @@ function App() {
             ? (hasAuthoritativeRating ? 'duplicate' : 'duplicate-unconfirmed')
             : type === 'blocked' ? 'blocked'
             : type === 'retry-scheduled' ? 'pending' : 'error'
-        const syncError = type === 'invalid-session' ? 'invalid-session' : type === 'failed' ? entry.lastError : ''
+        const syncError = type === 'invalid-session' || type === 'rejected' ? (result?.reason || 'server-rejected') : type === 'failed' ? entry.lastError : ''
         setPersisted((current) => {
           if (current.authToken !== entry.authToken || current.studentName.toLowerCase() !== entry.name.toLowerCase()) return current
           const mergedQueue = mergeQueueSnapshot(current.answerSyncQueue, nextQueue, answerSyncKey, initialIds)
@@ -960,6 +960,11 @@ function App() {
         if (activeRef.current.token !== entry.authToken || activeRef.current.course !== entry.course) return
         if (type === 'invalid-session') setNotice('回答は端末に保管されています。再ログインして保存を再開してください。')
         if (type === 'blocked') setNotice(MODERATION_NOTICE)
+        if (type === 'rejected') setNotice(result?.reason === 'invalid-question'
+          ? 'この問題はサーバー側に登録されていないため、レート保存できません。管理者に連絡してください。'
+          : result?.reason === 'pool-forbidden'
+            ? '現在のランキング対象に保存できません。ランキングを選び直して再送してください。'
+            : '所属情報が未設定のため、レート保存できません。')
         setSubmittedSync(entry.questionId, {
           ...(result?.serverValidated === true && typeof result.correct === 'boolean' ? { correct: result.correct } : {}),
           syncStatus,
@@ -999,7 +1004,7 @@ function App() {
     submitLock.current = true
     setNotice('')
     const rated = !question.practiceOnly
-    const entry = rated ? createPendingAnswer({ ...answerSyncIdentity, questionId: question.id, answer: userAnswer, correct, delta }) : null
+    const entry = rated ? createPendingAnswer({ ...answerSyncIdentity, poolId: rankingPoolId, questionId: question.id, answer: userAnswer, correct, delta }) : null
     const nextRating = rated ? Math.max(800, persisted.rating + delta) : persisted.rating
     const nextState = rated ? addAnsweredId({ ...persisted, rating: nextRating,
       ratingsByCourse: { ...persisted.ratingsByCourse, [answerSyncIdentity.course]: nextRating },
