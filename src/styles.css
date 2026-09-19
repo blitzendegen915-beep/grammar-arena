@@ -407,8 +407,28 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 .lobby-card h1 { overflow-wrap: normal; }
 @media (max-width: 780px) { .lobby-card h1 { font-size: clamp(26px, 7vw, 38px); white-space: normal; text-wrap: balance; } }
 
-.complete-actions { display: grid; grid-template-columns: minmax(0, 350px) minmax(190px, 240px); gap: 12px; width: 100%; align-items: stretch; }
+.complete-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; width: 100%; align-items: stretch; }
 .complete-actions .secondary-button { width: auto; }
+.complete-actions-help { margin: 12px 0 0; color: #766f5d; font-size: 11px; font-weight: 700; line-height: 1.6; }
+.partial-session-tools { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 14px; padding: 12px 16px; color: #5a564b; background: #fff8d9; border: 2px solid #cbbfa5; font-size: 12px; font-weight: 700; }
+.partial-session-tools .secondary-button { width: auto; min-height: 43px; padding: 0 16px; }
+.pdf-picker-trigger { width: auto; }
+.pdf-picker { position: relative; z-index: 5; margin-top: 14px; padding: 20px; color: var(--ink); background: var(--cream); border: 3px solid var(--ink); box-shadow: 7px 7px 0 var(--ink); }
+.pdf-picker-head { display: flex; align-items: start; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); }
+.pdf-picker-head h3 { margin: 2px 0 5px; font-size: 20px; }
+.pdf-picker-head p:not(.section-kicker) { margin: 0; color: #5a564b; font-size: 12px; }
+.pdf-picker-close { width: 34px; height: 34px; color: #fff; background: var(--ink); border: 0; font-size: 25px; line-height: 1; cursor: pointer; }
+.pdf-picker-actions { display: flex; align-items: center; gap: 12px; padding: 13px 0 9px; font-size: 11px; }
+.pdf-picker-actions span { margin-left: auto; color: #766f5d; font-weight: 700; }
+.text-button { padding: 0; color: var(--blue); background: none; border: 0; font-size: 11px; font-weight: 900; cursor: pointer; }
+.pdf-picker-list { display: grid; gap: 7px; max-height: 285px; overflow-y: auto; }
+.pdf-picker-row { display: grid; grid-template-columns: 18px 96px minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 9px 10px; background: #fffaf0; border: 1px solid #cbbfa5; cursor: pointer; }
+.pdf-picker-row input { width: 17px; height: 17px; accent-color: var(--blue); }
+.pdf-picker-row > span { color: var(--blue); font: 900 10px/1 'DM Sans', sans-serif; letter-spacing: .08em; }
+.pdf-picker-row strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.pdf-picker-row small { color: #267a57; font-size: 10px; font-weight: 900; }
+.pdf-picker-footer { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr); gap: 10px; margin-top: 14px; }
+.pdf-picker-footer .secondary-button, .pdf-picker-footer .primary-button { min-height: 46px; }
 .session-review { margin-top: 24px; padding: 28px; color: var(--ink); background: var(--cream); border: 3px solid var(--ink); box-shadow: 9px 9px 0 var(--ink); }
 .session-review-head { display: flex; justify-content: space-between; gap: 22px; align-items: start; padding-bottom: 20px; border-bottom: 3px solid var(--ink); }
 .session-review-head h2 { margin: 0 0 8px; font: 900 24px/1.2 'Arial Black', 'Noto Sans JP', sans-serif; letter-spacing: -.06em; }
@@ -443,6 +463,14 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 @media (max-width: 780px) {
   .complete-actions { grid-template-columns: 1fr; }
   .complete-actions .secondary-button { width: 100%; }
+  .partial-session-tools { align-items: stretch; flex-direction: column; }
+  .partial-session-tools .secondary-button, .pdf-picker-trigger { width: 100%; }
+  .pdf-picker { padding: 16px; }
+  .pdf-picker-actions { flex-wrap: wrap; }
+  .pdf-picker-actions span { width: 100%; margin-left: 0; }
+  .pdf-picker-row { grid-template-columns: 18px minmax(80px, 96px) minmax(0, 1fr); }
+  .pdf-picker-row small { grid-column: 2 / -1; }
+  .pdf-picker-footer { grid-template-columns: 1fr; }
   .session-review { padding: 20px 16px; }
   .session-review-head { display: grid; gap: 16px; }
   .session-review-meta { min-width: 0; }

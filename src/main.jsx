@@ -1170,7 +1170,6 @@ function App() {
         </div>
       </main>
     </div>
-    {isComplete && sessionAnswers.length > 0 && <SessionPrintView {...{ reviews: sessionAnswers, score: sessionScore, course: getCourseDetails(modeId), studentName: persisted.studentName, ratingStart: sessionRatingStart, ratingAfter: authoritativeRating, completedAt: sessionCompletedAt }} />}
     </>
   )
 }
@@ -1238,6 +1237,7 @@ function PracticeView({ course, question, queue, index, filter, setFilter, submi
       {notice && <div className="app-notice" role="status">{notice}</div>}
       {answerSyncSummary.total > 0 && <div className={`sync-status ${answerSyncSummary.errors && !answerSyncSummary.pending ? 'has-error' : ''}`} role="status"><span>{answerSyncSummary.errors && !answerSyncSummary.pending ? `保存エラー ${answerSyncSummary.errors}問` : answerSyncSummary.errors ? `保存待ち ${answerSyncSummary.total}問（自動再送中）` : `保存待ち ${answerSyncSummary.total}問`}</span><small>解答と判定は画面に反映済みです。</small>{answerSyncSummary.errors > 0 && <button type="button" onClick={retryFailedAnswers}>再送する</button>}</div>}
       {bankLoading ? <LoadingQuestionState /> : isComplete && sessionAnswers.length === 0 ? <EmptyQuestionState restart={() => restart(filter)} /> : isComplete ? <CompleteCard {...{ score: sessionScore, queue, reviews: sessionAnswers, course, studentName, ratingStart: sessionRatingStart, ratingAfter: authoritativeRating, provisionalRating: rating, completedAt: sessionCompletedAt, restart: () => restart(filter) }} /> : <QuestionCard {...{ question, queue, index, submitted, nextQuestion, selected, setSelected, tokens, useWord, removeWord, inputParts, setInputParts, submit, answerPreview, submitting, retryAnswer }} />}
+      {!isComplete && sessionAnswers.length > 0 && <div className="partial-session-tools"><span>ここまでの解説を保存</span><SessionPdfPicker {...{ reviews: sessionAnswers, course, studentName, ratingStart: sessionRatingStart, ratingAfter: authoritativeRating, completedAt: sessionCompletedAt }} /></div>}
     </section>
     <div className="right-column"><DailyRail correct={todayCorrect} answered={todayAnswered} seconds={todaySeconds} history={history} rating={rating} /><PublicLeaderboard players={leaderboard} currentName={studentName} courseLabel={course.label} poolLabel={poolLabel(rankingPoolId)} onOpen={openLeaderboard} /></div>
   </div>
@@ -1321,9 +1321,10 @@ function Feedback({ question, result, onRetry }) {
 
 function CompleteCard({ score, queue, reviews, course, studentName, ratingStart, ratingAfter, provisionalRating, completedAt, restart }) {
   const percentage = score.answered ? Math.round((score.correct / score.answered) * 100) : 0
+  const [showReview, setShowReview] = useState(false)
   return <>
-    <article className="complete-card"><div className="complete-icon"><Icon name="check" size={32} /></div><p className="section-kicker">SESSION COMPLETE</p><h2>今日の{queue.length}問、完了。</h2><div className="result-grid"><div><span>正答数</span><strong>{score.correct} / {queue.length}</strong></div><div><span>正答率</span><strong>{percentage}%</strong></div><div><span>学習モード</span><strong>{course.name}</strong></div></div><div className="complete-actions"><button type="button" className="primary-button" onClick={restart}>もう一度解く<Icon name="arrow" size={21} /></button><button type="button" className="secondary-button" onClick={() => exportSessionPdf(studentName, completedAt)}><Icon name="document" size={19} />PDFとして出力</button></div></article>
-    <section className="session-review"><div className="session-review-head"><div><p className="section-kicker">SESSION REVIEW</p><h2>今回の{reviews.length}問を復習する</h2><p>解いた問題の正答・日本語訳・解説をまとめています。</p></div><div className="session-review-meta"><span>{formatJapaneseDate(completedAt)}</span><strong>{studentName}</strong><small>確定レート {ratingStart.toLocaleString()} → {ratingAfter.toLocaleString()}</small>{provisionalRating !== ratingAfter && <small>暫定レート {provisionalRating.toLocaleString()}</small>}</div></div><div className="review-list">{reviews.map((review, index) => <ReviewItem key={review.id || `${review.question.id}-${index}`} review={review} index={index} />)}</div></section>
+    <article className="complete-card"><div className="complete-icon"><Icon name="check" size={32} /></div><p className="section-kicker">SESSION COMPLETE</p><h2>今日の{queue.length}問、完了。</h2><div className="result-grid"><div><span>正答数</span><strong>{score.correct} / {queue.length}</strong></div><div><span>正答率</span><strong>{percentage}%</strong></div><div><span>学習モード</span><strong>{course.name}</strong></div></div><div className="complete-actions"><button type="button" className="primary-button" onClick={restart}>続きを解く<Icon name="arrow" size={21} /></button><button type="button" className="secondary-button" onClick={() => setShowReview((current) => !current)}><Icon name="history" size={19} />{showReview ? '復習を閉じる' : '復習する'}</button><SessionPdfPicker {...{ reviews, course, studentName, ratingStart, ratingAfter, completedAt }} /></div><p className="complete-actions-help">「続きを解く」は新しい10問を始めます。今回の問題を見直すときは「復習する」を選んでください。</p></article>
+    {showReview && <section className="session-review"><div className="session-review-head"><div><p className="section-kicker">SESSION REVIEW</p><h2>今回の{reviews.length}問を復習する</h2><p>解いた問題の正答・日本語訳・解説をまとめています。</p></div><div className="session-review-meta"><span>{formatJapaneseDate(completedAt)}</span><strong>{studentName}</strong><small>確定レート {ratingStart.toLocaleString()} → {ratingAfter.toLocaleString()}</small>{provisionalRating !== ratingAfter && <small>暫定レート {provisionalRating.toLocaleString()}</small>}</div></div><div className="review-list">{reviews.map((review, index) => <ReviewItem key={review.id || `${review.question.id}-${index}`} review={review} index={index} />)}</div></section>}
   </>
 }
 
@@ -1338,12 +1339,44 @@ function formatJapaneseDate(value) {
   return new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' }).format(date)
 }
 
-function exportSessionPdf(studentName, completedAt) {
-  const originalTitle = document.title
-  const datePart = (completedAt || new Date().toISOString()).slice(0, 10)
-  document.title = `Grammar Arena_${studentName || 'student'}_${datePart}`
-  window.print()
-  window.setTimeout(() => { document.title = originalTitle }, 1000)
+function SessionPdfPicker({ reviews = [], course, studentName, ratingStart, ratingAfter, completedAt }) {
+  const [open, setOpen] = useState(false)
+  const [selectedIds, setSelectedIds] = useState([])
+  const [printReviews, setPrintReviews] = useState(null)
+  const reviewKey = (review, index) => review.id || `${review.question.id}-${index}`
+  const selectedReviews = reviews.filter((review, index) => selectedIds.includes(reviewKey(review, index)))
+
+  useEffect(() => {
+    if (!printReviews?.length) return undefined
+    const originalTitle = document.title
+    const datePart = (completedAt || new Date().toISOString()).slice(0, 10)
+    document.title = `Grammar Arena_${studentName || 'student'}_${datePart}`
+    const printTimer = window.setTimeout(() => window.print(), 60)
+    const cleanupTimer = window.setTimeout(() => {
+      document.title = originalTitle
+      setPrintReviews(null)
+    }, 1000)
+    return () => {
+      window.clearTimeout(printTimer)
+      window.clearTimeout(cleanupTimer)
+      document.title = originalTitle
+    }
+  }, [completedAt, printReviews, studentName])
+
+  const openPicker = () => {
+    setSelectedIds(reviews.map(reviewKey))
+    setOpen(true)
+  }
+  const toggleReview = (reviewId) => {
+    setSelectedIds((current) => current.includes(reviewId) ? current.filter((id) => id !== reviewId) : [...current, reviewId])
+  }
+  const selectedScore = { correct: selectedReviews.filter((review) => review.correct).length, answered: selectedReviews.length }
+
+  return <>
+    <button type="button" className="secondary-button pdf-picker-trigger" onClick={openPicker} disabled={!reviews.length}><Icon name="document" size={19} />PDFを選ぶ</button>
+    {open && <div className="pdf-picker" role="dialog" aria-modal="true" aria-label="PDFにする問題を選択"><div className="pdf-picker-head"><div><p className="section-kicker">PDF EXPORT</p><h3>出力する問題を選択</h3><p>必要な問題だけにチェックを入れてPDF化できます。</p></div><button type="button" className="pdf-picker-close" onClick={() => setOpen(false)} aria-label="閉じる">×</button></div><div className="pdf-picker-actions"><button type="button" className="text-button" onClick={() => setSelectedIds(reviews.map(reviewKey))}>すべて選択</button><button type="button" className="text-button" onClick={() => setSelectedIds([])}>すべて解除</button><span>{selectedReviews.length} / {reviews.length}問を選択中</span></div><div className="pdf-picker-list">{reviews.map((review, index) => { const id = reviewKey(review, index); return <label key={id} className="pdf-picker-row"><input type="checkbox" checked={selectedIds.includes(id)} onChange={() => toggleReview(id)} /><span>QUESTION {String(index + 1).padStart(2, '0')}</span><strong>{review.question.lesson} ・ {review.question.topic}</strong><small>{review.correct ? '正解' : '不正解'}</small></label> })}</div><div className="pdf-picker-footer"><button type="button" className="secondary-button" onClick={() => setOpen(false)}>キャンセル</button><button type="button" className="primary-button" disabled={!selectedReviews.length} onClick={() => { setOpen(false); setPrintReviews(selectedReviews) }}><Icon name="document" size={19} />選択した{selectedReviews.length}問をPDF出力</button></div></div>}
+    {printReviews?.length > 0 && <SessionPrintView reviews={printReviews} score={selectedScore} course={course} studentName={studentName} ratingStart={ratingStart} ratingAfter={ratingAfter} completedAt={completedAt} />}
+  </>
 }
 
 function SessionPrintView({ reviews, score, course, studentName, ratingStart, ratingAfter, completedAt }) {
