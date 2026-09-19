@@ -387,12 +387,54 @@ function shuffleDifferent(items) {
   return shuffled.every((item, index) => item === items[index]) ? [...items.slice(1), items[0]] : shuffled
 }
 
+function diversifiedSample(items, count, seed = []) {
+  const selected = [...seed]
+  const selectedIds = new Set(selected.map((item) => item.id))
+  const remaining = shuffle(items.filter((item) => !selectedIds.has(item.id)))
+  const counts = { lesson: new Map(), topic: new Map(), type: new Map() }
+  selected.forEach((item) => {
+    ;['lesson', 'topic', 'type'].forEach((key) => {
+      const value = String(item[key] || 'unknown')
+      counts[key].set(value, (counts[key].get(value) || 0) + 1)
+    })
+  })
+  while (selected.length < seed.length + count && remaining.length) {
+    const scored = remaining.map((item, index) => {
+      const lesson = String(item.lesson || 'unknown')
+      const topic = String(item.topic || 'unknown')
+      const type = String(item.type || 'unknown')
+      return {
+        item,
+        index,
+        score: (counts.lesson.get(lesson) || 0) * 100
+          + (counts.topic.get(topic) || 0) * 10
+          + (counts.type.get(type) || 0),
+      }
+    })
+    const bestScore = Math.min(...scored.map((entry) => entry.score))
+    const candidates = scored.filter((entry) => entry.score === bestScore)
+    const picked = candidates[Math.floor(Math.random() * candidates.length)]
+    selected.push(picked.item)
+    remaining.splice(picked.index, 1)
+    ;[['lesson', picked.item.lesson], ['topic', picked.item.topic], ['type', picked.item.type]].forEach(([key, rawValue]) => {
+      const value = String(rawValue || 'unknown')
+      counts[key].set(value, (counts[key].get(value) || 0) + 1)
+    })
+  }
+  return selected.slice(seed.length)
+}
+
 function buildQueue(filter, answeredIds = [], questionBank = FOUNDATION_QUESTIONS) {
   // Answer history is for statistics only. Every session may draw from the
   // complete bank so repeated practice can continue to affect the rating.
-  const preferred = filter === 'all' ? shuffle(questionBank) : shuffle(questionBank.filter((question) => question.difficulty === filter))
-  const supplemental = filter === 'all' ? [] : shuffle(questionBank.filter((question) => question.difficulty !== filter))
-  const selected = [...preferred, ...supplemental].slice(0, SESSION_LENGTH)
+  // The sample is still random, but its scoring avoids clustering the same
+  // lesson, topic, and question type at the start of a session.
+  const preferred = filter === 'all' ? questionBank : questionBank.filter((question) => question.difficulty === filter)
+  const selected = diversifiedSample(preferred, SESSION_LENGTH)
+  if (selected.length < SESSION_LENGTH) {
+    const supplemental = questionBank.filter((question) => !selected.some((picked) => picked.id === question.id))
+    selected.push(...diversifiedSample(supplemental, SESSION_LENGTH - selected.length, selected))
+  }
   if (selected.length >= SESSION_LENGTH || !questionBank.length) return selected
   const repeatPool = shuffle(filter === 'all'
     ? questionBank
