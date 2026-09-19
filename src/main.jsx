@@ -7,6 +7,7 @@ import { inputSlotCount, isBlankPlaceholder, withBlankCount } from './questionQu
 import { getQuestionTranslation } from './questionPresentation'
 import { isModerationBlocked, MODERATION_NOTICE } from './contentModeration'
 import { buildRatingChartModel, projectSessionRating } from './ratingHistory'
+import { AUTH_REQUEST_TIMEOUT_MS, requestAuthWithRetry } from './authRetry'
 import {
   ANSWER_SYNC_MAX_ATTEMPTS,
   ANSWER_SYNC_TIMEOUT_MS,
@@ -357,14 +358,14 @@ async function hashPin(pin) {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-function requestScoreApi(params, { signal } = {}) {
+function requestScoreApi(params, { signal, timeoutMs = 15000 } = {}) {
   if (!SCORE_API_URL) return Promise.reject(new Error('score-api-not-configured'))
   // Keep URLSearchParams as the body object so fetch sets the form content
   // type Apps Script uses to populate e.parameter. Passing .toString() here
   // turns it into text/plain and makes every POST look like a leaderboard read.
   const body = new URLSearchParams(params)
   const controller = signal ? null : typeof AbortController === 'undefined' ? null : new AbortController()
-  const timeout = controller ? window.setTimeout(() => controller.abort(), 15000) : null
+  const timeout = controller ? window.setTimeout(() => controller.abort(), timeoutMs) : null
   return fetch(SCORE_API_URL, { method: 'POST', body, cache: 'no-store', signal: signal || controller?.signal }).then((response) => {
     if (!response.ok) throw new Error('score-api-response')
     return response.json()
@@ -584,7 +585,9 @@ function App() {
       const params = isPlacement
         ? { action: 'update-profile', course: getRankingCourseId(modeId), name, authToken: placementSetup.token, grade: authGrade, className: authClassName, foundationMember: String(authFoundationMember), poolId: preferredPoolId({ grade: authGrade, className: authClassName, foundationMember: authFoundationMember }) }
         : { action: authMode, course: getRankingCourseId(modeId), name, pinHash: await hashPin(authPin), ...(authMode === 'register' ? { grade: authGrade, className: authClassName, foundationMember: String(authFoundationMember), poolId: preferredPoolId({ grade: authGrade, className: authClassName, foundationMember: authFoundationMember }) } : {}) }
-      const result = await requestScoreApi(params)
+      const result = await requestAuthWithRetry(
+        () => requestScoreApi(params, { timeoutMs: AUTH_REQUEST_TIMEOUT_MS }),
+      )
       if (!result.ok) {
         const messages = {
           'already-registered': 'この生徒名は登録済みです。ログインを選んでください。',
@@ -594,6 +597,8 @@ function App() {
           'placement-required': '学年とクラスを選択してください。',
           'invalid-session': '登録情報を確認できませんでした。もう一度ログインしてください。',
           'inappropriate-content': MODERATION_NOTICE,
+          'server-busy': '現在アクセスが集中しています。自動で再接続しましたが、数秒後にもう一度お試しください。',
+          'service-unavailable': '共有サーバーが一時的に混み合っています。数秒後にもう一度お試しください。',
         }
         setNotice(messages[result.reason] || 'ログインできませんでした。入力内容を確認してください。')
         return
@@ -616,7 +621,7 @@ function App() {
       setNotice('')
       setView('lobby')
     } catch {
-      setNotice('共有サーバーに接続できませんでした。時間をおいて再試行してください。')
+      setNotice('共有サーバーが混み合っています。入力内容は保持されています。数秒後にもう一度お試しください。')
     } finally {
       setAuthBusy(false)
     }

@@ -1414,13 +1414,24 @@ function doGet(e) {
 
 function doPost(e) {
   const params = e && e.parameter ? e.parameter : {}
-  const action = params.action || 'leaderboard'
-  if (action === 'register') return registerPlayer_(params)
-  if (action === 'login') return loginPlayer_(params)
-  if (action === 'session') return sessionPlayer_(params)
-  if (action === 'update-profile') return updatePlayerProfile_(params)
-  if (action === 'answer') return recordAnswer_(params)
-  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
+  try {
+    const action = params.action || 'leaderboard'
+    if (action === 'register') return registerPlayer_(params)
+    if (action === 'login') return loginPlayer_(params)
+    if (action === 'session') return sessionPlayer_(params)
+    if (action === 'update-profile') return updatePlayerProfile_(params)
+    if (action === 'answer') return recordAnswer_(params)
+    return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
+  } catch (error) {
+    const message = String(error && error.message || error || '')
+    const retryable = isTransientBackendError_(message)
+    console.error(message)
+    return json_({ ok: false, reason: retryable ? 'server-busy' : 'server-error', retryable }, params.callback)
+  }
+}
+
+function isTransientBackendError_(message) {
+  return /lock|simultaneous|too many|timed out|timeout|quota|service invoked too many|try again/i.test(String(message || ''))
 }
 
 function setup() {
@@ -1456,6 +1467,19 @@ function getOrCreateSheet_(book, name, headers) {
   return sheet
 }
 
+// Operational requests already run after setup. Avoid rereading and validating
+// every header four times for every student request; only create a sheet when a
+// legacy deployment has not created it yet.
+function getRuntimeSheets_(book) {
+  const get = (name, headers) => book.getSheetByName(name) || getOrCreateSheet_(book, name, headers)
+  return {
+    players: get('Players', PLAYER_HEADERS),
+    answers: get('Answers', ANSWER_HEADERS),
+    courseProfiles: get('CourseProfiles', COURSE_PROFILE_HEADERS),
+    poolProfiles: get('PoolProfiles', POOL_PROFILE_HEADERS),
+  }
+}
+
 function registerPlayer_(params) {
   const name = cleanName_(params.name)
   const playerKey = keyFor_(name)
@@ -1472,25 +1496,30 @@ function registerPlayer_(params) {
   lock.waitLock(10000)
   try {
     const book = getBook_()
-    const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
-    const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
-    const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
-    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
+    const { players, answers, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
     const rows = players.getDataRange().getValues()
     const playerIndex = rows.findIndex((row, index) => index > 0 && row[0] === playerKey)
     const now = new Date()
     const token = Utilities.getUuid()
     const pinSecret = pinSecretFor_(pinHash, playerKey)
     if (playerIndex >= 0) {
-      if (String(rows[playerIndex][5] || '')) return json_({ ok: false, reason: 'already-registered' }, params.callback)
+      if (String(rows[playerIndex][5] || '')) {
+        if (String(rows[playerIndex][5]) !== pinSecret) return json_({ ok: false, reason: 'already-registered' }, params.callback)
+        // A lost response can make a successful registration look failed in
+        // the browser. Treat the same name + PIN as an idempotent reconnect,
+        // but preserve the stored class/pool placement.
+        players.getRange(playerIndex + 1, 5).setValue(now)
+        players.getRange(playerIndex + 1, 7).setValue(tokenHashFor_(token, playerKey))
+        return json_(profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false, includeAnsweredIds: true }), params.callback)
+      }
       const rating = Number(rows[playerIndex][2]) || 1240
       const answered = Number(rows[playerIndex][3]) || 0
       players.getRange(playerIndex + 1, 2, 1, 9).setValues([[name, rating, answered, now, pinSecret, tokenHashFor_(token, playerKey), grade, className, foundationMember]])
-      return json_(profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
+      return json_(profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false, includeAnsweredIds: true }), params.callback)
     }
     players.appendRow([playerKey, name, 1240, 0, now, pinSecret, tokenHashFor_(token, playerKey), grade, className, foundationMember])
     const newIndex = players.getLastRow() - 1
-    return json_(profile_(players, answers, courseProfiles, poolProfiles, newIndex, playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, newIndex, playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false, includeAnsweredIds: false }), params.callback)
   } finally {
     lock.releaseLock()
   }
@@ -1508,10 +1537,7 @@ function loginPlayer_(params) {
   lock.waitLock(10000)
   try {
     const book = getBook_()
-    const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
-    const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
-    const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
-    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
+    const { players, answers, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
     const rows = players.getDataRange().getValues()
     const playerIndex = rows.findIndex((row, index) => index > 0 && row[0] === playerKey)
     if (playerIndex < 0) return json_({ ok: false, reason: 'not-found' }, params.callback)
@@ -1522,7 +1548,7 @@ function loginPlayer_(params) {
     const now = new Date()
     players.getRange(playerIndex + 1, 5).setValue(now)
     players.getRange(playerIndex + 1, 7).setValue(tokenHashFor_(token, playerKey))
-    return json_(profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false }), params.callback)
   } finally {
     lock.releaseLock()
   }
@@ -1538,19 +1564,18 @@ function sessionPlayer_(params) {
   lock.waitLock(10000)
   try {
     const book = getBook_()
-    const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
-    const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
-    const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
-    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
+    const { players, answers, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
     const auth = authenticate_(players, name, token)
     if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
-    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false }), params.callback)
   } finally {
     lock.releaseLock()
   }
 }
 
-function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, requestedPool) {
+function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, requestedPool, options = {}) {
+  const includePlayers = options.includePlayers !== false
+  const includeAnsweredIds = options.includeAnsweredIds !== false
   const row = players.getDataRange().getValues()[playerIndex]
   const poolIds = playerPools_(row)
   const profiles = poolIds.map((poolId) => ({
@@ -1568,7 +1593,7 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
     name: String(row[1]),
     rating: activeProfile.rating,
     answered: activeProfile.answered,
-    answeredIds: answeredIds_(answers, playerKey, course),
+    answeredIds: includeAnsweredIds ? answeredIds_(answers, playerKey, course) : [],
     authToken: token,
     grade: cleanGrade_(row[7]),
     className: cleanClassName_(row[8]),
@@ -1577,7 +1602,7 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
     poolId: activePool,
     poolIds,
     ratings,
-    players: activePool ? leaderboard_(players, courseProfiles, poolProfiles, course, activePool, playerKey) : [],
+    players: includePlayers && activePool ? leaderboard_(players, courseProfiles, poolProfiles, course, activePool, playerKey) : [],
   }
 }
 
@@ -1593,16 +1618,13 @@ function updatePlayerProfile_(params) {
   lock.waitLock(10000)
   try {
     const book = getBook_()
-    const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
-    const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
-    const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
-    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
+    const { players, answers, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
     const auth = authenticate_(players, name, token)
     if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
     const foundationMember = cleanBoolean_(params.foundationMember)
     players.getRange(auth.playerIndex + 1, 8, 1, 3).setValues([[grade, className, foundationMember]])
     const course = cleanCourse_(params.course) || COURSE_NAME
-    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId)), params.callback)
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false }), params.callback)
   } finally {
     lock.releaseLock()
   }
@@ -1677,10 +1699,7 @@ function recordAnswer_(params) {
   lock.waitLock(10000)
   try {
     const book = getBook_()
-    const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
-    const answers = getOrCreateSheet_(book, 'Answers', ANSWER_HEADERS)
-    const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
-    const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
+    const { players, answers, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
     const auth = authenticate_(players, name, String(params.authToken || ''))
     if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
     const playerKey = auth.playerKey
@@ -1734,9 +1753,7 @@ function recordAnswer_(params) {
 function getLeaderboard_(course, poolId, name, authToken, callback) {
   course = cleanCourse_(course) || COURSE_NAME
   const book = getBook_()
-  const players = getOrCreateSheet_(book, 'Players', PLAYER_HEADERS)
-  const courseProfiles = getOrCreateSheet_(book, 'CourseProfiles', COURSE_PROFILE_HEADERS)
-  const poolProfiles = getOrCreateSheet_(book, 'PoolProfiles', POOL_PROFILE_HEADERS)
+  const { players, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
   const auth = authenticate_(players, cleanName_(name), String(authToken || ''))
   if (!auth) return json_({ ok: false, reason: 'auth-required', players: [] }, callback)
   const memberPools = playerPools_(players.getDataRange().getValues()[auth.playerIndex])
