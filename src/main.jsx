@@ -34,7 +34,7 @@ const DEFAULT_THEME_ID = 'ascention'
 const THEME_OPTIONS = [
   { id: 'ascention', label: 'Ascention', description: 'The original yellow and black theme' },
   { id: 'moon', label: 'Moon', description: 'Midnight blue with a cool cyan glow' },
-  { id: 'crystallium', label: 'Crystallium', description: 'Pearl light, prism facets, and jewel tones' },
+  { id: 'crystallium', label: 'Crystallium', description: 'Pink prism light and floating crystal shards' },
 ]
 
 function normalizeThemeId(value) {

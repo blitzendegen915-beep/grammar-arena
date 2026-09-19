@@ -873,6 +873,252 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 .theme-option-crystallium .theme-preview::after { right: 8px; bottom: 7px; width: 15px; height: 24px; background: #e84e9b; clip-path: polygon(50% 0, 100% 39%, 69% 100%, 30% 100%, 0 39%); transform: none; box-shadow: none; }
 .theme-option-crystallium .theme-preview span { left: 6px; bottom: 6px; width: 25px; height: 2px; background: #7052d6; box-shadow: 0 -6px 0 #46c9b2; transform: rotate(-27deg); }
 
+/* Crystallium atmosphere: pink prism light, a mineral field, and floating shards. */
+.theme-crystallium.app-shell {
+  --sun: #ff9ed8;
+  --ink: #f8efff;
+  --cream: #fff7fc;
+  --paper: #171034;
+  --signal: #ff75c5;
+  --blue: #8fe9ff;
+  --line: rgba(255, 158, 216, .48);
+  position: relative;
+  isolation: isolate;
+  overflow-x: hidden;
+  color: #f8efff;
+  background: #08051d;
+}
+.theme-crystallium.app-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(132, 73, 255, .16), transparent 34%),
+    linear-gradient(180deg, rgba(8, 5, 29, .2), rgba(8, 5, 29, .62));
+}
+.theme-crystallium .sidebar,
+.theme-crystallium .topbar {
+  background: rgba(9, 6, 30, .78);
+  border-color: rgba(255, 158, 216, .38);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+.theme-crystallium .sidebar { position: relative; z-index: 2; }
+.theme-crystallium .brand-mark { color: var(--sun); }
+.theme-crystallium .brand-name,
+.theme-crystallium .nav-item,
+.theme-crystallium .sidebar-footer,
+.theme-crystallium .footer-cap { color: #fff3fc; }
+.theme-crystallium .nav-item:hover { color: #fff; background: rgba(255, 117, 197, .16); }
+.theme-crystallium .nav-item.active { color: #190a2c; background: var(--sun); }
+.theme-crystallium .nav-item.active::after { color: #190a2c; }
+.theme-crystallium .footer-line { background: rgba(143, 233, 255, .34); }
+.theme-crystallium .main-area {
+  position: relative;
+  min-height: 100vh;
+  background-color: #08051d;
+  background-image:
+    linear-gradient(180deg, rgba(8, 5, 29, .58), rgba(8, 5, 29, .72)),
+    url('./assets/crystallium-background.jpg');
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+.theme-crystallium .main-area::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(255, 117, 197, .12), transparent 32%),
+    linear-gradient(110deg, transparent 0 38%, rgba(143, 233, 255, .06) 48%, transparent 57%);
+  animation: crystallium-aura 13s ease-in-out infinite alternate;
+}
+.theme-crystallium .content-wrap { position: relative; z-index: 1; }
+.theme-crystallium .topbar {
+  position: relative;
+  z-index: 3;
+  color: #fff3fc;
+  background: rgba(9, 6, 30, .66);
+  border-bottom-color: rgba(255, 158, 216, .48);
+}
+.theme-crystallium .top-stat,
+.theme-crystallium .top-stat strong,
+.theme-crystallium .top-stat span:not(.rating-delta),
+.theme-crystallium .top-greeting { color: #fff3fc; }
+.theme-crystallium .rating-delta { color: var(--signal) !important; }
+.theme-crystallium .top-divider { background: rgba(143, 233, 255, .5); }
+.theme-crystallium .profile-orb { color: #180a2c; background: var(--sun); }
+.theme-crystallium .selector-stack label,
+.theme-crystallium .selector-stack span { color: #e5d7ff; }
+.theme-crystallium .selector-stack select { color: #1a1037; background: #fff7fc; border-color: var(--sun); }
+.theme-crystallium .content-wrap::before { background: linear-gradient(135deg, rgba(255, 117, 197, .12), transparent 44%); }
+.theme-crystallium .section-kicker,
+.theme-crystallium .lesson-label,
+.theme-crystallium .rail-title,
+.theme-crystallium .leaderboard-link,
+.theme-crystallium .leaderboard-empty svg,
+.theme-crystallium .input-translation span { color: var(--blue); }
+.theme-crystallium h1,
+.theme-crystallium .subcopy,
+.theme-crystallium .difficulty-tab,
+.theme-crystallium .japanese-prompt,
+.theme-crystallium .sentence,
+.theme-crystallium .rail-title h2,
+.theme-crystallium .rail-card h3,
+.theme-crystallium .history-panel-head h2 { color: #fff3fc; }
+.theme-crystallium .subcopy,
+.theme-crystallium .difficulty-tab,
+.theme-crystallium .lesson-label span,
+.theme-crystallium .question-type,
+.theme-crystallium .progress-block,
+.theme-crystallium .prompt,
+.theme-crystallium .history-panel-head span { color: #d8c8ee; }
+.theme-crystallium .difficulty-tabs { border-bottom-color: rgba(255, 158, 216, .4); }
+.theme-crystallium .difficulty-tab:hover,
+.theme-crystallium .difficulty-tab.selected { color: var(--sun); }
+.theme-crystallium .difficulty-tab.selected { background: rgba(255, 117, 197, .12); border-bottom-color: var(--sun); }
+.theme-crystallium .question-card,
+.theme-crystallium .complete-card,
+.theme-crystallium .rail-card,
+.theme-crystallium .history-panel,
+.theme-crystallium .settings-panel,
+.theme-crystallium .leaderboard-table-card,
+.theme-crystallium .leaderboard-you,
+.theme-crystallium .leaderboard-rule,
+.theme-crystallium .lobby-card,
+.theme-crystallium .landing-hero,
+.theme-crystallium .empty-question-state {
+  color: #fff3fc;
+  background: rgba(13, 8, 43, .84);
+  border-color: rgba(255, 158, 216, .58);
+  box-shadow: 0 0 0 1px rgba(143, 233, 255, .16), 12px 12px 0 rgba(2, 1, 13, .78), 0 22px 70px rgba(2, 1, 13, .3);
+  backdrop-filter: blur(16px) saturate(135%);
+}
+.theme-crystallium .question-head,
+.theme-crystallium .history-panel-head,
+.theme-crystallium .leaderboard-table-head { border-color: rgba(143, 233, 255, .24); }
+.theme-crystallium .progress-track { background: rgba(255, 255, 255, .15); }
+.theme-crystallium .progress-track span { background: linear-gradient(90deg, var(--signal), var(--blue)); }
+.theme-crystallium .sentence-blank,
+.theme-crystallium .answer-line,
+.theme-crystallium .input-wrap,
+.theme-crystallium .input-wrap-multi input { border-color: var(--sun); }
+.theme-crystallium .choice-button,
+.theme-crystallium .secondary-button,
+.theme-crystallium .setting-option {
+  color: #fff3fc;
+  background: rgba(32, 20, 76, .78);
+  border-color: rgba(143, 233, 255, .42);
+}
+.theme-crystallium .choice-button:hover,
+.theme-crystallium .secondary-button:hover,
+.theme-crystallium .setting-option:hover,
+.theme-crystallium .setting-option.selected { color: #fff; background: rgba(112, 41, 130, .72); border-color: var(--sun); }
+.theme-crystallium .choice-button.chosen { border-color: var(--sun); background: rgba(255, 117, 197, .2); }
+.theme-crystallium .choice-letter { color: #1a0c32; background: linear-gradient(135deg, var(--sun), #ffc4ef); }
+.theme-crystallium .choice-button svg { color: var(--blue); }
+.theme-crystallium .token { color: #fff3fc; background: rgba(39, 26, 91, .78); border-color: rgba(143, 233, 255, .42); }
+.theme-crystallium .token:hover,
+.theme-crystallium .selected-token { background: rgba(255, 117, 197, .2); border-color: var(--sun); }
+.theme-crystallium .input-wrap input { color: #fff3fc; }
+.theme-crystallium .input-wrap > span,
+.theme-crystallium .answer-placeholder { color: #c9b7df; }
+.theme-crystallium .primary-button { color: #1a0c32; background: linear-gradient(100deg, var(--sun), #ffc1ed); box-shadow: 0 5px 0 #250b3b; }
+.theme-crystallium .primary-button:hover { background: #ffd7f3; }
+.theme-crystallium .logout-button { color: #1a0c32; background: var(--sun); border-color: #1a0c32; }
+.theme-crystallium .feedback-correct { background: rgba(29, 119, 129, .36); border-color: var(--blue); }
+.theme-crystallium .feedback-wrong { background: rgba(112, 24, 91, .42); border-color: var(--signal); }
+.theme-crystallium .feedback-title,
+.theme-crystallium .feedback p,
+.theme-crystallium .correction strong,
+.theme-crystallium .translation p { color: #fff3fc; }
+.theme-crystallium .feedback-wrong .feedback-title { color: #ffb5df; }
+.theme-crystallium .translation { background: rgba(143, 233, 255, .1); border-left-color: var(--blue); }
+.theme-crystallium .translation span,
+.theme-crystallium .correction span,
+.theme-crystallium .feedback small,
+.theme-crystallium .history-current span,
+.theme-crystallium .history-row span,
+.theme-crystallium .empty-history p,
+.theme-crystallium .empty-history { color: #d8c8ee; }
+.theme-crystallium .metric-row,
+.theme-crystallium .metric-row strong,
+.theme-crystallium .rail-note p,
+.theme-crystallium .history-row strong,
+.theme-crystallium .leaderboard-table-head h2,
+.theme-crystallium .leaderboard-table-row { color: #fff3fc; }
+.theme-crystallium .metric-icon,
+.theme-crystallium .chart-line,
+.theme-crystallium .chart-dot { color: var(--sun); stroke: var(--sun); }
+.theme-crystallium .chart-axis,
+.theme-crystallium .chart-grid { stroke: rgba(143, 233, 255, .5); }
+.theme-crystallium .chart-area { fill: rgba(255, 117, 197, .16); }
+.theme-crystallium .rating-chart text { fill: #d8c8ee; }
+.theme-crystallium .rail-note { color: var(--sun); background: rgba(255, 117, 197, .1); }
+.theme-crystallium .history-current,
+.theme-crystallium .leaderboard-table-label { background: rgba(255, 117, 197, .16); }
+.theme-crystallium .history-current strong,
+.theme-crystallium .history-change strong.up,
+.theme-crystallium .empty-history svg { color: var(--sun); }
+.theme-crystallium .history-row,
+.theme-crystallium .leaderboard-table-row { border-color: rgba(143, 233, 255, .24); }
+.theme-crystallium .leaderboard-table-row.current { color: #1a0c32; background: var(--sun); }
+.theme-crystallium .leaderboard-table-label { color: #e4d5f3; }
+.theme-crystallium .leaderboard-rule { color: #1a0c32; background: rgba(255, 247, 252, .92); border-color: var(--sun); }
+.theme-crystallium .leaderboard-rule strong,
+.theme-crystallium .leaderboard-rule small { color: #1a0c32; }
+.theme-crystallium .landing-hero,
+.theme-crystallium .lobby-card { background: rgba(13, 8, 43, .88); color: #fff3fc; }
+.theme-crystallium .landing-hero h1,
+.theme-crystallium .lobby-card h1,
+.theme-crystallium .landing-copy,
+.theme-crystallium .landing-form label,
+.theme-crystallium .landing-footer,
+.theme-crystallium .session-hint { color: #fff3fc; }
+.theme-crystallium .landing-mark { color: #1a0c32; background: var(--sun); }
+.theme-crystallium .landing-hero .section-kicker,
+.theme-crystallium .landing-footer > span:first-child { color: var(--blue); }
+.theme-crystallium .landing-form input,
+.theme-crystallium .landing-form select { color: #1a0c32; background: #fff7fc; border-color: var(--sun); }
+.theme-crystallium .auth-tabs { border-color: rgba(255, 158, 216, .54); }
+.theme-crystallium .auth-tabs button { color: #d8c8ee; }
+.theme-crystallium .auth-tabs button.selected { color: #1a0c32; background: var(--sun); }
+.theme-crystallium .landing-note,
+.theme-crystallium .placement-help { color: #d8c8ee; }
+.theme-crystallium .course-banner { color: #1a0c32; background: var(--sun); border-color: #1a0c32; }
+.theme-crystallium .settings-panel h2,
+.theme-crystallium .settings-panel > p,
+.theme-crystallium .theme-option-copy strong { color: #fff3fc; }
+.theme-crystallium .settings-panel > p,
+.theme-crystallium .theme-option-copy small { color: #d8c8ee; }
+.theme-crystallium .theme-option { color: #fff3fc; background: rgba(25, 15, 63, .82); border-color: rgba(143, 233, 255, .42); }
+.theme-crystallium .theme-option:hover,
+.theme-crystallium .theme-option.selected { background: rgba(112, 41, 130, .72); border-color: var(--sun); box-shadow: 4px 4px 0 rgba(2, 1, 13, .78); }
+.theme-crystallium .setting-radio { border-color: #b5a5dd; }
+.theme-crystallium .setting-option.selected .setting-radio::after { background: var(--sun); }
+.theme-crystallium .toggle-row { border-color: rgba(143, 233, 255, .24); }
+.theme-crystallium .toggle-row small,
+.theme-crystallium .rule-note { color: #d8c8ee; }
+.theme-crystallium .toggle.on { background: var(--signal); }
+.theme-crystallium .rule-note { background: rgba(143, 233, 255, .1); }
+.theme-crystallium .rule-note svg { color: var(--blue); }
+.theme-option-crystallium .theme-preview {
+  background: #10082f url('./assets/crystallium-background.jpg') center / cover;
+  border-color: var(--sun);
+}
+.theme-option-crystallium .theme-preview::before { background: rgba(255, 117, 197, .75); clip-path: polygon(0 0, 74% 0, 32% 100%, 0 100%); transform: none; }
+.theme-option-crystallium .theme-preview::after { right: 8px; bottom: 7px; width: 15px; height: 24px; background: var(--blue); clip-path: polygon(50% 0, 100% 39%, 69% 100%, 30% 100%, 0 39%); transform: none; box-shadow: none; }
+.theme-option-crystallium .theme-preview span { left: 6px; bottom: 6px; width: 25px; height: 2px; background: var(--sun); box-shadow: 0 -6px 0 var(--blue); transform: rotate(-27deg); }
+@keyframes crystallium-aura {
+  from { opacity: .72; transform: translate3d(-1%, 0, 0) scale(1); }
+  to { opacity: 1; transform: translate3d(1%, -1%, 0) scale(1.025); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-crystallium .main-area::before { animation: none; }
+}
+
 .brand-block { appearance: none; border: 0; margin: 0; width: 100%; color: inherit; background: transparent; font: inherit; text-align: left; cursor: pointer; }
 .brand-block:focus-visible { outline: 3px solid var(--sun); outline-offset: 4px; }
 .theme-unlock-overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px; background: rgba(8, 10, 29, .82); animation: theme-unlock-fade .25s ease both; }
@@ -887,14 +1133,14 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 .theme-unlock-card p { margin: 22px auto 30px; max-width: 470px; color: #b9d5ed; font-size: clamp(15px, 2vw, 20px); font-weight: 700; line-height: 1.55; }
 .theme-unlock-button { min-width: min(320px, 100%); padding: 16px 22px; color: #07112e; background: #5edcff; border: 3px solid #020611; box-shadow: 5px 5px 0 #020611; font: 900 14px/1 'DM Sans', sans-serif; letter-spacing: .08em; cursor: pointer; }
 .theme-unlock-button:hover { background: #baf7ff; }
-.theme-unlock-crystallium .theme-unlock-card { color: #171a38; background: #fbfcff; border-color: #171a38; box-shadow: 14px 14px 0 #c7b8ff; }
-.theme-unlock-crystallium .theme-unlock-card::before { background: repeating-linear-gradient(135deg, transparent 0 28px, rgba(112,82,214,.1) 28px 34px); }
-.theme-unlock-crystallium .theme-unlock-card::after { border-color: rgba(232,78,155,.75); }
-.theme-unlock-crystallium .theme-unlock-kicker { color: #7052d6; }
-.theme-unlock-crystallium .theme-unlock-symbol { color: #e84e9b; text-shadow: 0 0 22px rgba(232,78,155,.3); }
-.theme-unlock-crystallium .theme-unlock-card p { color: #626685; }
-.theme-unlock-crystallium .theme-unlock-button { color: #171a38; background: #c7b8ff; border-color: #171a38; box-shadow: 5px 5px 0 #171a38; }
-.theme-unlock-crystallium .theme-unlock-button:hover { background: #dfd5ff; }
+.theme-unlock-crystallium .theme-unlock-card { color: #fff3fc; background: linear-gradient(180deg, rgba(10, 5, 34, .7), rgba(10, 5, 34, .9)), url('./assets/crystallium-background.jpg') center / cover; border-color: #ff9ed8; box-shadow: 14px 14px 0 #4d1766; }
+.theme-unlock-crystallium .theme-unlock-card::before { background: repeating-linear-gradient(135deg, transparent 0 28px, rgba(143,233,255,.12) 28px 34px); }
+.theme-unlock-crystallium .theme-unlock-card::after { border-color: rgba(255,158,216,.8); }
+.theme-unlock-crystallium .theme-unlock-kicker { color: #8fe9ff; }
+.theme-unlock-crystallium .theme-unlock-symbol { color: #ff9ed8; text-shadow: 0 0 22px rgba(255,117,197,.7); }
+.theme-unlock-crystallium .theme-unlock-card p { color: #ead8f4; }
+.theme-unlock-crystallium .theme-unlock-button { color: #1a0c32; background: #ff9ed8; border-color: #1a0c32; box-shadow: 5px 5px 0 #1a0c32; }
+.theme-unlock-crystallium .theme-unlock-button:hover { background: #ffd7f3; }
 @keyframes theme-unlock-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes theme-unlock-rise { from { opacity: 0; transform: translateY(22px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (prefers-reduced-motion: reduce) { .theme-unlock-overlay, .theme-unlock-card { animation: none; } }
