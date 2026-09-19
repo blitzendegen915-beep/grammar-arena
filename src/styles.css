@@ -869,3 +869,30 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 .theme-option-crystallium .theme-preview::before { background: #c7b8ff; clip-path: polygon(0 0, 74% 0, 32% 100%, 0 100%); transform: none; }
 .theme-option-crystallium .theme-preview::after { right: 8px; bottom: 7px; width: 15px; height: 24px; background: #e84e9b; clip-path: polygon(50% 0, 100% 39%, 69% 100%, 30% 100%, 0 39%); transform: none; box-shadow: none; }
 .theme-option-crystallium .theme-preview span { left: 6px; bottom: 6px; width: 25px; height: 2px; background: #7052d6; box-shadow: 0 -6px 0 #46c9b2; transform: rotate(-27deg); }
+
+.brand-block { appearance: none; border: 0; margin: 0; width: 100%; color: inherit; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.brand-block:focus-visible { outline: 3px solid var(--sun); outline-offset: 4px; }
+.theme-unlock-overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px; background: rgba(8, 10, 29, .82); animation: theme-unlock-fade .25s ease both; }
+.theme-unlock-card { position: relative; width: min(760px, 100%); overflow: hidden; padding: clamp(38px, 7vw, 84px) clamp(26px, 8vw, 96px); color: #f4fbff; background: #0d2048; border: 4px solid #5edcff; box-shadow: 14px 14px 0 #020611; text-align: center; animation: theme-unlock-rise .35s cubic-bezier(.2,.8,.2,1) both; }
+.theme-unlock-card::before, .theme-unlock-card::after { content: ''; position: absolute; pointer-events: none; }
+.theme-unlock-card::before { inset: -55% 24%; background: repeating-linear-gradient(135deg, transparent 0 28px, rgba(94,220,255,.12) 28px 34px); transform: rotate(18deg); }
+.theme-unlock-card::after { top: 18%; right: 12%; width: 88px; height: 88px; border: 2px solid rgba(94,220,255,.6); transform: rotate(45deg); }
+.theme-unlock-kicker, .theme-unlock-card h2, .theme-unlock-card p, .theme-unlock-button, .theme-unlock-symbol { position: relative; z-index: 1; }
+.theme-unlock-kicker { display: block; color: #5edcff; font: 800 13px/1 'DM Sans', sans-serif; letter-spacing: .2em; }
+.theme-unlock-symbol { display: block; margin: 22px 0 8px; color: #baf7ff; font-size: clamp(52px, 10vw, 108px); line-height: .8; text-shadow: 0 0 22px rgba(94,220,255,.65); }
+.theme-unlock-card h2 { margin: 0; font: 900 clamp(42px, 8vw, 90px)/.95 'Arial Black', 'DM Sans', sans-serif; letter-spacing: -.07em; text-transform: none; }
+.theme-unlock-card p { margin: 22px auto 30px; max-width: 470px; color: #b9d5ed; font-size: clamp(15px, 2vw, 20px); font-weight: 700; line-height: 1.55; }
+.theme-unlock-button { min-width: min(320px, 100%); padding: 16px 22px; color: #07112e; background: #5edcff; border: 3px solid #020611; box-shadow: 5px 5px 0 #020611; font: 900 14px/1 'DM Sans', sans-serif; letter-spacing: .08em; cursor: pointer; }
+.theme-unlock-button:hover { background: #baf7ff; }
+.theme-unlock-crystallium .theme-unlock-card { color: #171a38; background: #fbfcff; border-color: #171a38; box-shadow: 14px 14px 0 #c7b8ff; }
+.theme-unlock-crystallium .theme-unlock-card::before { background: repeating-linear-gradient(135deg, transparent 0 28px, rgba(112,82,214,.1) 28px 34px); }
+.theme-unlock-crystallium .theme-unlock-card::after { border-color: rgba(232,78,155,.75); }
+.theme-unlock-crystallium .theme-unlock-kicker { color: #7052d6; }
+.theme-unlock-crystallium .theme-unlock-symbol { color: #e84e9b; text-shadow: 0 0 22px rgba(232,78,155,.3); }
+.theme-unlock-crystallium .theme-unlock-card p { color: #626685; }
+.theme-unlock-crystallium .theme-unlock-button { color: #171a38; background: #c7b8ff; border-color: #171a38; box-shadow: 5px 5px 0 #171a38; }
+.theme-unlock-crystallium .theme-unlock-button:hover { background: #dfd5ff; }
+@keyframes theme-unlock-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes theme-unlock-rise { from { opacity: 0; transform: translateY(22px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .theme-unlock-overlay, .theme-unlock-card { animation: none; } }
+@media (max-width: 520px) { .theme-unlock-overlay { padding: 16px; } .theme-unlock-card { padding: 38px 20px 30px; box-shadow: 7px 7px 0 #020611; } .theme-unlock-crystallium .theme-unlock-card { box-shadow: 7px 7px 0 #c7b8ff; } .theme-unlock-card h2 { font-size: clamp(38px, 12vw, 60px); } .theme-unlock-card p { font-size: 14px; } }

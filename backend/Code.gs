@@ -1,6 +1,7 @@
 const COURSE_NAME = 'foundation-course'
 const RATING_MIN = 800
-const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash', 'grade', 'className', 'foundationMember']
+const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash', 'grade', 'className', 'foundationMember', 'unlockedThemes']
+const THEME_UNLOCKS = ['moon', 'crystallium']
 const ANSWER_HEADERS = ['playerKey', 'course', 'questionId', 'correct', 'delta', 'answeredAt', 'answerId']
 const COURSE_PROFILE_HEADERS = ['playerKey', 'course', 'rating', 'answered', 'updatedAt']
 const POOL_PROFILE_HEADERS = ['playerKey', 'course', 'poolId', 'rating', 'answered', 'updatedAt']
@@ -1420,6 +1421,7 @@ function doPost(e) {
     if (action === 'login') return loginPlayer_(params)
     if (action === 'session') return sessionPlayer_(params)
     if (action === 'update-profile') return updatePlayerProfile_(params)
+    if (action === 'unlock-theme') return unlockTheme_(params)
     if (action === 'answer') return recordAnswer_(params)
     return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
   } catch (error) {
@@ -1577,8 +1579,10 @@ function getOrCreateSheet_(book, name, headers) {
 // legacy deployment has not created it yet.
 function getRuntimeSheets_(book) {
   const get = (name, headers) => book.getSheetByName(name) || getOrCreateSheet_(book, name, headers)
+  const players = get('Players', PLAYER_HEADERS)
+  if (String(players.getRange(1, 11).getValue() || '') !== 'unlockedThemes') players.getRange(1, 11).setValue('unlockedThemes')
   return {
-    players: get('Players', PLAYER_HEADERS),
+    players,
     answers: get('Answers', ANSWER_HEADERS),
     courseProfiles: get('CourseProfiles', COURSE_PROFILE_HEADERS),
     poolProfiles: get('PoolProfiles', POOL_PROFILE_HEADERS),
@@ -1678,10 +1682,67 @@ function sessionPlayer_(params) {
   }
 }
 
+function themeUnlocksFromRow_(row) {
+  try {
+    const parsed = JSON.parse(String(row[10] || '[]'))
+    return Array.isArray(parsed) ? [...new Set(parsed.filter((themeId) => THEME_UNLOCKS.includes(String(themeId))))] : []
+  } catch (error) {
+    return []
+  }
+}
+
+function maxPlayerRating_(players, poolProfiles, playerIndex, playerKey) {
+  const playerRow = players.getDataRange().getValues()[playerIndex] || []
+  const poolRatings = poolProfiles.getDataRange().getValues().slice(1)
+    .filter((row) => String(row[0] || '') === playerKey)
+    .map((row) => Number(row[3]))
+    .filter((rating) => Number.isFinite(rating))
+  return Math.max(Number(playerRow[2]) || RATING_MIN, ...poolRatings)
+}
+
+function eligibleThemeUnlocks_(players, poolProfiles, playerIndex, playerKey) {
+  const row = players.getDataRange().getValues()[playerIndex] || []
+  const unlocks = themeUnlocksFromRow_(row)
+  if (maxPlayerRating_(players, poolProfiles, playerIndex, playerKey) >= 10000 && !unlocks.includes('crystallium')) {
+    unlocks.push('crystallium')
+    players.getRange(playerIndex + 1, 11).setValue(JSON.stringify(unlocks))
+  }
+  return unlocks
+}
+
+function unlockTheme_(params) {
+  const name = cleanName_(params.name)
+  const token = String(params.authToken || '')
+  const themeId = String(params.themeId || '').trim()
+  const course = cleanCourse_(params.course) || COURSE_NAME
+  if (!name || !token || !THEME_UNLOCKS.includes(themeId)) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
+
+  const lock = LockService.getScriptLock()
+  lock.waitLock(10000)
+  try {
+    const book = getBook_()
+    const { players, answers, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
+    const auth = authenticate_(players, name, token)
+    if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
+    const playerRows = players.getDataRange().getValues()
+    const row = playerRows[auth.playerIndex] || []
+    const unlocks = eligibleThemeUnlocks_(players, poolProfiles, auth.playerIndex, auth.playerKey)
+    if (themeId === 'crystallium' && !unlocks.includes('crystallium')) return json_({ ok: false, reason: 'rating-threshold', unlockedThemes: unlocks }, params.callback)
+    if (!unlocks.includes(themeId)) {
+      unlocks.push(themeId)
+      players.getRange(auth.playerIndex + 1, 11).setValue(JSON.stringify(unlocks))
+    }
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false }), params.callback)
+  } finally {
+    lock.releaseLock()
+  }
+}
+
 function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, requestedPool, options = {}) {
   const includePlayers = options.includePlayers !== false
   const includeAnsweredIds = options.includeAnsweredIds !== false
   const row = players.getDataRange().getValues()[playerIndex]
+  const unlockedThemes = eligibleThemeUnlocks_(players, poolProfiles, playerIndex, playerKey)
   const poolIds = playerPools_(row)
   const profiles = poolIds.map((poolId) => ({
     poolId,
@@ -1703,6 +1764,7 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
     grade: cleanGrade_(row[7]),
     className: cleanClassName_(row[8]),
     foundationMember: String(row[9] || '').toLowerCase() === 'true',
+    unlockedThemes,
     needsPlacement: !cleanGrade_(row[7]) || !cleanClassName_(row[8]),
     poolId: activePool,
     poolIds,
@@ -1855,7 +1917,8 @@ function recordAnswer_(params) {
     players.getRange(playerIndex + 1, 3, 1, 2).setValues([[primaryProfile.rating, primaryProfile.answered]])
     players.getRange(playerIndex + 1, 5).setValue(now)
     const activeUpdated = updatedProfiles.find((profile) => profile.poolId === activePool) || primaryProfile
-    const result = { ok: true, rating: activeUpdated.rating, delta: safeDelta, correct, serverValidated, poolId: activePool, ratings: ratingsFromProfiles_(updatedProfiles) }
+    const unlockedThemes = eligibleThemeUnlocks_(players, poolProfiles, playerIndex, playerKey)
+    const result = { ok: true, rating: activeUpdated.rating, delta: safeDelta, correct, serverValidated, poolId: activePool, ratings: ratingsFromProfiles_(updatedProfiles), unlockedThemes }
     if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, poolProfiles, course, activePool, playerKey)
     return json_(result, params.callback)
   } finally {

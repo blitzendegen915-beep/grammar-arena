@@ -41,6 +41,16 @@ function normalizeThemeId(value) {
   return THEME_OPTIONS.some((theme) => theme.id === value) ? value : DEFAULT_THEME_ID
 }
 
+const HIDDEN_THEME_IDS = new Set(['moon', 'crystallium'])
+
+function normalizeUnlockedThemes(value) {
+  return Array.isArray(value) ? [...new Set(value.filter((themeId) => HIDDEN_THEME_IDS.has(themeId)))] : []
+}
+
+function unlockSeenKey(name, themeId) {
+  return `${String(name || '').trim().toLowerCase()}::${themeId}`
+}
+
 const DEFAULT_PERSISTED = {
   rating: DEFAULT_RATING,
   streak: 0,
@@ -63,6 +73,8 @@ const DEFAULT_PERSISTED = {
   studyTimeByDate: {},
   modeId: DEFAULT_MODE_ID,
   themeId: DEFAULT_THEME_ID,
+  unlockedThemes: [],
+  unlockCelebrationSeen: {},
 }
 
 const QUESTIONS = [
@@ -495,6 +507,7 @@ function App() {
     return Number(initial.studyTimeByDate?.[localDateKey()]) || 0
   })
   const [notice, setNotice] = useState('')
+  const [unlockCelebration, setUnlockCelebration] = useState(null)
   const [authMode, setAuthMode] = useState('login')
   const [authName, setAuthName] = useState(() => readPersisted().studentName || '')
   const [authPin, setAuthPin] = useState('')
@@ -511,6 +524,8 @@ function App() {
   const [answerSyncTick, setAnswerSyncTick] = useState(0)
   const todaySecondsRef = useRef(todaySeconds)
   todaySecondsRef.current = todaySeconds
+  const logoTapTimesRef = useRef([])
+  const celebratedUnlocksRef = useRef(new Set())
   const activeRef = useRef(null)
   activeRef.current = { name: persisted.studentName, token: persisted.authToken, course: getRankingCourseId(modeId), poolId: rankingPoolId }
   const submitLock = useRef(false)
@@ -545,6 +560,11 @@ function App() {
   useEffect(() => {
     setPersisted((current) => current.themeId === themeId ? current : { ...current, themeId })
   }, [themeId])
+
+  useEffect(() => {
+    const unlockedThemes = normalizeUnlockedThemes(persisted.unlockedThemes)
+    if (themeId !== DEFAULT_THEME_ID && (!hasSession || !unlockedThemes.includes(themeId))) setThemeId(DEFAULT_THEME_ID)
+  }, [themeId, hasSession, persisted.unlockedThemes])
 
   useEffect(() => {
     if (!hasSession || view !== 'practice' || isComplete) return undefined
@@ -587,6 +607,15 @@ function App() {
     const nextSyncKey = getSyncKey({ name: nextName, authToken: nextAuthToken, course: rankingId })
     const serverRating = Number(result.rating) || DEFAULT_RATING
     const displayedRating = applyProvisionalRating(serverRating, migratedQueue, nextSyncKey)
+    const nextUnlockedThemes = normalizeUnlockedThemes(result.unlockedThemes)
+    const newUnlock = nextUnlockedThemes.find((themeId) => !persisted.unlockedThemes.includes(themeId))
+    const newUnlockSeenKey = newUnlock ? unlockSeenKey(nextName, newUnlock) : ''
+    const shouldCelebrateUnlock = Boolean(newUnlock && !persisted.unlockCelebrationSeen?.[newUnlockSeenKey])
+    if (shouldCelebrateUnlock && !celebratedUnlocksRef.current.has(newUnlockSeenKey)) {
+      celebratedUnlocksRef.current.add(newUnlockSeenKey)
+      setThemeId(newUnlock)
+      setUnlockCelebration(newUnlock)
+    }
     const serverScopeRatings = ratingsToScopeMap(result.ratings, rankingId)
     serverScopeRatings[ratingScopeKey(rankingId, nextPoolId)] = serverRating
     const authoritativeScopeRatings = Object.entries(result.ratings || {}).reduce((next, [poolId, value]) => {
@@ -603,6 +632,8 @@ function App() {
       grade: result.grade || current.grade,
       className: result.className || current.className,
       foundationMember: typeof result.foundationMember === 'boolean' ? result.foundationMember : current.foundationMember,
+      unlockedThemes: nextUnlockedThemes,
+      unlockCelebrationSeen: shouldCelebrateUnlock ? { ...(current.unlockCelebrationSeen || {}), [newUnlockSeenKey]: true } : current.unlockCelebrationSeen,
       rankingPoolId: nextPoolId,
       poolIds: Array.isArray(result.poolIds) ? result.poolIds : current.poolIds,
       ratingsByCourse: { ...(current.ratingsByCourse || {}), [rankingId]: displayedRating },
@@ -619,6 +650,61 @@ function App() {
     setAuthPin('')
     setSessionRatingStart(serverRating)
     return { name: nextName, token: nextAuthToken, needsPlacement: Boolean(result.needsPlacement) }
+  }
+
+  const unlockAccountTheme = async (requestedThemeId) => {
+    if (!hasSession) {
+      setNotice('テーマ解放はログイン後に行えます。')
+      return
+    }
+    if (normalizeUnlockedThemes(persisted.unlockedThemes).includes(requestedThemeId)) return
+    setNotice('')
+    try {
+      const result = await requestScoreApi({
+        action: 'unlock-theme',
+        course: getRankingCourseId(modeId),
+        poolId: rankingPoolId,
+        name: persisted.studentName,
+        authToken: persisted.authToken,
+        themeId: requestedThemeId,
+      }, { timeoutMs: AUTH_REQUEST_TIMEOUT_MS })
+      const unlockedThemes = normalizeUnlockedThemes(result.unlockedThemes)
+      if (!result.ok || !unlockedThemes.includes(requestedThemeId)) {
+        setNotice(result.reason === 'rating-threshold' ? 'Crystalliumはレート10,000到達で解放されます。' : 'テーマを解放できませんでした。数秒後にもう一度お試しください。')
+        return
+      }
+      const seenKey = unlockSeenKey(persisted.studentName, requestedThemeId)
+      celebratedUnlocksRef.current.add(seenKey)
+      setPersisted((current) => ({
+        ...current,
+        unlockedThemes,
+        unlockCelebrationSeen: { ...(current.unlockCelebrationSeen || {}), [seenKey]: true },
+      }))
+      setThemeId(requestedThemeId)
+      setUnlockCelebration(requestedThemeId)
+    } catch {
+      setNotice('テーマ解放の確認に失敗しました。数秒後にもう一度お試しください。')
+    }
+  }
+
+  const handleBrandTap = () => {
+    if (!hasSession) {
+      setNotice('Moonはログイン後に解放できます。')
+      return
+    }
+    const now = Date.now()
+    const previous = logoTapTimesRef.current
+    if (previous.length && now - previous[previous.length - 1] < 3000) {
+      logoTapTimesRef.current = []
+      return
+    }
+    const next = [...previous, now]
+    if (next.length >= 4) {
+      logoTapTimesRef.current = []
+      void unlockAccountTheme('moon')
+      return
+    }
+    logoTapTimesRef.current = next
   }
 
   const submitAuth = async () => {
@@ -849,8 +935,10 @@ function App() {
       grade: '',
       className: '',
       foundationMember: false,
+      unlockedThemes: [],
       publicLeaderboard: [],
     }))
+    setThemeId(DEFAULT_THEME_ID)
     setAuthName('')
     setAuthPin('')
     setSessionScore({ correct: 0, answered: 0 })
@@ -927,6 +1015,7 @@ function App() {
             grade: result.grade || current.grade,
             className: result.className || current.className,
             foundationMember: typeof result.foundationMember === 'boolean' ? result.foundationMember : current.foundationMember,
+            unlockedThemes: Array.isArray(result.unlockedThemes) ? normalizeUnlockedThemes(result.unlockedThemes) : current.unlockedThemes,
             poolIds: Array.isArray(result.poolIds) ? result.poolIds : current.poolIds,
             answeredIds: identity.course === 'foundation-course' ? serverAnsweredIds : current.answeredIds,
             answeredByCourse: { ...(current.answeredByCourse || {}), [identity.course]: serverAnsweredIds },
@@ -1015,6 +1104,14 @@ function App() {
             : type === 'blocked' ? 'blocked'
             : type === 'retry-scheduled' ? 'pending' : 'error'
         const syncError = type === 'invalid-session' || type === 'rejected' ? (result?.reason || 'server-rejected') : type === 'failed' ? entry.lastError : ''
+        const resultUnlockedThemes = Array.isArray(result?.unlockedThemes) ? normalizeUnlockedThemes(result.unlockedThemes) : null
+        const newResultUnlock = resultUnlockedThemes?.find((themeId) => !normalizeUnlockedThemes(persisted.unlockedThemes).includes(themeId))
+        const resultUnlockKey = newResultUnlock ? unlockSeenKey(persisted.studentName, newResultUnlock) : ''
+        if (newResultUnlock && !celebratedUnlocksRef.current.has(resultUnlockKey)) {
+          celebratedUnlocksRef.current.add(resultUnlockKey)
+          setThemeId(newResultUnlock)
+          setUnlockCelebration(newResultUnlock)
+        }
         setPersisted((current) => {
           if (current.authToken !== entry.authToken || current.studentName.toLowerCase() !== entry.name.toLowerCase()) return current
           const mergedQueue = mergeQueueSnapshot(current.answerSyncQueue, nextQueue, answerSyncKey, initialIds)
@@ -1034,6 +1131,8 @@ function App() {
             ratingsByScope: { ...(current.ratingsByScope || {}), ...resultScopeRatings },
             authoritativeRatingsBySyncKey: { ...(current.authoritativeRatingsBySyncKey || {}), [entry.syncKey]: serverRating },
             authoritativeRatingsByScope: { ...(current.authoritativeRatingsByScope || {}), ...resultAuthoritative },
+            unlockedThemes: resultUnlockedThemes || current.unlockedThemes,
+            unlockCelebrationSeen: newResultUnlock ? { ...(current.unlockCelebrationSeen || {}), [resultUnlockKey]: true } : current.unlockCelebrationSeen,
           }
         })
         if (activeRef.current.token !== entry.authToken || activeRef.current.course !== entry.course) return
@@ -1151,10 +1250,10 @@ function App() {
     <>
     <div className={`app-shell theme-${themeId}`} data-theme={themeId}>
       <aside className="sidebar">
-        <div className="brand-block">
+        <button type="button" className="brand-block" aria-label="Grammar Arena" onClick={handleBrandTap}>
           <div className="brand-mark"><Icon name="practice" size={30} /></div>
           <div><div className="brand-name">GRAMMAR</div><div className="brand-name">ARENA</div></div>
-        </div>
+        </button>
         <nav className="main-nav" aria-label="メインナビゲーション">
           <NavItem icon="practice" label="演習" active={view === 'practice' || view === 'landing' || view === 'lobby'} onClick={() => selectNav('practice')} />
           <NavItem icon="leaderboard" label="ランキング" active={view === 'leaderboard'} onClick={() => selectNav('leaderboard')} />
@@ -1183,10 +1282,11 @@ function App() {
           {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, inputParts, setInputParts, answerPreview, isComplete, bankLoading, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, history: persisted.history, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
           {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={hasSession ? persisted.publicLeaderboard : []} rating={authoritativeRating} studentName={persisted.studentName} rankingPoolId={rankingPoolId} refresh={refreshLeaderboard} notice={notice} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={authoritativeRating} />}
-          {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} themeId={themeId} setThemeId={setThemeId} />}
+          {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} themeId={themeId} setThemeId={setThemeId} hasSession={hasSession} unlockedThemes={persisted.unlockedThemes} />}
         </div>
       </main>
     </div>
+    {unlockCelebration && <ThemeUnlockOverlay themeId={unlockCelebration} onClose={() => setUnlockCelebration(null)} />}
     </>
   )
 }
@@ -1435,8 +1535,16 @@ function HistoryView({ history, rating }) {
   return <div className="simple-view"><div className="section-heading"><div><p className="section-kicker">YOUR PROGRESS</p><h1>学習履歴</h1><p className="subcopy">解いた記録を見返して、伸び方をつかもう。</p></div><div className="history-current"><span>現在レート</span><strong>{rating.toLocaleString()}</strong></div></div><div className="history-panel"><div className="history-panel-head"><h2>最近のセッション</h2><span>{history.length}件</span></div>{history.length ? <div className="history-list">{history.map((item) => <div className="history-row" key={item.id}><div className="history-date"><span>{item.date.replaceAll('-', '.')}</span><strong>{item.label}</strong></div><div className="history-result"><strong>{item.correct} / {item.total}</strong><span>正答</span></div><div className="history-change"><strong className={item.ratingDelta >= 0 ? 'up' : 'down'}>{item.ratingDelta >= 0 ? '+' : ''}{item.ratingDelta}</strong><span>レート変動</span></div><div className="history-after"><span>終了時</span><strong>{item.ratingAfter.toLocaleString()}</strong></div></div>)}</div> : <div className="empty-history"><Icon name="history" size={34} /><h3>まだ履歴がありません。</h3><p>演習を終えると、ここにレートと正答数が記録されます。</p></div>}</div></div>
 }
 
-function SettingsView({ filter, setFilter, autoExplanation, setAutoExplanation, themeId, setThemeId }) {
-  return <div className="simple-view"><div className="section-heading"><div><p className="section-kicker">SETTINGS</p><h1>設定</h1><p className="subcopy">出題レベル、表示方法、テーマを自分の学習スタイルに合わせて変更できます。</p></div></div><div className="settings-grid"><section className="settings-panel"><h2>テーマ変更</h2><p>演習画面の色と雰囲気を切り替えます。選択はこの端末に保存されます。</p><div className="theme-options" role="radiogroup" aria-label="テーマ変更">{THEME_OPTIONS.map((theme) => <button type="button" role="radio" aria-checked={theme.id === themeId} key={theme.id} className={`theme-option theme-option-${theme.id} ${theme.id === themeId ? 'selected' : ''}`} onClick={() => setThemeId(theme.id)}><span className="theme-preview" aria-hidden="true"><span /></span><span className="theme-option-copy"><strong>{theme.label}</strong><small>{theme.description}</small></span><span className="theme-radio" aria-hidden="true" /></button>)}</div></section><section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? 'Lesson 13〜15・Plus' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section><section className="settings-panel settings-panel-display"><h2>学習の表示</h2><p>解答後の画面の見え方を設定します。</p><label className="toggle-row"><span><strong>解説を自動で表示</strong><small>正誤判定のあとに解説を開きます</small></span><button type="button" className={`toggle ${autoExplanation ? 'on' : ''}`} aria-pressed={autoExplanation} onClick={() => setAutoExplanation(!autoExplanation)}><span /></button></label><div className="rule-note"><Icon name="document" size={19} /><span>正答数に応じてレートが変動し、履歴に保存されます。</span></div></section></div></div>
+function ThemeUnlockOverlay({ themeId, onClose }) {
+  const theme = THEME_OPTIONS.find((option) => option.id === themeId) || THEME_OPTIONS[0]
+  const headline = `${theme.label} unlocked`
+  const message = themeId === 'crystallium' ? 'A new realm has crystallized around your progress.' : 'The night mode has answered your call.'
+  return <div className={`theme-unlock-overlay theme-unlock-${themeId}`} role="dialog" aria-modal="true" aria-label={headline}><div className="theme-unlock-card"><span className="theme-unlock-kicker">SECRET THEME UNLOCKED</span><span className="theme-unlock-symbol" aria-hidden="true">✦</span><h2>{headline}</h2><p>{message}</p><button type="button" className="theme-unlock-button" onClick={onClose}>ENTER THEME <span aria-hidden="true">→</span></button></div></div>
+}
+
+function SettingsView({ filter, setFilter, autoExplanation, setAutoExplanation, themeId, setThemeId, hasSession, unlockedThemes }) {
+  const availableThemes = THEME_OPTIONS.filter((theme) => theme.id === DEFAULT_THEME_ID || (hasSession && normalizeUnlockedThemes(unlockedThemes).includes(theme.id)))
+  return <div className="simple-view"><div className="section-heading"><div><p className="section-kicker">SETTINGS</p><h1>設定</h1><p className="subcopy">出題レベル、表示方法、テーマを自分の学習スタイルに合わせて変更できます。</p></div></div><div className="settings-grid"><section className="settings-panel"><h2>テーマ変更</h2><p>演習画面の色と雰囲気を切り替えます。解放したテーマはこのアカウントに保存されます。</p><div className="theme-options" role="radiogroup" aria-label="テーマ変更">{availableThemes.map((theme) => <button type="button" role="radio" aria-checked={theme.id === themeId} key={theme.id} className={`theme-option theme-option-${theme.id} ${theme.id === themeId ? 'selected' : ''}`} onClick={() => setThemeId(theme.id)}><span className="theme-preview" aria-hidden="true"><span /></span><span className="theme-option-copy"><strong>{theme.label}</strong><small>{theme.description}</small></span><span className="theme-radio" aria-hidden="true" /></button>)}</div></section><section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? 'Lesson 13〜15・Plus' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section><section className="settings-panel settings-panel-display"><h2>学習の表示</h2><p>解答後の画面の見え方を設定します。</p><label className="toggle-row"><span><strong>解説を自動で表示</strong><small>正誤判定のあとに解説を開きます</small></span><button type="button" className={`toggle ${autoExplanation ? 'on' : ''}`} aria-pressed={autoExplanation} onClick={() => setAutoExplanation(!autoExplanation)}><span /></button></label><div className="rule-note"><Icon name="document" size={19} /><span>正答数に応じてレートが変動し、履歴に保存されます。</span></div></section></div></div>
 }
 
 createRoot(document.getElementById('root')).render(<StrictMode><App /></StrictMode>)
