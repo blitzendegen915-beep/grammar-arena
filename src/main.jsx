@@ -1,5 +1,6 @@
 import { StrictMode, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { flushSync } from 'react-dom'
 import './styles.css'
 import { FOUNDATION_TRANSLATIONS } from './foundationTranslations'
 import { loadQuestionBank } from './questionBankLoader'
@@ -1465,25 +1466,13 @@ function SessionPdfPicker({ reviews = [], course, studentName, ratingStart, rati
   const [open, setOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
   const [printReviews, setPrintReviews] = useState(null)
+  const printCleanupRef = useRef(null)
   const reviewKey = (review, index) => review.id || `${review.question.id}-${index}`
   const selectedReviews = reviews.filter((review, index) => selectedIds.includes(reviewKey(review, index)))
 
   useEffect(() => {
-    if (!printReviews?.length) return undefined
-    const originalTitle = document.title
-    const datePart = (completedAt || new Date().toISOString()).slice(0, 10)
-    document.title = `Grammar Arena_${studentName || 'student'}_${datePart}`
-    const printTimer = window.setTimeout(() => window.print(), 60)
-    const cleanupTimer = window.setTimeout(() => {
-      document.title = originalTitle
-      setPrintReviews(null)
-    }, 1000)
-    return () => {
-      window.clearTimeout(printTimer)
-      window.clearTimeout(cleanupTimer)
-      document.title = originalTitle
-    }
-  }, [completedAt, printReviews, studentName])
+    return () => printCleanupRef.current?.()
+  }, [])
 
   const openPicker = () => {
     setSelectedIds(reviews.map(reviewKey))
@@ -1492,11 +1481,34 @@ function SessionPdfPicker({ reviews = [], course, studentName, ratingStart, rati
   const toggleReview = (reviewId) => {
     setSelectedIds((current) => current.includes(reviewId) ? current.filter((id) => id !== reviewId) : [...current, reviewId])
   }
+  const printSelectedReviews = () => {
+    if (!selectedReviews.length) return
+    const originalTitle = document.title
+    const datePart = (completedAt || new Date().toISOString()).slice(0, 10)
+    const printTitle = `Grammar Arena_${studentName || 'student'}_${datePart}`
+    let cleaned = false
+    const cleanup = () => {
+      if (cleaned) return
+      cleaned = true
+      window.removeEventListener('afterprint', cleanup)
+      if (printCleanupRef.current === cleanup) printCleanupRef.current = null
+      document.title = originalTitle
+      setPrintReviews(null)
+    }
+    printCleanupRef.current?.()
+    printCleanupRef.current = cleanup
+    window.addEventListener('afterprint', cleanup)
+    document.title = printTitle
+    setOpen(false)
+    flushSync(() => setPrintReviews(selectedReviews))
+    window.print()
+    window.setTimeout(cleanup, 15000)
+  }
   const selectedScore = { correct: selectedReviews.filter((review) => review.correct).length, answered: selectedReviews.length }
 
   return <>
     <button type="button" className="secondary-button pdf-picker-trigger" onClick={openPicker} disabled={!reviews.length}><Icon name="document" size={19} />PDFを選ぶ</button>
-    {open && <div className="pdf-picker" role="dialog" aria-modal="true" aria-label="PDFにする問題を選択"><div className="pdf-picker-head"><div><p className="section-kicker">PDF EXPORT</p><h3>出力する問題を選択</h3><p>必要な問題だけにチェックを入れてPDF化できます。</p></div><button type="button" className="pdf-picker-close" onClick={() => setOpen(false)} aria-label="閉じる">×</button></div><div className="pdf-picker-actions"><button type="button" className="text-button" onClick={() => setSelectedIds(reviews.map(reviewKey))}>すべて選択</button><button type="button" className="text-button" onClick={() => setSelectedIds([])}>すべて解除</button><span>{selectedReviews.length} / {reviews.length}問を選択中</span></div><div className="pdf-picker-list">{reviews.map((review, index) => { const id = reviewKey(review, index); return <label key={id} className="pdf-picker-row"><input type="checkbox" checked={selectedIds.includes(id)} onChange={() => toggleReview(id)} /><span>QUESTION {String(index + 1).padStart(2, '0')}</span><strong>{review.question.lesson} ・ {review.question.topic}</strong><small>{review.correct ? '正解' : '不正解'}</small></label> })}</div><div className="pdf-picker-footer"><button type="button" className="secondary-button" onClick={() => setOpen(false)}>キャンセル</button><button type="button" className="primary-button" disabled={!selectedReviews.length} onClick={() => { setOpen(false); setPrintReviews(selectedReviews) }}><Icon name="document" size={19} />選択した{selectedReviews.length}問をPDF出力</button></div></div>}
+    {open && <div className="pdf-picker" role="dialog" aria-modal="true" aria-label="PDFにする問題を選択"><div className="pdf-picker-head"><div><p className="section-kicker">PDF EXPORT</p><h3>出力する問題を選択</h3><p>必要な問題だけにチェックを入れてPDF化できます。</p></div><button type="button" className="pdf-picker-close" onClick={() => setOpen(false)} aria-label="閉じる">×</button></div><div className="pdf-picker-actions"><button type="button" className="text-button" onClick={() => setSelectedIds(reviews.map(reviewKey))}>すべて選択</button><button type="button" className="text-button" onClick={() => setSelectedIds([])}>すべて解除</button><span>{selectedReviews.length} / {reviews.length}問を選択中</span></div><div className="pdf-picker-list">{reviews.map((review, index) => { const id = reviewKey(review, index); return <label key={id} className="pdf-picker-row"><input type="checkbox" checked={selectedIds.includes(id)} onChange={() => toggleReview(id)} /><span>QUESTION {String(index + 1).padStart(2, '0')}</span><strong>{review.question.lesson} ・ {review.question.topic}</strong><small>{review.correct ? '正解' : '不正解'}</small></label> })}</div><div className="pdf-picker-footer"><button type="button" className="secondary-button" onClick={() => setOpen(false)}>キャンセル</button><button type="button" className="primary-button" disabled={!selectedReviews.length} onClick={printSelectedReviews}><Icon name="document" size={19} />選択した{selectedReviews.length}問をPDF出力</button></div></div>}
     {printReviews?.length > 0 && <SessionPrintView reviews={printReviews} score={selectedScore} course={course} studentName={studentName} ratingStart={ratingStart} ratingAfter={ratingAfter} completedAt={completedAt} />}
   </>
 }
