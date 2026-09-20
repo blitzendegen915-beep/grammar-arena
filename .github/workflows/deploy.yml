@@ -31,6 +31,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Test before publishing
+        run: pnpm test
       - name: Build
         run: pnpm build
       - name: Upload Pages artifact

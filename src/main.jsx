@@ -5,10 +5,12 @@ import './styles.css'
 import { FOUNDATION_TRANSLATIONS } from './foundationTranslations'
 import { loadQuestionBank } from './questionBankLoader'
 import { inputSlotCount, isBlankPlaceholder, withBlankCount } from './questionQuality'
+import { reviewSelectionKey, selectReviewsForPdf } from './pdfSelection'
 import { getQuestionTranslation, splitRewriteSentences } from './questionPresentation'
 import { isModerationBlocked, MODERATION_NOTICE } from './contentModeration'
 import { buildRatingChartModel, projectSessionRating } from './ratingHistory'
 import { AUTH_REQUEST_TIMEOUT_MS, requestAuthWithRetry } from './authRetry'
+import { isSameRequestScope } from './requestScope'
 import {
   ANSWER_SYNC_MAX_ATTEMPTS,
   ANSWER_SYNC_TIMEOUT_MS,
@@ -110,7 +112,7 @@ const QUESTIONS = [
   {
     id: 'l13-04', lesson: 'LESSON 13', topic: '名詞的用法', difficulty: 'starter', type: 'input',
     prompt: '空所に入る語句を入力しなさい。',
-    sentence: 'Our purpose is ______ the poor.', answer: 'to help', accepted: ['to help'], answerLabel: 'to help',
+    sentence: 'Our purpose is ______ ______ the poor.', answer: 'to help', accepted: ['to help'], answerLabel: 'to help',
     explanation: 'be動詞の後ろで「目的の中身」を説明しています。「助けること」は to help と表します。',
     source: '英語演習I 2中・Exercise 13 A(1)'
   },
@@ -145,7 +147,7 @@ const QUESTIONS = [
   {
     id: 'l14-04', lesson: 'LESSON 14', topic: '否定の位置', difficulty: 'standard', type: 'input',
     prompt: '空所に入る語句を入力しなさい。',
-    sentence: 'We decided ______ take part in the game.', answer: 'not to', accepted: ['not to'], answerLabel: 'not to',
+    sentence: 'We decided ______ ______ take part in the game.', answer: 'not to', accepted: ['not to'], answerLabel: 'not to',
     explanation: '不定詞を否定するときは、to の直前に not を置きます。not to take part で「参加しないこと」です。',
     source: '英語演習I 2中・Exercise 14 C(4)'
   },
@@ -551,7 +553,11 @@ function App() {
   const student = { name: hasSession ? persisted.studentName : '未ログイン', grade: hasSession ? 'STUDENT' : 'NAME REQUIRED' }
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted))
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted))
+    } catch {
+      setNotice('端末に保存できません。ブラウザを閉じる前に、空き容量や保存設定を確認してください。')
+    }
   }, [persisted])
 
   useEffect(() => {
@@ -962,19 +968,21 @@ function App() {
       setPersisted((current) => current.publicLeaderboard.length ? { ...current, publicLeaderboard: [] } : current)
       return
     }
-    if (leaderboardInFlightRef.current) return
-    leaderboardInFlightRef.current = true
+    const scope = { name: persisted.studentName, token: persisted.authToken, course: getRankingCourseId(modeId), poolId: rankingPoolId }
+    if (isSameRequestScope(leaderboardInFlightRef.current?.scope, scope)) return
     const requestId = ++leaderboardRequestRef.current
-    const rankingId = getRankingCourseId(modeId)
+    leaderboardInFlightRef.current = { scope, requestId }
+    const isCurrentRequest = () => requestId === leaderboardRequestRef.current && isSameRequestScope(scope, activeRef.current)
     try {
-      const data = await requestScoreApi({ action: 'leaderboard', course: rankingId, poolId: rankingPoolId, name: persisted.studentName, authToken: persisted.authToken })
-      if (requestId !== leaderboardRequestRef.current) return
-      if (data.ok && Array.isArray(data.players)) setPersisted((current) => ({ ...current, publicLeaderboard: data.players }))
-      else setPersisted((current) => ({ ...current, publicLeaderboard: [] }))
+      const data = await requestScoreApi({ action: 'leaderboard', course: scope.course, poolId: scope.poolId, name: scope.name, authToken: scope.token })
+      if (!isCurrentRequest()) return
+      setPersisted((current) => isCurrentRequest() && current.authToken === scope.token && current.studentName === scope.name
+        ? { ...current, publicLeaderboard: data.ok && Array.isArray(data.players) ? data.players : [] }
+        : current)
     } catch {
-      if (requestId === leaderboardRequestRef.current) setNotice('公開ランキングを読み込めませんでした。')
+      if (isCurrentRequest()) setNotice('公開ランキングを読み込めませんでした。')
     } finally {
-      leaderboardInFlightRef.current = false
+      if (leaderboardInFlightRef.current?.requestId === requestId) leaderboardInFlightRef.current = null
     }
   }
 
@@ -1097,6 +1105,8 @@ function App() {
         answerSyncQueue: mergeQueueSnapshot(current.answerSyncQueue, nextQueue, answerSyncKey, initialIds),
       })),
       onResult: ({ type, entry, result, queue: nextQueue }) => {
+        // Late saves must not show another account's notices or theme unlocks.
+        if (activeRef.current.token !== entry.authToken || activeRef.current.name !== entry.name) return
         const hasAuthoritativeRating = result?.rating != null && Number.isFinite(Number(result.rating))
         const syncStatus = type === 'synced'
           ? (hasAuthoritativeRating ? 'synced' : 'synced-unconfirmed')
@@ -1317,7 +1327,7 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
               <div><label htmlFor="landing-class">クラス</label><select id="landing-class" value={authClassName} onChange={(event) => setAuthClassName(event.target.value)}>{CLASS_OPTIONS.map((className) => <option key={className} value={className}>{className}組</option>)}</select></div>
             </div>
             <label className="placement-check"><input type="checkbox" checked={authFoundationMember} onChange={(event) => setAuthFoundationMember(event.target.checked)} /><span>基礎講座受講中</span></label>
-            <p className="placement-help">チェックを入れると基礎講座ランキング、入れない場合は所属クラスランキングに参加します。</p>
+            <p className="placement-help">チェックを入れると基礎講座と所属クラスの両方のランキングに参加し、外すと所属クラスのランキングに参加します。</p>
           </>}
           {notice && <p className="auth-notice" role="alert">{notice}</p>}
           <button type="submit" className="primary-button landing-start" disabled={authBusy}>{authBusy ? '確認中…' : placementSetup ? '所属情報を保存して開始' : authMode === 'login' ? 'ログインしてレート確認' : '登録してレート対戦へ'}<Icon name="arrow" size={21} /></button>
@@ -1451,10 +1461,10 @@ function CompleteCard({ score, queue, reviews, course, studentName, ratingStart,
   </>
 }
 
-function ReviewItem({ review, index }) {
+function ReviewItem({ review, index, questionNumber = index + 1 }) {
   const { question } = review
   const translation = getQuestionTranslation(question)
-  return <article className={`review-item ${review.correct ? 'review-correct' : 'review-wrong'}`}><div className="review-item-head"><div><span className="review-number">QUESTION {String(index + 1).padStart(2, '0')}</span><strong>{question.lesson} ・ {question.topic}</strong></div><span className="review-result">{review.correct ? '正解' : '不正解'}</span></div><p className="review-prompt">{question.prompt}</p>{question.sentence && <SentenceDisplay question={question} className="review-sentence" />}{question.type === 'reorder' && <p className="review-sentence review-reorder">並べ替え：{question.words.join(' / ')}</p>}<div className="review-answers"><div><span>あなたの解答</span><strong>{review.userAnswer || '（未回答）'}</strong></div><div><span>正答</span><strong>{review.correctAnswer}</strong></div></div>{translation && <div className="review-translation"><span>日本語訳</span><p>{translation}</p></div>}<div className="review-explanation"><span>解説</span><p>{question.explanation}</p></div><small>{question.source}</small></article>
+  return <article className={`review-item ${review.correct ? 'review-correct' : 'review-wrong'}`}><div className="review-item-head"><div><span className="review-number">QUESTION {String(questionNumber).padStart(2, '0')}</span><strong>{question.lesson} ・ {question.topic}</strong></div><span className="review-result">{review.correct ? '正解' : '不正解'}</span></div><p className="review-prompt">{question.prompt}</p>{question.sentence && <SentenceDisplay question={question} className="review-sentence" />}{question.type === 'reorder' && <p className="review-sentence review-reorder">並べ替え：{question.words.join(' / ')}</p>}<div className="review-answers"><div><span>あなたの解答</span><strong>{review.userAnswer || '（未回答）'}</strong></div><div><span>正答</span><strong>{review.correctAnswer}</strong></div></div>{translation && <div className="review-translation"><span>日本語訳</span><p>{translation}</p></div>}<div className="review-explanation"><span>解説</span><p>{question.explanation}</p></div><small>{question.source}</small></article>
 }
 
 function formatJapaneseDate(value) {
@@ -1467,15 +1477,14 @@ function SessionPdfPicker({ reviews = [], course, studentName, ratingStart, rati
   const [selectedIds, setSelectedIds] = useState([])
   const [printReviews, setPrintReviews] = useState(null)
   const printCleanupRef = useRef(null)
-  const reviewKey = (review, index) => review.id || `${review.question.id}-${index}`
-  const selectedReviews = reviews.filter((review, index) => selectedIds.includes(reviewKey(review, index)))
+  const selectedReviews = selectReviewsForPdf(reviews, selectedIds)
 
   useEffect(() => {
-    return () => printCleanupRef.current?.()
+    return () => printCleanupRef.current?.(false)
   }, [])
 
   const openPicker = () => {
-    setSelectedIds(reviews.map(reviewKey))
+    setSelectedIds(reviews.map(reviewSelectionKey))
     setOpen(true)
   }
   const toggleReview = (reviewId) => {
@@ -1483,39 +1492,44 @@ function SessionPdfPicker({ reviews = [], course, studentName, ratingStart, rati
   }
   const printSelectedReviews = () => {
     if (!selectedReviews.length) return
+    printCleanupRef.current?.()
     const originalTitle = document.title
     const datePart = (completedAt || new Date().toISOString()).slice(0, 10)
     const printTitle = `Grammar Arena_${studentName || 'student'}_${datePart}`
     let cleaned = false
-    const cleanup = () => {
+    const cleanup = (clearPrintView = true) => {
       if (cleaned) return
       cleaned = true
-      window.removeEventListener('afterprint', cleanup)
+      window.removeEventListener('afterprint', handleAfterPrint)
       if (printCleanupRef.current === cleanup) printCleanupRef.current = null
       document.title = originalTitle
-      setPrintReviews(null)
+      if (clearPrintView) setPrintReviews(null)
     }
-    printCleanupRef.current?.()
+    const handleAfterPrint = () => cleanup()
     printCleanupRef.current = cleanup
-    window.addEventListener('afterprint', cleanup)
+    window.addEventListener('afterprint', handleAfterPrint)
     document.title = printTitle
     setOpen(false)
     flushSync(() => setPrintReviews(selectedReviews))
     window.print()
-    window.setTimeout(cleanup, 15000)
   }
-  const selectedScore = { correct: selectedReviews.filter((review) => review.correct).length, answered: selectedReviews.length }
+  const selectedScore = { correct: selectedReviews.filter(({ review }) => review.correct).length, answered: selectedReviews.length }
 
   return <>
-    <button type="button" className="secondary-button pdf-picker-trigger" onClick={openPicker} disabled={!reviews.length}><Icon name="document" size={19} />PDFを選ぶ</button>
-    {open && <div className="pdf-picker" role="dialog" aria-modal="true" aria-label="PDFにする問題を選択"><div className="pdf-picker-head"><div><p className="section-kicker">PDF EXPORT</p><h3>出力する問題を選択</h3><p>必要な問題だけにチェックを入れてPDF化できます。</p></div><button type="button" className="pdf-picker-close" onClick={() => setOpen(false)} aria-label="閉じる">×</button></div><div className="pdf-picker-actions"><button type="button" className="text-button" onClick={() => setSelectedIds(reviews.map(reviewKey))}>すべて選択</button><button type="button" className="text-button" onClick={() => setSelectedIds([])}>すべて解除</button><span>{selectedReviews.length} / {reviews.length}問を選択中</span></div><div className="pdf-picker-list">{reviews.map((review, index) => { const id = reviewKey(review, index); return <label key={id} className="pdf-picker-row"><input type="checkbox" checked={selectedIds.includes(id)} onChange={() => toggleReview(id)} /><span>QUESTION {String(index + 1).padStart(2, '0')}</span><strong>{review.question.lesson} ・ {review.question.topic}</strong><small>{review.correct ? '正解' : '不正解'}</small></label> })}</div><div className="pdf-picker-footer"><button type="button" className="secondary-button" onClick={() => setOpen(false)}>キャンセル</button><button type="button" className="primary-button" disabled={!selectedReviews.length} onClick={printSelectedReviews}><Icon name="document" size={19} />選択した{selectedReviews.length}問をPDF出力</button></div></div>}
+    <button type="button" className="secondary-button pdf-picker-trigger" onClick={openPicker} disabled={!reviews.length} aria-expanded={open} aria-controls={open ? 'session-pdf-picker' : undefined}><Icon name="document" size={19} />PDFを選ぶ</button>
+    {open && <section id="session-pdf-picker" className="pdf-picker" aria-labelledby="session-pdf-picker-title">
+      <div className="pdf-picker-head"><div><p className="section-kicker">PDF EXPORT</p><h3 id="session-pdf-picker-title">出力する問題を選択</h3><p>必要な問題だけにチェックを入れてPDF化できます。</p></div><button type="button" className="pdf-picker-close" onClick={() => setOpen(false)} aria-label="閉じる">×</button></div>
+      <div className="pdf-picker-actions"><button type="button" className="text-button" onClick={() => setSelectedIds(reviews.map(reviewSelectionKey))}>すべて選択</button><button type="button" className="text-button" onClick={() => setSelectedIds([])}>すべて解除</button><span aria-live="polite" aria-atomic="true">{selectedReviews.length} / {reviews.length}問を選択中</span></div>
+      <div className="pdf-picker-list" role="group" aria-label="PDFに含める問題">{reviews.map((review, index) => { const id = reviewSelectionKey(review, index); return <label key={id} className="pdf-picker-row"><input type="checkbox" checked={selectedIds.includes(id)} onChange={() => toggleReview(id)} /><span>QUESTION {String(index + 1).padStart(2, '0')}</span><strong>{review.question.lesson} ・ {review.question.topic}</strong><small>{review.correct ? '正解' : '不正解'}</small></label> })}</div>
+      <div className="pdf-picker-footer"><button type="button" className="secondary-button" onClick={() => setOpen(false)}>キャンセル</button><button type="button" className="primary-button" disabled={!selectedReviews.length} onClick={printSelectedReviews}><Icon name="document" size={19} />選択した{selectedReviews.length}問をPDF出力</button></div>
+    </section>}
     {printReviews?.length > 0 && createPortal(<SessionPrintView reviews={printReviews} score={selectedScore} course={course} studentName={studentName} ratingStart={ratingStart} ratingAfter={ratingAfter} completedAt={completedAt} />, document.body)}
   </>
 }
 
 function SessionPrintView({ reviews, score, course, studentName, ratingStart, ratingAfter, completedAt }) {
   const percentage = score.answered ? Math.round((score.correct / score.answered) * 100) : 0
-  return <section className="print-sheet"><header className="print-header"><p>GRAMMAR ARENA / SESSION REVIEW</p><h1>{course.label} ・ {course.name}</h1><div className="print-meta"><div><span>年月日</span><strong>{formatJapaneseDate(completedAt)}</strong></div><div><span>名前</span><strong>{studentName}</strong></div><div><span>正答数</span><strong>{score.correct} / {score.answered}</strong></div><div><span>正答率</span><strong>{percentage}%</strong></div><div><span>レート</span><strong>{ratingStart.toLocaleString()} → {ratingAfter.toLocaleString()}</strong></div></div></header><div className="print-list">{reviews.map((review, index) => <ReviewItem key={review.id || `${review.question.id}-${index}`} review={review} index={index} />)}</div><footer className="print-footer">GRAMMAR ARENA / {course.label} ・ {course.name}</footer></section>
+  return <section className="print-sheet"><header className="print-header"><p>GRAMMAR ARENA / SESSION REVIEW</p><h1>{course.label} ・ {course.name}</h1><div className="print-meta"><div><span>年月日</span><strong>{formatJapaneseDate(completedAt)}</strong></div><div><span>名前</span><strong>{studentName}</strong></div><div><span>正答数</span><strong>{score.correct} / {score.answered}</strong></div><div><span>正答率</span><strong>{percentage}%</strong></div><div><span>レート</span><strong>{ratingStart.toLocaleString()} → {ratingAfter.toLocaleString()}</strong></div></div></header><div className="print-list">{reviews.map(({ review, questionNumber }) => <ReviewItem key={review.id || `${review.question.id}-${questionNumber}`} review={review} index={questionNumber - 1} questionNumber={questionNumber} />)}</div><footer className="print-footer">GRAMMAR ARENA / {course.label} ・ {course.name}</footer></section>
 }
 
 function DailyRail({ correct, answered, seconds, history, rating }) {
