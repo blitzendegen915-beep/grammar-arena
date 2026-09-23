@@ -38,7 +38,7 @@ const THEME_OPTIONS = [
   { id: 'ascention', label: 'Ascention', description: 'The original yellow and black theme' },
   { id: 'moon', label: 'Moon', description: 'Midnight blue with a cool cyan glow' },
   { id: 'crystallium', label: 'Crystallium', description: 'Pink prism light and floating crystal shards' },
-  { id: 'dignity', label: 'Dignity', description: 'Obsidian calm, ivory light, and antique gold' },
+  { id: 'dignity', label: 'Dignity', description: 'Obsidian black, lacquer red, and antique gold' },
 ]
 
 function normalizeThemeId(value) {
