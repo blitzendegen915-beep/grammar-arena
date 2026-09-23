@@ -578,6 +578,115 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 .theme-crystallium .toggle.on { background: var(--sun); }
 .theme-crystallium .rule-note { background: rgba(189,249,255,.1); }
 .theme-crystallium .rule-note svg { color: var(--sun); }
+
+/* Dignity: a quiet editorial skin with obsidian depth, ivory surfaces, and antique gold. */
+.theme-dignity {
+  --sun: #e6bd70;
+  --ink: #151522;
+  --cream: #f7f0e5;
+  --paper: #211d2c;
+  --signal: #e28a82;
+  --blue: #d9aa63;
+  --line: #c99552;
+  color: #f8f0e2;
+  background: #090d1b;
+}
+.theme-dignity .sidebar { background: #0d111f; border-right-color: #30283a; }
+.theme-dignity .brand-mark { color: var(--sun); }
+.theme-dignity .brand-name { color: #f9f0df; }
+.theme-dignity .nav-item { color: #c8bdaf; }
+.theme-dignity .nav-item:hover { color: #fff8e9; background: rgba(230,189,112,.12); }
+.theme-dignity .nav-item.active { color: var(--ink); background: var(--sun); }
+.theme-dignity .nav-item.active::after { content: '›'; color: var(--ink); }
+.theme-dignity .sidebar-footer { color: #a89a91; }
+.theme-dignity .footer-line { background: rgba(230,189,112,.28); }
+.theme-dignity .footer-cap { color: var(--sun); }
+.theme-dignity .main-area { background-color: #090d1b; background-image: linear-gradient(90deg, rgba(7,10,20,.88) 0%, rgba(7,10,20,.48) 45%, rgba(27,12,27,.62) 100%), url('./assets/dignity-background.svg'); background-size: cover; background-position: center top; background-attachment: fixed; }
+.theme-dignity .topbar { color: #fff8e9; background: rgba(15,17,31,.95); border-bottom-color: var(--sun); }
+.theme-dignity .top-stat, .theme-dignity .top-stat strong, .theme-dignity .top-stat span:not(.rating-delta), .theme-dignity .top-greeting { color: #fff8e9; }
+.theme-dignity .rating-delta { color: #ef9b8c !important; }
+.theme-dignity .top-divider { background: rgba(230,189,112,.55); }
+.theme-dignity .profile-orb { color: var(--ink); background: var(--sun); }
+.theme-dignity .selector-stack label, .theme-dignity .selector-stack span { color: #d8cbbb; }
+.theme-dignity .selector-stack select { color: var(--ink); background-color: var(--cream); border-color: var(--sun); }
+.theme-dignity .content-wrap::before { background: repeating-linear-gradient(-45deg, rgba(230,189,112,.12) 0 9px, transparent 9px 27px); }
+.theme-dignity .section-kicker { color: var(--sun); }
+.theme-dignity h1 { color: #fff8e9; }
+.theme-dignity .subcopy, .theme-dignity .setting-option small { color: #c8bdaf; }
+.theme-dignity .difficulty-tabs { border-bottom-color: rgba(230,189,112,.4); }
+.theme-dignity .difficulty-tab { color: #c8bdaf; }
+.theme-dignity .difficulty-tab:hover, .theme-dignity .difficulty-tab.selected { color: var(--sun); }
+.theme-dignity .difficulty-tab.selected { background: rgba(230,189,112,.1); border-bottom-color: var(--sun); }
+.theme-dignity .question-card, .theme-dignity .complete-card, .theme-dignity .rail-card, .theme-dignity .history-panel, .theme-dignity .settings-panel, .theme-dignity .leaderboard-table-card, .theme-dignity .leaderboard-you, .theme-dignity .leaderboard-rule, .theme-dignity .lobby-card, .theme-dignity .landing-hero, .theme-dignity .empty-question-state { color: #f8f0e2; background: rgba(28,25,39,.96); border-color: var(--sun); box-shadow: 9px 9px 0 #05070e; }
+.theme-dignity .question-head, .theme-dignity .history-panel-head, .theme-dignity .leaderboard-table-head { border-color: rgba(230,189,112,.28); }
+.theme-dignity .lesson-label, .theme-dignity .rail-title, .theme-dignity .leaderboard-link, .theme-dignity .leaderboard-empty svg { color: var(--sun); }
+.theme-dignity .lesson-label span, .theme-dignity .question-type, .theme-dignity .progress-block, .theme-dignity .prompt, .theme-dignity .history-panel-head span { color: #b8aaa0; }
+.theme-dignity .progress-track { background: #413548; }
+.theme-dignity .progress-track span { background: var(--sun); }
+.theme-dignity .japanese-prompt, .theme-dignity .sentence, .theme-dignity .rail-title h2, .theme-dignity .rail-card h3, .theme-dignity .history-panel-head h2 { color: #fff8e9; }
+.theme-dignity .input-translation span { color: var(--sun); }
+.theme-dignity .sentence-blank, .theme-dignity .answer-line { border-color: var(--sun); }
+.theme-dignity .choice-button, .theme-dignity .secondary-button, .theme-dignity .setting-option { color: #f8f0e2; background: #2b2639; border-color: #65536a; }
+.theme-dignity .choice-button:hover, .theme-dignity .secondary-button:hover, .theme-dignity .setting-option:hover, .theme-dignity .setting-option.selected { color: #fffaf0; background: #3b3048; border-color: var(--sun); }
+.theme-dignity .choice-button.chosen { border-color: var(--sun); background: #49354b; }
+.theme-dignity .choice-letter { color: var(--ink); background: var(--sun); }
+.theme-dignity .choice-button svg { color: var(--sun); }
+.theme-dignity .token { color: #f8f0e2; background: #332b43; border-color: #65536a; }
+.theme-dignity .token:hover, .theme-dignity .selected-token { background: #4b3850; border-color: var(--sun); }
+.theme-dignity .input-wrap input { color: #fff8e9; }
+.theme-dignity .input-wrap, .theme-dignity .input-wrap-multi input { border-color: var(--sun); }
+.theme-dignity .input-wrap > span, .theme-dignity .answer-placeholder { color: #b8aaa0; }
+.theme-dignity .primary-button { color: var(--ink); background: var(--sun); box-shadow: 0 5px 0 #05070e; }
+.theme-dignity .primary-button:hover { background: #f2d28d; }
+.theme-dignity .secondary-button:hover { color: var(--ink); }
+.theme-dignity .logout-button { color: var(--ink); background: var(--sun); border-color: var(--ink); }
+.theme-dignity .feedback-correct { background: #1d3a38; border-color: #74c3a4; }
+.theme-dignity .feedback-wrong { background: #452838; border-color: var(--signal); }
+.theme-dignity .feedback-title, .theme-dignity .feedback p, .theme-dignity .correction strong, .theme-dignity .translation p { color: #fff8e9; }
+.theme-dignity .feedback-wrong .feedback-title { color: #ffd7cc; }
+.theme-dignity .translation { background: rgba(230,189,112,.1); border-left-color: var(--sun); }
+.theme-dignity .translation span, .theme-dignity .correction span, .theme-dignity .feedback small { color: #b8aaa0; }
+.theme-dignity .metric-row, .theme-dignity .metric-row strong, .theme-dignity .rail-note p { color: #f8f0e2; }
+.theme-dignity .metric-icon, .theme-dignity .chart-line, .theme-dignity .chart-dot { color: var(--sun); stroke: var(--sun); }
+.theme-dignity .chart-axis, .theme-dignity .chart-grid { stroke: #65536a; }
+.theme-dignity .chart-area { fill: rgba(230,189,112,.14); }
+.theme-dignity .rating-chart text { fill: #b8aaa0; }
+.theme-dignity .rail-note { color: var(--sun); background: rgba(230,189,112,.09); }
+.theme-dignity .history-current, .theme-dignity .leaderboard-table-label { background: #443044; }
+.theme-dignity .history-current span, .theme-dignity .history-row span, .theme-dignity .empty-history p, .theme-dignity .empty-history { color: #b8aaa0; }
+.theme-dignity .history-current strong, .theme-dignity .history-change strong.up, .theme-dignity .empty-history svg { color: var(--sun); }
+.theme-dignity .history-row, .theme-dignity .leaderboard-table-row { border-color: rgba(230,189,112,.25); }
+.theme-dignity .history-row strong, .theme-dignity .leaderboard-table-head h2, .theme-dignity .leaderboard-table-row { color: #f8f0e2; }
+.theme-dignity .leaderboard-table-row.current { color: var(--ink); background: var(--sun); }
+.theme-dignity .leaderboard-table-label { color: #d8cbbb; }
+.theme-dignity .leaderboard-rule { color: var(--ink); background: var(--cream); border-color: var(--sun); }
+.theme-dignity .leaderboard-rule strong, .theme-dignity .leaderboard-rule small { color: var(--ink); }
+.theme-dignity .leaderboard-empty h3 { color: #fff8e9; }
+.theme-dignity .landing-hero, .theme-dignity .lobby-card { background: var(--cream); color: var(--ink); }
+.theme-dignity .landing-hero h1, .theme-dignity .lobby-card h1, .theme-dignity .landing-copy, .theme-dignity .landing-form label, .theme-dignity .landing-footer, .theme-dignity .session-hint { color: var(--ink); }
+.theme-dignity .landing-mark { color: var(--ink); background: var(--sun); }
+.theme-dignity .landing-hero .section-kicker, .theme-dignity .landing-footer > span:first-child { color: #724153; }
+.theme-dignity .landing-form input, .theme-dignity .landing-form select { color: var(--ink); background: #fffaf2; border-color: var(--ink); }
+.theme-dignity .auth-tabs { border-color: var(--ink); }
+.theme-dignity .auth-tabs button { color: #725c61; }
+.theme-dignity .auth-tabs button.selected { color: var(--ink); background: var(--sun); }
+.theme-dignity .landing-note, .theme-dignity .placement-help { color: #725c61; }
+.theme-dignity .course-banner { color: var(--ink); background: var(--sun); border-color: var(--ink); }
+.theme-dignity .settings-panel h2, .theme-dignity .settings-panel > p, .theme-dignity .theme-option-copy strong { color: #fff8e9; }
+.theme-dignity .settings-panel > p, .theme-dignity .theme-option-copy small { color: #b8aaa0; }
+.theme-dignity .theme-option { color: #f8f0e2; background: #2b2639; border-color: #65536a; }
+.theme-dignity .theme-option:hover, .theme-dignity .theme-option.selected { background: #3b3048; border-color: var(--sun); box-shadow: 4px 4px 0 #05070e; }
+.theme-option-dignity .theme-preview { background: #151626; border-color: #e6bd70; }
+.theme-option-dignity .theme-preview::before { background: #7b284b; clip-path: polygon(0 0, 100% 0, 66% 100%, 0 100%); transform: none; }
+.theme-option-dignity .theme-preview::after { right: 6px; bottom: 7px; width: 18px; height: 18px; background: #e6bd70; border-radius: 50%; transform: none; box-shadow: 0 0 0 3px rgba(230,189,112,.2); }
+.theme-option-dignity .theme-preview span { left: 6px; bottom: 6px; width: 28px; height: 2px; background: #f7f0e5; box-shadow: 0 -6px 0 #c99552; transform: rotate(-22deg); }
+.theme-dignity .setting-radio { border-color: #a9958a; }
+.theme-dignity .setting-option.selected .setting-radio::after { background: var(--sun); }
+.theme-dignity .toggle-row { border-color: rgba(230,189,112,.28); }
+.theme-dignity .toggle-row small, .theme-dignity .rule-note { color: #b8aaa0; }
+.theme-dignity .toggle.on { background: var(--sun); }
+.theme-dignity .rule-note { background: rgba(230,189,112,.1); }
+.theme-dignity .rule-note svg { color: var(--sun); }
 .theme-crystallium .pdf-picker {
   color: #241437;
   background: #fff8fd;

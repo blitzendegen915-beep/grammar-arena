@@ -38,6 +38,7 @@ const THEME_OPTIONS = [
   { id: 'ascention', label: 'Ascention', description: 'The original yellow and black theme' },
   { id: 'moon', label: 'Moon', description: 'Midnight blue with a cool cyan glow' },
   { id: 'crystallium', label: 'Crystallium', description: 'Pink prism light and floating crystal shards' },
+  { id: 'dignity', label: 'Dignity', description: 'Obsidian calm, ivory light, and antique gold' },
 ]
 
 function normalizeThemeId(value) {
@@ -88,7 +89,7 @@ const QUESTIONS = [
     words: ['Our', 'purpose', 'is', 'to', 'help', 'the', 'poor.'],
     answer: 'Our purpose is to help the poor.',
     answerLabel: 'Our purpose is to help the poor.',
-    explanation: '「〜すること」が文の主語や補語になるとき、不定詞の名詞的用法を使います。ここでは to help the poor 全体が「目的」の内容です。',
+    explanation: '目的や内容を「〜すること」と説明するときは、to + 動詞の原形を使います。ここでは to help the poor が Our purpose の中身を補い、「私たちの目的は貧しい人を助けること」となります。',
     source: '英語演習I 2中・Exercise 13 A(1)'
   },
   {
@@ -97,7 +98,7 @@ const QUESTIONS = [
     sentence: 'I have a lot of friends (　　　).',
     choices: ['to talk with', 'talking with', 'to talk'], answer: 'to talk with',
     answerLabel: 'to talk with',
-    explanation: 'to talk with が直前の friends を説明し、「話をする友だち」という意味になります。前置詞 with まで忘れないのがポイントです。',
+    explanation: '名詞のあとに置いた to talk with が friends を説明し、「話をする友だち」という意味を作ります。talk with 人で「人と話す」なので、選択肢では文末の with まで必要です。to talk だけでは「誰と話すか」が表せません。',
     source: '英語演習I 2中・Exercise 13 B(1)'
   },
   {
@@ -106,14 +107,14 @@ const QUESTIONS = [
     sentence: "I'm hungry. I want something to eat.",
     choices: ['食べるものがほしい', '食べながら何かがほしい', '食べ終わったものがほしい'], answer: '食べるものがほしい',
     answerLabel: '食べるものがほしい',
-    explanation: 'something to eat は「食べるための何か」つまり「食べるもの」です。to eat が something の具体的な内容を説明しています。',
+    explanation: 'something to eat は「食べるための何か」、自然な日本語では「食べるもの」です。to eat は直前の something を説明していて、食べる動作をしながら何かをする意味ではありません。',
     source: '英語演習I 2中・Exercise 13 総合(5)'
   },
   {
     id: 'l13-04', lesson: 'LESSON 13', topic: '名詞的用法', difficulty: 'starter', type: 'input',
     prompt: '空所に入る語句を入力しなさい。',
     sentence: 'Our purpose is ______ ______ the poor.', answer: 'to help', accepted: ['to help'], answerLabel: 'to help',
-    explanation: 'be動詞の後ろで「目的の中身」を説明しています。「助けること」は to help と表します。',
+    explanation: '「〜すること」という目的や内容は、to + 動詞の原形で表せます。to help が Our purpose の内容を説明するので、空欄は to と help の2語です。',
     source: '英語演習I 2中・Exercise 13 A(1)'
   },
   {
@@ -122,7 +123,7 @@ const QUESTIONS = [
     sentence: 'I went to Harajuku to buy some clothes yesterday.',
     choices: ['服を買うために原宿へ行った', '服を買ったので原宿へ行った', '服を買い終えて原宿へ行った'], answer: '服を買うために原宿へ行った',
     answerLabel: '服を買うために原宿へ行った',
-    explanation: 'to buy some clothes は「何のために行ったのか」を表す目的の副詞的用法です。',
+    explanation: 'to buy some clothes は「服を買うために」という目的を表し、went の理由ではなく「何のために行ったか」を説明します。to のあとには動詞の原形 buy が続きます。',
     source: '英語演習I 2中・Exercise 14 A(1)'
   },
   {
@@ -131,7 +132,7 @@ const QUESTIONS = [
     sentence: 'The police officer (　　　) (　　　) (　　　) home.',
     choices: ['told us to go', 'told to us go', 'told us going'], answer: 'told us to go',
     answerLabel: 'told us to go',
-    explanation: 'tell は tell + 人 + to do の形をとります。「私たちに帰るように言った」なので told us to go です。',
+    explanation: 'tell は tell + 人 + to + 動詞の原形で「人に〜するように言う」です。人を先に置くため told us to go となり、to us とするとこの語順になりません。文が過去の出来事なので tell は told にします。',
     source: '英語演習I 2中・Exercise 14 B(2)'
   },
   {
@@ -141,14 +142,14 @@ const QUESTIONS = [
     words: ['It', 'is', 'not', 'easy', 'to', 'understand', "others'", 'feelings.'],
     answer: 'It is not easy to understand others\' feelings.',
     answerLabel: "It is not easy to understand others' feelings.",
-    explanation: 'It is + 形容詞 + to do の形です。意味の中心は to understand others\' feelings で、it は仮の主語です。',
+    explanation: '長い主語を後ろに置くときは It is + 形容詞 + to do の形にできます。ここでは「他人の気持ちを理解すること」が意味上の主語で、it 自体を「それ」と訳す必要はありません。否定は形容詞 easy の前に not を置きます。',
     source: '英語演習I 2中・Exercise 14 C(2)'
   },
   {
     id: 'l14-04', lesson: 'LESSON 14', topic: '否定の位置', difficulty: 'standard', type: 'input',
     prompt: '空所に入る語句を入力しなさい。',
     sentence: 'We decided ______ ______ take part in the game.', answer: 'not to', accepted: ['not to'], answerLabel: 'not to',
-    explanation: '不定詞を否定するときは、to の直前に not を置きます。not to take part で「参加しないこと」です。',
+    explanation: 'to 不定詞を否定するときは、動詞の前に not を置いて not to + 動詞の原形にします。decided の目的語が not to take part となり、「参加しないことに決めた」という意味です。not を to の後ろに置く語順にはしません。',
     source: '英語演習I 2中・Exercise 14 C(4)'
   },
   {
@@ -156,7 +157,7 @@ const QUESTIONS = [
     prompt: '意味の通る英文になるように、適切な語句を選びなさい。',
     sentence: "I didn't ______ me go out.",
     choices: ['make', 'let', 'have'], answer: 'let', answerLabel: 'let',
-    explanation: 'let + O + 動詞の原形で「Oに〜させておく／許す」です。didn\'t let me go で「私を外出させてくれなかった」。',
+    explanation: 'let は let + 人 + 動詞の原形で「人に〜するのを許す」です。否定文では助動詞 didn’t のあとに let を原形で置き、let の直後の go にも to は付けません。ここでは「外出するのを許さなかった」となります。',
     source: '英語演習I 2中・Exercise 15 A(2)'
   },
   {
@@ -164,7 +165,7 @@ const QUESTIONS = [
     prompt: '意味の通る英文になるように、適切な語句を選びなさい。',
     sentence: 'I heard my sister (　　　) something in her sleep.',
     choices: ['say', 'to say', 'saying to'], answer: 'say', answerLabel: 'say',
-    explanation: 'hear + O + 動詞の原形で「Oが〜するのを聞く」です。知覚動詞の後ろでは to を置きません。',
+    explanation: 'hear + 人・もの + 動詞の原形で、動作全体を聞いたことを表せます。my sister のあとに say を置き、知覚動詞 hear のあとでは to say とはしません。',
     source: '英語演習I 2中・Exercise 15 A(4)'
   },
   {
@@ -172,7 +173,7 @@ const QUESTIONS = [
     prompt: '空所に入る最も適切な語句を選びなさい。',
     sentence: 'I seemed (　　　) (　　　) my glasses somewhere.',
     choices: ['to have left', 'to leave', 'to be leaving'], answer: 'to have left', answerLabel: 'to have left',
-    explanation: 'seem の時点より前に「置き忘れた」ので、完了形の不定詞 to have + 過去分詞を使います。',
+    explanation: '「眼鏡を置き忘れる」出来事は、そう思った時点より前に起きています。seem より前の出来事を表すため、完了不定詞 to have + 過去分詞を使い、leave の過去分詞 left を続けます。to leave だけでは時間の前後関係が示せません。',
     source: '英語演習I 2中・Exercise 15 B(3)'
   },
   {
@@ -182,7 +183,7 @@ const QUESTIONS = [
     words: ['Shinji', 'seems', 'to', 'be', 'playing', 'soccer', 'in', 'the', 'park', 'now.'],
     answer: 'Shinji seems to be playing soccer in the park now.',
     answerLabel: 'Shinji seems to be playing soccer in the park now.',
-    explanation: '今まさに進行中のことを seem で表すため、to be + 動詞-ing を使います。',
+    explanation: '「今、公園でサッカーをしている」という進行中の様子を seem（〜のようだ）につなぐには seem + to be + 動詞-ing を使います。to play だけでは「している最中」という形になりません。',
     source: '英語演習I 2中・Exercise 15 総合(5)'
   },
   {
@@ -190,7 +191,7 @@ const QUESTIONS = [
     prompt: '文の意味に合う語句を選びなさい。',
     sentence: '______ you the truth, that jacket doesn\'t suit you.',
     choices: ['To tell', 'Telling', 'To telling'], answer: 'To tell', answerLabel: 'To tell',
-    explanation: 'To tell you the truth は「正直に言うと」という文全体にかかる独立不定詞です。',
+    explanation: '文頭の To tell you the truth は、文全体に「正直に言うと」という話し手の姿勢を添える定型表現です。文の主語や目的語ではなく、後ろの that jacket doesn’t suit you 全体にかかります。to の直後は動詞の原形 tell です。',
     source: '英語演習I 2中・Plus Exercise C(9)'
   },
   {
@@ -200,7 +201,7 @@ const QUESTIONS = [
     words: ['The', 'French', 'President', 'is', 'to', 'visit', 'Japan', 'next', 'month.'],
     answer: 'The French President is to visit Japan next month.',
     answerLabel: 'The French President is to visit Japan next month.',
-    explanation: 'be to do は「予定・義務・可能」などを表します。ここでは公的な予定を表しています。',
+    explanation: 'be to + 動詞の原形は文脈によって予定・義務などを表します。ここでは next month と訪問時期が示されているため、「来月訪問する予定」と読むのが自然です。be のあとに to visit と続けます。',
     source: '英語演習I 2中・Plus Exercise 2(1)'
   },
   {
@@ -208,14 +209,14 @@ const QUESTIONS = [
     prompt: '空所に入る最も適切なものを選びなさい。',
     sentence: 'The shop is (　　　) (　　　) (　　　).',
     choices: ['easy to find', 'easy for find', 'easily to finding'], answer: 'easy to find', answerLabel: 'easy to find',
-    explanation: 'It is easy to find the shop. を書き換えると The shop is easy to find. になります。形容詞 + to do の形です。',
+    explanation: 'easy のように「〜しやすい」を表す形容詞は、形容詞 + to + 動詞の原形で使えます。The shop is easy to find は「その店は見つけやすい」で、店は find の目的語にあたります。easily to finding のように副詞や動名詞にはしません。',
     source: '英語演習I 2中・Plus Exercise 3(1)'
   },
   {
     id: 'plus-04', lesson: 'PLUS', topic: '疑問詞 + to 不定詞', difficulty: 'advanced', type: 'input',
     prompt: '空所に入る語句を入力しなさい。',
     sentence: "She didn't know ______ ______ go.", answer: 'where to', accepted: ['where to'], answerLabel: 'where to',
-    explanation: 'where she should go を where to go に短くできます。疑問詞 + to 不定詞で「どこへ行くべきか」です。',
+    explanation: '「どこへ行けばよいか」は、疑問詞 where + to + 動詞の原形で where to go と表せます。where she should go のような節を短くした形で、疑問詞の直後に to を置きます。',
     source: '英語演習I 2中・Plus Exercise 3(2)'
   },
 ]
@@ -1574,7 +1575,7 @@ function ThemeUnlockOverlay({ themeId, onClose }) {
 }
 
 function SettingsView({ filter, setFilter, autoExplanation, setAutoExplanation, themeId, setThemeId, hasSession, unlockedThemes }) {
-  const availableThemes = THEME_OPTIONS.filter((theme) => theme.id === DEFAULT_THEME_ID || (hasSession && normalizeUnlockedThemes(unlockedThemes).includes(theme.id)))
+  const availableThemes = THEME_OPTIONS.filter((theme) => !HIDDEN_THEME_IDS.has(theme.id) || (hasSession && normalizeUnlockedThemes(unlockedThemes).includes(theme.id)))
   return <div className="simple-view"><div className="section-heading"><div><p className="section-kicker">SETTINGS</p><h1>設定</h1><p className="subcopy">出題レベル、表示方法、テーマを自分の学習スタイルに合わせて変更できます。</p></div></div><div className="settings-grid"><section className="settings-panel"><h2>テーマ変更</h2><p>演習画面の色と雰囲気を切り替えます。解放したテーマはこのアカウントに保存されます。</p><div className="theme-options" role="radiogroup" aria-label="テーマ変更">{availableThemes.map((theme) => <button type="button" role="radio" aria-checked={theme.id === themeId} key={theme.id} className={`theme-option theme-option-${theme.id} ${theme.id === themeId ? 'selected' : ''}`} onClick={() => setThemeId(theme.id)}><span className="theme-preview" aria-hidden="true"><span /></span><span className="theme-option-copy"><strong>{theme.label}</strong><small>{theme.description}</small></span><span className="theme-radio" aria-hidden="true" /></button>)}</div></section><section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? 'Lesson 13〜15・Plus' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section><section className="settings-panel settings-panel-display"><h2>学習の表示</h2><p>解答後の画面の見え方を設定します。</p><label className="toggle-row"><span><strong>解説を自動で表示</strong><small>正誤判定のあとに解説を開きます</small></span><button type="button" className={`toggle ${autoExplanation ? 'on' : ''}`} aria-pressed={autoExplanation} onClick={() => setAutoExplanation(!autoExplanation)}><span /></button></label><div className="rule-note"><Icon name="document" size={19} /><span>正答数に応じてレートが変動し、履歴に保存されます。</span></div></section></div></div>
 }
 
