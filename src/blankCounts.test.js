@@ -16,7 +16,7 @@ const REGULAR_SOURCE_BLANK_COUNTS = {
   'reg27-20': 1, 'reg27-21': 1,
   'reg13-05': 3, 'reg13-06': 2, 'reg13-07': 2, 'reg13-08': 3,
   'reg14-06': 4, 'reg14-07': 4, 'reg14-08': 4, 'reg14-09': 4,
-  'reg15-07': 2, 'reg15-08': 3, 'reg15-09': 3, 'reg15-10': 4,
+  'reg15-02': 1, 'reg15-07': 2, 'reg15-08': 3, 'reg15-09': 3, 'reg15-10': 4,
   'regplus-06': 3, 'regplus-07': 2, 'regplus-08': 3, 'regplus-09': 2,
   'regplus-10': 2, 'regplus-11': 3, 'regplus-12': 2, 'regplus-13': 2,
   'regplus-14': 2, 'regplus-15': 1, 'regplus-16': 2,
