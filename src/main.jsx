@@ -765,10 +765,11 @@ function App() {
       const applied = applyAuthResult(result, name)
       if (applied.needsPlacement) {
         setPlacementSetup({ name: applied.name, token: applied.token })
-        setAuthGrade(result.grade || '1')
-        setAuthClassName(result.className || 'A')
-        setAuthFoundationMember(Boolean(result.foundationMember))
-        setNotice('所属情報を設定すると、クラスランキングに参加できます。')
+        setAuthGrade(result.grade || '')
+        setAuthClassName(result.className || '')
+        // Legacy accounts without placement data came from the Foundation Course cohort.
+        setAuthFoundationMember(Boolean(result.foundationMember || result.needsPlacement))
+        setNotice('所属クラスを選択してください。基礎講座受講者はチェックを入れたまま登録すると、両方のランキングを見られます。')
         setView('landing')
         return
       }
@@ -1009,6 +1010,16 @@ function App() {
         if (!result.ok || activeRef.current.token !== identity.authToken || activeRef.current.course !== identity.course || activeRef.current.poolId !== rankingPoolId) return
         const nextPoolId = result.poolId || preferredPoolId(result)
         if (nextPoolId && nextPoolId !== rankingPoolId) setRankingPoolId(nextPoolId)
+        if (result.needsPlacement) {
+          setPlacementSetup({ name: identity.name, token: identity.authToken })
+          setAuthName(identity.name)
+          setAuthGrade(result.grade || '')
+          setAuthClassName(result.className || '')
+          // Accounts created before class placement existed were Foundation Course accounts.
+          setAuthFoundationMember(Boolean(result.foundationMember || result.needsPlacement))
+          setNotice('所属クラスを選択してください。基礎講座受講者はチェックを入れたまま登録すると、両方のランキングを見られます。')
+          setView('landing')
+        }
         const serverRating = Number(result.rating) || DEFAULT_RATING
         const syncKey = getSyncKey(identity)
         setPersisted((current) => {
@@ -1310,7 +1321,7 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
         <div className="landing-eyebrow"><span className="landing-mark"><Icon name="practice" size={25} /></span><span>WELCOME TO GRAMMAR ARENA</span></div>
       <p className="section-kicker">{course.eyebrow} / {course.unit}</p>
         <h1>レートを確認して、<br /><em>対戦を始める。</em></h1>
-        <p className="landing-copy">{placementSetup ? '所属情報を登録すると、クラスごとのランキングに参加できます。' : `表示名と暗証番号で確認してから、${course.label}・${course.name}の10問対戦を始められます。`}</p>
+        <p className="landing-copy">{placementSetup ? '所属クラスを登録してください。既存のレートや解答履歴はそのまま引き継がれます。' : `表示名と暗証番号で確認してから、${course.label}・${course.name}の10問対戦を始められます。`}</p>
         {!placementSetup && <div className="auth-tabs" role="tablist" aria-label="アカウント操作">
           <button type="button" className={authMode === 'login' ? 'selected' : ''} onClick={() => { setAuthMode('login'); setNotice('') }}>ログイン</button>
           <button type="button" className={authMode === 'register' ? 'selected' : ''} onClick={() => { setAuthMode('register'); setNotice('') }}>初回登録</button>
@@ -1324,11 +1335,11 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
           </>}
           {(placementSetup || authMode === 'register') && <>
             <div className="placement-grid">
-              <div><label htmlFor="landing-grade">学年</label><select id="landing-grade" value={authGrade} onChange={(event) => setAuthGrade(event.target.value)}>{GRADE_OPTIONS.map((grade) => <option key={grade} value={grade}>{grade}年</option>)}</select></div>
-              <div><label htmlFor="landing-class">クラス</label><select id="landing-class" value={authClassName} onChange={(event) => setAuthClassName(event.target.value)}>{CLASS_OPTIONS.map((className) => <option key={className} value={className}>{className}組</option>)}</select></div>
+              <div><label htmlFor="landing-grade">学年</label><select id="landing-grade" value={authGrade} onChange={(event) => setAuthGrade(event.target.value)}><option value="">選択してください</option>{GRADE_OPTIONS.map((grade) => <option key={grade} value={grade}>{grade}年</option>)}</select></div>
+              <div><label htmlFor="landing-class">クラス</label><select id="landing-class" value={authClassName} onChange={(event) => setAuthClassName(event.target.value)}><option value="">選択してください</option>{CLASS_OPTIONS.map((className) => <option key={className} value={className}>{className}組</option>)}</select></div>
             </div>
             <label className="placement-check"><input type="checkbox" checked={authFoundationMember} onChange={(event) => setAuthFoundationMember(event.target.checked)} /><span>基礎講座受講中</span></label>
-            <p className="placement-help">チェックを入れると基礎講座と所属クラスの両方のランキングに参加し、外すと所属クラスのランキングに参加します。</p>
+            <p className="placement-help">従来から基礎講座を受講している生徒はチェックを入れたままにしてください。所属クラスと基礎講座の両方のランキングを切り替えて見られます。</p>
           </>}
           {notice && <p className="auth-notice" role="alert">{notice}</p>}
           <button type="submit" className="primary-button landing-start" disabled={authBusy}>{authBusy ? '確認中…' : placementSetup ? '所属情報を保存して開始' : authMode === 'login' ? 'ログインしてレート確認' : '登録してレート対戦へ'}<Icon name="arrow" size={21} /></button>
