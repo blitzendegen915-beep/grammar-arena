@@ -1691,19 +1691,23 @@ function themeUnlocksFromRow_(row) {
   }
 }
 
-function maxPlayerRating_(players, poolProfiles, playerIndex, playerKey) {
+function maxPlayerRating_(players, courseProfiles, poolProfiles, playerIndex, playerKey) {
   const playerRow = players.getDataRange().getValues()[playerIndex] || []
+  const legacyRatings = courseProfiles.getDataRange().getValues().slice(1)
+    .filter((row) => String(row[0] || '') === playerKey)
+    .map((row) => Number(row[2]))
+    .filter((rating) => Number.isFinite(rating))
   const poolRatings = poolProfiles.getDataRange().getValues().slice(1)
     .filter((row) => String(row[0] || '') === playerKey)
     .map((row) => Number(row[3]))
     .filter((rating) => Number.isFinite(rating))
-  return Math.max(Number(playerRow[2]) || RATING_MIN, ...poolRatings)
+  return Math.max(Number(playerRow[2]) || RATING_MIN, ...legacyRatings, ...poolRatings)
 }
 
-function eligibleThemeUnlocks_(players, poolProfiles, playerIndex, playerKey) {
+function eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey) {
   const row = players.getDataRange().getValues()[playerIndex] || []
   const unlocks = themeUnlocksFromRow_(row)
-  if (maxPlayerRating_(players, poolProfiles, playerIndex, playerKey) >= 10000 && !unlocks.includes('crystallium')) {
+  if (maxPlayerRating_(players, courseProfiles, poolProfiles, playerIndex, playerKey) >= 10000 && !unlocks.includes('crystallium')) {
     unlocks.push('crystallium')
     players.getRange(playerIndex + 1, 11).setValue(JSON.stringify(unlocks))
   }
@@ -1726,7 +1730,7 @@ function unlockTheme_(params) {
     if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
     const playerRows = players.getDataRange().getValues()
     const row = playerRows[auth.playerIndex] || []
-    const unlocks = eligibleThemeUnlocks_(players, poolProfiles, auth.playerIndex, auth.playerKey)
+    const unlocks = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey)
     if (themeId === 'crystallium' && !unlocks.includes('crystallium')) return json_({ ok: false, reason: 'rating-threshold', unlockedThemes: unlocks }, params.callback)
     if (!unlocks.includes(themeId)) {
       unlocks.push(themeId)
@@ -1742,7 +1746,7 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
   const includePlayers = options.includePlayers !== false
   const includeAnsweredIds = options.includeAnsweredIds !== false
   const row = players.getDataRange().getValues()[playerIndex]
-  const unlockedThemes = eligibleThemeUnlocks_(players, poolProfiles, playerIndex, playerKey)
+  const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey)
   const poolIds = playerPools_(row)
   const profiles = poolIds.map((poolId) => ({
     poolId,
@@ -1894,7 +1898,10 @@ function recordAnswer_(params) {
       return answerId ? String(row[6] || '') === answerId : true
     })
     // A retry may follow a lost response. Return the authoritative rating without scoring twice.
-    if (duplicate) return json_({ ok: false, reason: 'already-answered', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles) }, params.callback)
+    if (duplicate) {
+      const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey)
+      return json_({ ok: false, reason: 'already-answered', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles), unlockedThemes }, params.callback)
+    }
     // New clients send the answer text. Older queued answers only have the
     // browser's result, so retain a temporary compatibility path for them.
     const serverValidated = submittedAnswer.length > 0
@@ -1917,7 +1924,7 @@ function recordAnswer_(params) {
     players.getRange(playerIndex + 1, 3, 1, 2).setValues([[primaryProfile.rating, primaryProfile.answered]])
     players.getRange(playerIndex + 1, 5).setValue(now)
     const activeUpdated = updatedProfiles.find((profile) => profile.poolId === activePool) || primaryProfile
-    const unlockedThemes = eligibleThemeUnlocks_(players, poolProfiles, playerIndex, playerKey)
+    const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey)
     const result = { ok: true, rating: activeUpdated.rating, delta: safeDelta, correct, serverValidated, poolId: activePool, ratings: ratingsFromProfiles_(updatedProfiles), unlockedThemes }
     if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, poolProfiles, course, activePool, playerKey)
     return json_(result, params.callback)

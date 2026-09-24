@@ -530,6 +530,7 @@ function App() {
   todaySecondsRef.current = todaySeconds
   const logoTapTimesRef = useRef([])
   const celebratedUnlocksRef = useRef(new Set())
+  const themeUnlockRequestsRef = useRef(new Set())
   const activeRef = useRef(null)
   activeRef.current = { name: persisted.studentName, token: persisted.authToken, course: getRankingCourseId(modeId), poolId: rankingPoolId }
   const submitLock = useRef(false)
@@ -666,16 +667,21 @@ function App() {
       return
     }
     if (normalizeUnlockedThemes(persisted.unlockedThemes).includes(requestedThemeId)) return
+    if (themeUnlockRequestsRef.current.has(requestedThemeId)) return
+    const requestName = persisted.studentName
+    const requestToken = persisted.authToken
+    themeUnlockRequestsRef.current.add(requestedThemeId)
     setNotice('')
     try {
-      const result = await requestScoreApi({
+      const result = await requestAuthWithRetry(() => requestScoreApi({
         action: 'unlock-theme',
         course: getRankingCourseId(modeId),
         poolId: rankingPoolId,
         name: persisted.studentName,
         authToken: persisted.authToken,
         themeId: requestedThemeId,
-      }, { timeoutMs: AUTH_REQUEST_TIMEOUT_MS })
+      }, { timeoutMs: AUTH_REQUEST_TIMEOUT_MS }), { maxAttempts: 3 })
+      if (activeRef.current.token !== requestToken || activeRef.current.name !== requestName) return
       const unlockedThemes = normalizeUnlockedThemes(result.unlockedThemes)
       if (!result.ok || !unlockedThemes.includes(requestedThemeId)) {
         setNotice(result.reason === 'rating-threshold' ? 'Crystalliumはレート10,000到達で解放されます。' : 'テーマを解放できませんでした。数秒後にもう一度お試しください。')
@@ -691,7 +697,11 @@ function App() {
       setThemeId(requestedThemeId)
       setUnlockCelebration(requestedThemeId)
     } catch {
-      setNotice('テーマ解放の確認に失敗しました。数秒後にもう一度お試しください。')
+      if (activeRef.current.token === requestToken && activeRef.current.name === requestName) {
+        setNotice('テーマ解放の確認に失敗しました。数秒後にもう一度お試しください。')
+      }
+    } finally {
+      themeUnlockRequestsRef.current.delete(requestedThemeId)
     }
   }
 
@@ -703,7 +713,9 @@ function App() {
     const now = Date.now()
     const previous = logoTapTimesRef.current
     if (previous.length && now - previous[previous.length - 1] < 3000) {
-      logoTapTimesRef.current = []
+      // Re-anchor the sequence at the latest tap so one rushed tap does not
+      // discard the next correctly spaced attempts.
+      logoTapTimesRef.current = [now]
       return
     }
     const next = [...previous, now]
