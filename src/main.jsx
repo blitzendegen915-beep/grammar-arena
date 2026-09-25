@@ -1,6 +1,7 @@
-import { StrictMode, useEffect, useMemo, useRef, useState } from 'react'
+import { StrictMode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal, flushSync } from 'react-dom'
+import { shouldResetThemeSelection } from './themeAccess.js'
 import './styles.css'
 import { FOUNDATION_TRANSLATIONS } from './foundationTranslations'
 import { loadQuestionBank } from './questionBankLoader'
@@ -33,19 +34,25 @@ const DEFAULT_RATING = 1240
 const SESSION_LENGTH = 10
 const DEFAULT_MODE_ID = 'foundation-infinitive'
 const DEFAULT_THEME_ID = 'ascention'
+const ThemeUnlockContext = createContext(null)
 
 const THEME_OPTIONS = [
   { id: 'ascention', label: 'Ascention', description: 'The original yellow and black theme' },
   { id: 'moon', label: 'Moon', description: 'Midnight blue with a cool cyan glow' },
   { id: 'crystallium', label: 'Crystallium', description: 'Pink prism light and floating crystal shards' },
   { id: 'dignity', label: 'Dignity', description: 'Obsidian black, lacquer red, and antique gold' },
+  { id: 'archive', label: 'Archive', description: 'A quiet study among old books and vellum' },
+  { id: 'eclipse', label: 'Eclipse', description: 'A silver horizon framed by deep shadow' },
+  { id: 'verdant', label: 'Verdant', description: 'An emerald sanctuary of leaves and light' },
+  { id: 'ember', label: 'Ember', description: 'Warm copper light against charcoal stone' },
+  { id: 'aurora', label: 'Aurora', description: 'Northern lights over a midnight sea' },
 ]
 
 function normalizeThemeId(value) {
   return THEME_OPTIONS.some((theme) => theme.id === value) ? value : DEFAULT_THEME_ID
 }
 
-const HIDDEN_THEME_IDS = new Set(['moon', 'crystallium'])
+const HIDDEN_THEME_IDS = new Set(['moon', 'crystallium', 'dignity', 'archive', 'eclipse', 'verdant', 'ember', 'aurora'])
 
 function normalizeUnlockedThemes(value) {
   return Array.isArray(value) ? [...new Set(value.filter((themeId) => HIDDEN_THEME_IDS.has(themeId)))] : []
@@ -512,6 +519,12 @@ function App() {
   })
   const [notice, setNotice] = useState('')
   const [unlockCelebration, setUnlockCelebration] = useState(null)
+  const [adminLoginOpen, setAdminLoginOpen] = useState(false)
+  const [adminPassword, setAdminPassword] = useState('')
+  const [adminError, setAdminError] = useState('')
+  const [adminBusy, setAdminBusy] = useState(false)
+  const [adminToken, setAdminToken] = useState('')
+  const [adminConsoleOpen, setAdminConsoleOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [authName, setAuthName] = useState(() => readPersisted().studentName || '')
   const [authPin, setAuthPin] = useState('')
@@ -529,6 +542,7 @@ function App() {
   const todaySecondsRef = useRef(todaySeconds)
   todaySecondsRef.current = todaySeconds
   const logoTapTimesRef = useRef([])
+  const adminTapSequenceRef = useRef([])
   const celebratedUnlocksRef = useRef(new Set())
   const themeUnlockRequestsRef = useRef(new Set())
   const activeRef = useRef(null)
@@ -572,7 +586,7 @@ function App() {
 
   useEffect(() => {
     const unlockedThemes = normalizeUnlockedThemes(persisted.unlockedThemes)
-    if (themeId !== DEFAULT_THEME_ID && (!hasSession || !unlockedThemes.includes(themeId))) setThemeId(DEFAULT_THEME_ID)
+    if (shouldResetThemeSelection(themeId, hasSession, unlockedThemes, HIDDEN_THEME_IDS)) setThemeId(DEFAULT_THEME_ID)
   }, [themeId, hasSession, persisted.unlockedThemes])
 
   useEffect(() => {
@@ -607,6 +621,12 @@ function App() {
     const rankingId = getRankingCourseId(modeId)
     const nextAuthToken = String(result.authToken || '')
     const nextName = result.name || fallbackName
+    if (persisted.authToken !== nextAuthToken) {
+      setAdminToken('')
+      setAdminConsoleOpen(false)
+      setAdminLoginOpen(false)
+      adminTapSequenceRef.current = []
+    }
     const serverAnsweredIds = Array.isArray(result.answeredIds) ? result.answeredIds : []
     const migratedQueue = rekeyAnswersForAuth(persisted.answerSyncQueue, {
       name: fallbackName,
@@ -617,7 +637,8 @@ function App() {
     const serverRating = Number(result.rating) || DEFAULT_RATING
     const displayedRating = applyProvisionalRating(serverRating, migratedQueue, nextSyncKey)
     const nextUnlockedThemes = normalizeUnlockedThemes(result.unlockedThemes)
-    const newUnlock = nextUnlockedThemes.find((themeId) => !normalizeUnlockedThemes(persisted.unlockedThemes).includes(themeId))
+    const isOwnerAccount = String(nextName || '').trim().toLowerCase() === 'おとめ座'
+    const newUnlock = isOwnerAccount ? null : nextUnlockedThemes.find((themeId) => !normalizeUnlockedThemes(persisted.unlockedThemes).includes(themeId))
     const newUnlockSeenKey = newUnlock ? unlockSeenKey(nextName, newUnlock) : ''
     const shouldCelebrateUnlock = Boolean(newUnlock && !persisted.unlockCelebrationSeen?.[newUnlockSeenKey])
     if (shouldCelebrateUnlock && !celebratedUnlocksRef.current.has(newUnlockSeenKey)) {
@@ -661,13 +682,13 @@ function App() {
     return { name: nextName, token: nextAuthToken, needsPlacement: Boolean(result.needsPlacement) }
   }
 
-  const unlockAccountTheme = async (requestedThemeId) => {
+  const unlockAccountTheme = useCallback(async (requestedThemeId, secretTapSequence = '') => {
     if (!hasSession) {
       setNotice('テーマ解放はログイン後に行えます。')
-      return
+      return false
     }
-    if (normalizeUnlockedThemes(persisted.unlockedThemes).includes(requestedThemeId)) return
-    if (themeUnlockRequestsRef.current.has(requestedThemeId)) return
+    if (normalizeUnlockedThemes(persisted.unlockedThemes).includes(requestedThemeId)) return true
+    if (themeUnlockRequestsRef.current.has(requestedThemeId)) return false
     const requestName = persisted.studentName
     const requestToken = persisted.authToken
     themeUnlockRequestsRef.current.add(requestedThemeId)
@@ -680,12 +701,18 @@ function App() {
         name: persisted.studentName,
         authToken: persisted.authToken,
         themeId: requestedThemeId,
+        secretTapSequence,
+        pdfSaved: requestedThemeId === 'dignity' ? 'true' : '',
       }, { timeoutMs: AUTH_REQUEST_TIMEOUT_MS }), { maxAttempts: 3 })
-      if (activeRef.current.token !== requestToken || activeRef.current.name !== requestName) return
+      if (activeRef.current.token !== requestToken || activeRef.current.name !== requestName) return false
       const unlockedThemes = normalizeUnlockedThemes(result.unlockedThemes)
       if (!result.ok || !unlockedThemes.includes(requestedThemeId)) {
-        setNotice(result.reason === 'rating-threshold' ? 'Crystalliumはレート10,000到達で解放されます。' : 'テーマを解放できませんでした。数秒後にもう一度お試しください。')
-        return
+        setNotice(result.reason === 'rating-threshold'
+          ? 'Crystalliumはレート10,000到達で解放されます。'
+          : result.reason === 'pdf-required'
+            ? 'PDFとして保存したことを確認してから解放できます。'
+            : 'テーマを解放できませんでした。数秒後にもう一度お試しください。')
+        return false
       }
       const seenKey = unlockSeenKey(persisted.studentName, requestedThemeId)
       celebratedUnlocksRef.current.add(seenKey)
@@ -696,16 +723,57 @@ function App() {
       }))
       setThemeId(requestedThemeId)
       setUnlockCelebration(requestedThemeId)
+      return true
     } catch {
       if (activeRef.current.token === requestToken && activeRef.current.name === requestName) {
         setNotice('テーマ解放の確認に失敗しました。数秒後にもう一度お試しください。')
       }
+      return false
     } finally {
       themeUnlockRequestsRef.current.delete(requestedThemeId)
+    }
+  }, [hasSession, persisted.unlockedThemes, persisted.studentName, persisted.authToken, modeId, rankingPoolId])
+
+  const recordAdminTap = (source) => {
+    const isOwnerAccount = String(persisted.studentName || '').trim().toLowerCase() === 'おとめ座'
+    if (!hasSession || !isOwnerAccount || adminLoginOpen || adminConsoleOpen) return
+    const sequence = adminTapSequenceRef.current
+    const next = !sequence.length || sequence[sequence.length - 1] === source ? [source] : [...sequence, source]
+    if (next.length === 10) {
+      adminTapSequenceRef.current = []
+      setAdminError('')
+      setAdminPassword('')
+      setAdminLoginOpen(true)
+      return
+    }
+    adminTapSequenceRef.current = next
+  }
+
+  const handleAdminLogin = async (event) => {
+    event?.preventDefault()
+    if (adminBusy || !hasSession || String(persisted.studentName || '').trim().toLowerCase() !== 'おとめ座') return
+    setAdminBusy(true)
+    setAdminError('')
+    try {
+      const result = await requestScoreApi({ action: 'admin-auth', name: persisted.studentName, authToken: persisted.authToken, password: adminPassword }, { timeoutMs: AUTH_REQUEST_TIMEOUT_MS })
+      if (activeRef.current.token !== persisted.authToken || activeRef.current.name !== persisted.studentName) return
+      if (!result.ok || !result.adminToken) {
+        setAdminError(result.reason === 'admin-rate-limited' ? '試行回数の上限に達しました。10分後に再試行してください。' : result.reason === 'admin-password-wrong' ? 'パスワードが違います。' : result.reason === 'admin-not-configured' ? '管理者認証の設定が不完全です。運営者に連絡してください。' : '管理者認証に失敗しました。')
+        return
+      }
+      setAdminToken(result.adminToken)
+      setAdminPassword('')
+      setAdminLoginOpen(false)
+      setAdminConsoleOpen(true)
+    } catch {
+      setAdminError('サーバーに接続できませんでした。通信を確認して再試行してください。')
+    } finally {
+      setAdminBusy(false)
     }
   }
 
   const handleBrandTap = () => {
+    recordAdminTap('brand')
     if (!hasSession) {
       setNotice('Moonはログイン後に解放できます。')
       return
@@ -721,7 +789,7 @@ function App() {
     const next = [...previous, now]
     if (next.length >= 4) {
       logoTapTimesRef.current = []
-      void unlockAccountTheme('moon')
+      void unlockAccountTheme('moon', 'brand-spaced-4')
       return
     }
     logoTapTimesRef.current = next
@@ -959,6 +1027,11 @@ function App() {
       unlockedThemes: [],
       publicLeaderboard: [],
     }))
+    setAdminToken('')
+    setAdminConsoleOpen(false)
+    setAdminLoginOpen(false)
+    setAdminPassword('')
+    adminTapSequenceRef.current = []
     setThemeId(DEFAULT_THEME_ID)
     setAuthName('')
     setAuthPin('')
@@ -1280,8 +1353,13 @@ function App() {
   }
 
   const answerPreview = question ? (question.type === 'reorder' ? tokens.join(' ') : currentAnswer()) : ''
+  const themeUnlockContext = useMemo(() => ({
+    dignityUnlocked: normalizeUnlockedThemes(persisted.unlockedThemes).includes('dignity'),
+    unlockAccountTheme,
+  }), [persisted.unlockedThemes, unlockAccountTheme])
 
   return (
+    <ThemeUnlockContext.Provider value={themeUnlockContext}>
     <>
     <div className={`app-shell theme-${themeId}`} data-theme={themeId}>
       <aside className="sidebar">
@@ -1308,7 +1386,7 @@ function App() {
           <div className="selector-stack course-switcher"><label htmlFor="course-selector">講座</label><select id="course-selector" value={modeId} onChange={(event) => changeMode(event.target.value)}>{COURSE_MODES.map((course) => <option key={course.id} value={course.id} disabled={!course.available}>{course.label}</option>)}</select><span>講座と所属別にランキングが分かれます</span></div>
           {hasSession && allowedPoolOptions.length > 0 && <div className="selector-stack pool-switcher"><label htmlFor="ranking-pool-selector">ランキング</label><select id="ranking-pool-selector" value={rankingPoolId} onChange={(event) => changeRankingPool(event.target.value)}>{allowedPoolOptions.map((pool) => <option key={pool.id} value={pool.id}>{pool.label}</option>)}</select><span>{poolLabel(rankingPoolId)}の参加者を表示</span></div>}
           {hasSession && <button type="button" className="logout-button" onClick={logout}>ログアウト</button>}
-          <div className="profile-orb" aria-hidden="true">{student.name.slice(0, 1)}</div>
+          <button type="button" className="profile-orb" aria-label="アカウント" onClick={() => recordAdminTap('profile')}>{student.name.slice(0, 1)}</button>
         </header>
 
         <div className="content-wrap">
@@ -1322,7 +1400,10 @@ function App() {
       </main>
     </div>
     {unlockCelebration && <ThemeUnlockOverlay themeId={unlockCelebration} onClose={() => setUnlockCelebration(null)} />}
+    {adminLoginOpen && <AdminPasswordDialog password={adminPassword} setPassword={setAdminPassword} error={adminError} busy={adminBusy} onSubmit={handleAdminLogin} onClose={() => { setAdminLoginOpen(false); setAdminPassword(''); setAdminError('') }} />}
+    {adminConsoleOpen && adminToken && <AdminConsole name={persisted.studentName} authToken={persisted.authToken} adminToken={adminToken} course={getRankingCourseId(modeId)} onClose={() => { setAdminConsoleOpen(false); setAdminToken('') }} />}
     </>
+    </ThemeUnlockContext.Provider>
   )
 }
 
@@ -1497,9 +1578,13 @@ function formatJapaneseDate(value) {
 }
 
 function SessionPdfPicker({ reviews = [], course, studentName, ratingStart, ratingAfter, completedAt }) {
+  const { dignityUnlocked, unlockAccountTheme } = useContext(ThemeUnlockContext)
   const [open, setOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
   const [printReviews, setPrintReviews] = useState(null)
+  const [confirmPdfSave, setConfirmPdfSave] = useState(false)
+  const [unlockingDignity, setUnlockingDignity] = useState(false)
+  const [unlockError, setUnlockError] = useState('')
   const printCleanupRef = useRef(null)
   const selectedReviews = selectReviewsForPdf(reviews, selectedIds)
 
@@ -1529,13 +1614,30 @@ function SessionPdfPicker({ reviews = [], course, studentName, ratingStart, rati
       document.title = originalTitle
       if (clearPrintView) setPrintReviews(null)
     }
-    const handleAfterPrint = () => cleanup()
+    const handleAfterPrint = () => {
+      cleanup()
+      if (!dignityUnlocked) setConfirmPdfSave(true)
+    }
     printCleanupRef.current = cleanup
     window.addEventListener('afterprint', handleAfterPrint)
     document.title = printTitle
     setOpen(false)
     flushSync(() => setPrintReviews(selectedReviews))
     window.print()
+  }
+  const confirmPdfWasSaved = async () => {
+    if (unlockingDignity) return
+    setUnlockingDignity(true)
+    setUnlockError('')
+    try {
+      const unlocked = await unlockAccountTheme('dignity')
+      if (unlocked) setConfirmPdfSave(false)
+      else setUnlockError('解放の記録を保存できませんでした。通信状態を確認して、もう一度お試しください。')
+    } catch {
+      setUnlockError('解放の記録を保存できませんでした。通信状態を確認して、もう一度お試しください。')
+    } finally {
+      setUnlockingDignity(false)
+    }
   }
   const selectedScore = { correct: selectedReviews.filter(({ review }) => review.correct).length, answered: selectedReviews.length }
 
@@ -1548,6 +1650,7 @@ function SessionPdfPicker({ reviews = [], course, studentName, ratingStart, rati
       <div className="pdf-picker-footer"><button type="button" className="secondary-button" onClick={() => setOpen(false)}>キャンセル</button><button type="button" className="primary-button" disabled={!selectedReviews.length} onClick={printSelectedReviews}><Icon name="document" size={19} />選択した{selectedReviews.length}問をPDF出力</button></div>
     </section>}
     {printReviews?.length > 0 && createPortal(<SessionPrintView reviews={printReviews} score={selectedScore} course={course} studentName={studentName} ratingStart={ratingStart} ratingAfter={ratingAfter} completedAt={completedAt} />, document.body)}
+    {confirmPdfSave && <div className="pdf-save-confirmation-overlay" role="presentation"><section className="pdf-save-confirmation" role="dialog" aria-modal="true" aria-labelledby="pdf-save-confirmation-title"><p className="section-kicker">PDF EXPORT CHECK</p><h2 id="pdf-save-confirmation-title">PDFとして保存できましたか？</h2><p>印刷画面で「PDFとして保存」を選び、ファイルが端末に保存された場合に確認してください。確認後、このアカウントでDignityテーマが解放されます。</p>{unlockError && <p className="pdf-save-error" role="alert">{unlockError}</p>}<div className="pdf-save-confirmation-actions"><button type="button" className="secondary-button" onClick={() => setConfirmPdfSave(false)} disabled={unlockingDignity}>保存していない</button><button type="button" className="primary-button" onClick={confirmPdfWasSaved} disabled={unlockingDignity}>{unlockingDignity ? '確認中…' : 'PDFを保存した'}</button></div><small>この確認はアカウントごとに一度だけです。</small></section></div>}
   </>
 }
 
@@ -1593,13 +1696,157 @@ function HistoryView({ history, rating }) {
 function ThemeUnlockOverlay({ themeId, onClose }) {
   const theme = THEME_OPTIONS.find((option) => option.id === themeId) || THEME_OPTIONS[0]
   const headline = `${theme.label} unlocked`
-  const message = themeId === 'crystallium' ? 'A new realm has crystallized around your progress.' : 'The night mode has answered your call.'
+  const messages = {
+    moon: 'The night mode has answered your call.',
+    crystallium: 'A new realm has crystallized around your progress.',
+    dignity: 'Your dedication has earned a place of honor.',
+    archive: 'A new chapter has been added to your collection.',
+    eclipse: 'You found the light at the edge of the shadow.',
+    verdant: 'Your steady practice has brought new growth.',
+    ember: 'Persistence has turned every mistake into momentum.',
+    aurora: 'Your progress is shining across the horizon.',
+  }
+  const message = messages[themeId] || 'A new study space is now yours.'
   return <div className={`theme-unlock-overlay theme-unlock-${themeId}`} role="dialog" aria-modal="true" aria-label={headline}><div className="theme-unlock-card"><span className="theme-unlock-kicker">SECRET THEME UNLOCKED</span><span className="theme-unlock-symbol" aria-hidden="true">✦</span><h2>{headline}</h2><p>{message}</p><button type="button" className="theme-unlock-button" onClick={onClose}>ENTER THEME <span aria-hidden="true">→</span></button></div></div>
 }
 
+function AdminPasswordDialog({ password, setPassword, error, busy, onSubmit, onClose }) {
+  return <div className="admin-overlay" role="presentation"><section className="admin-dialog admin-password-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-password-title">
+    <button type="button" className="admin-close" aria-label="閉じる" onClick={onClose}>×</button>
+    <p className="section-kicker">PRIVATE ACCESS</p><h2 id="admin-password-title">管理者認証</h2>
+    <p>パスワードを入力してください。初回の認証時にサーバーへ安全に登録し、次回以降も同じパスワードで確認します。</p>
+    <form onSubmit={onSubmit}>
+      <label htmlFor="admin-password">パスワード</label>
+      <input id="admin-password" type="password" autoComplete="current-password" minLength={8} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} required autoFocus />
+      {error && <p className="admin-error" role="alert">{error}</p>}
+      <div className="admin-actions"><button type="button" className="secondary-button" onClick={onClose} disabled={busy}>キャンセル</button><button type="submit" className="primary-button" disabled={busy || password.length < 8}>{busy ? '確認中…' : '管理者メニューへ'}</button></div>
+    </form>
+  </section></div>
+}
+
+function AdminConsole({ name, authToken, adminToken, course: initialCourse, onClose }) {
+  const [query, setQuery] = useState('')
+  const [course, setCourse] = useState(initialCourse === 'regular-english-practice' ? initialCourse : 'foundation-course')
+  const [students, setStudents] = useState([])
+  const [target, setTarget] = useState(null)
+  const [poolId, setPoolId] = useState('')
+  const [rating, setRating] = useState('')
+  const [reason, setReason] = useState('')
+  const [confirming, setConfirming] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+
+  const selectedProfile = target?.ratings?.find((profile) => profile.course === course && profile.poolId === poolId)
+  const currentRating = selectedProfile?.rating ?? ''
+  const search = async (event) => {
+    event?.preventDefault()
+    if (busy || query.trim().length < 2) return
+    setBusy(true)
+    setError('')
+    setMessage('')
+    try {
+      const result = await requestScoreApi({ action: 'admin-search', name, authToken, adminToken, query: query.trim() }, { timeoutMs: AUTH_REQUEST_TIMEOUT_MS })
+      if (!result.ok) throw new Error(result.reason === 'admin-session-required' ? '管理者セッションの期限が切れました。もう一度ログインしてください。' : '検索できませんでした。入力を確認してください。')
+      setStudents(Array.isArray(result.students) ? result.students : [])
+      setTarget(null)
+      setMessage(result.students?.length ? `${result.students.length}名が見つかりました。` : '該当する生徒はいません。')
+    } catch (requestError) {
+      setError(requestError.message || '検索に失敗しました。')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const chooseStudent = (student) => {
+    setTarget(student)
+    const nextPool = student.pools?.includes(poolId) ? poolId : student.pools?.[0] || ''
+    setPoolId(nextPool)
+    const profile = student.ratings?.find((item) => item.course === course && item.poolId === nextPool)
+    setRating(profile ? String(profile.rating) : '')
+    setReason('')
+    setConfirming(false)
+    setError('')
+    setMessage('')
+  }
+
+  const changeCourse = (nextCourse) => {
+    setCourse(nextCourse)
+    setConfirming(false)
+    if (!target) return
+    const profile = target.ratings?.find((item) => item.course === nextCourse && item.poolId === poolId)
+    setRating(profile ? String(profile.rating) : '')
+  }
+
+  const changePool = (nextPool) => {
+    setPoolId(nextPool)
+    setConfirming(false)
+    const profile = target?.ratings?.find((item) => item.course === course && item.poolId === nextPool)
+    setRating(profile ? String(profile.rating) : '')
+  }
+
+  const saveRating = async () => {
+    if (!target || busy) return
+    if (!confirming) {
+      setConfirming(true)
+      return
+    }
+    setBusy(true)
+    setError('')
+    setMessage('')
+    try {
+      const result = await requestScoreApi({ action: 'admin-set-rating', name, authToken, adminToken, targetName: target.name, course, poolId, rating, reason: reason.trim() }, { timeoutMs: AUTH_REQUEST_TIMEOUT_MS })
+      if (!result.ok) throw new Error(result.reason === 'admin-session-required' ? '管理者セッションの期限が切れました。もう一度ログインしてください。' : result.reason === 'pool-forbidden' ? '指定したランキングプールに所属していません。' : 'レートを変更できませんでした。')
+      const nextProfile = { course, poolId, rating: result.rating, answered: result.answered }
+      setTarget((current) => ({ ...current, ratings: [...(current.ratings || []).filter((item) => item.course !== course || item.poolId !== poolId), nextProfile] }))
+      setRating(String(result.rating))
+      setReason('')
+      setConfirming(false)
+      setMessage(`${result.targetName}さんの${poolLabel(poolId)}レートを${Number(result.rating).toLocaleString()}に変更しました。`)
+    } catch (requestError) {
+      setError(requestError.message || 'レート変更に失敗しました。')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return <div className="admin-overlay" role="presentation"><section className="admin-dialog admin-console" role="dialog" aria-modal="true" aria-labelledby="admin-console-title">
+    <button type="button" className="admin-close" aria-label="閉じる" onClick={onClose}>×</button>
+    <p className="section-kicker">GRAMMAR ARENA / ADMIN</p><h2 id="admin-console-title">運営メニュー</h2>
+    <div className="admin-feature-grid"><section className="admin-feature-card"><h3>生徒検索</h3><p>2文字以上で検索できます。表示される情報は運営者のみに限定されています。</p>
+      <form className="admin-search-form" onSubmit={search}><input aria-label="生徒名またはクラス" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="名前・学年・クラス" minLength={2} /><button type="submit" className="primary-button" disabled={busy || query.trim().length < 2}>{busy ? '検索中…' : '検索'}</button></form>
+      {message && <p className="admin-status" role="status">{message}</p>}{error && <p className="admin-error" role="alert">{error}</p>}
+      {students.length > 0 && <div className="admin-student-results" aria-label="検索結果">{students.map((student) => <button type="button" key={student.name} className={`admin-student-result ${target?.name === student.name ? 'selected' : ''}`} onClick={() => chooseStudent(student)}><strong>{student.name}</strong><span>{student.grade ? `${student.grade}年${student.className}組` : 'クラス未登録'}{student.foundationMember ? ' ・ 基礎講座' : ''}</span></button>)}</div>}
+    </section>
+    <section className="admin-feature-card"><h3>レート修正</h3><p>対象プールと講座を確認し、理由を記録して修正します。</p>
+      {!target ? <div className="admin-empty">まず生徒を検索して選択してください。</div> : <div className="admin-rate-form">
+        <div className="admin-target"><strong>{target.name}</strong><span>{target.grade ? `${target.grade}年${target.className}組` : 'クラス未登録'}</span></div>
+        <label>講座<select value={course} onChange={(event) => changeCourse(event.target.value)}><option value="foundation-course">基礎講座</option><option value="regular-english-practice">平常授業</option></select></label>
+        <label>ランキングプール<select value={poolId} onChange={(event) => changePool(event.target.value)}>{(target.pools || []).map((id) => <option key={id} value={id}>{poolLabel(id)}</option>)}</select></label>
+        <div className="admin-current-rate"><span>現在レート</span><strong>{currentRating === '' ? '未記録' : Number(currentRating).toLocaleString()}</strong></div>
+        <label>変更後のレート<input type="number" min="800" max="1000000" step="1" value={rating} onChange={(event) => { setRating(event.target.value); setConfirming(false) }} /></label>
+        <label>修正理由<textarea rows="2" maxLength="240" value={reason} onChange={(event) => { setReason(event.target.value); setConfirming(false) }} placeholder="例：記録漏れの補正" /></label>
+        {confirming && <p className="admin-confirm-note" role="alert">{target.name} / {poolLabel(poolId)}：{currentRating === '' ? '未記録' : Number(currentRating).toLocaleString()} → {Number(rating).toLocaleString()} を確定しますか？</p>}
+        <button type="button" className="primary-button" onClick={saveRating} disabled={busy || !rating || Number(rating) < 800 || Number(rating) > 1000000 || !reason.trim() || !poolId || String(currentRating) === String(rating)}>{busy ? '保存中…' : confirming ? 'この内容で確定' : '変更内容を確認'}</button>
+      </div>}
+    </section></div>
+    <div className="admin-footer"><span>操作は記録されます。学生アカウントからは利用できません。</span><button type="button" className="secondary-button" onClick={onClose}>終了</button></div>
+  </section></div>
+}
+
 function SettingsView({ filter, setFilter, autoExplanation, setAutoExplanation, themeId, setThemeId, hasSession, unlockedThemes }) {
-  const availableThemes = THEME_OPTIONS.filter((theme) => !HIDDEN_THEME_IDS.has(theme.id) || (hasSession && normalizeUnlockedThemes(unlockedThemes).includes(theme.id)))
-  return <div className="simple-view"><div className="section-heading"><div><p className="section-kicker">SETTINGS</p><h1>設定</h1><p className="subcopy">出題レベル、表示方法、テーマを自分の学習スタイルに合わせて変更できます。</p></div></div><div className="settings-grid"><section className="settings-panel"><h2>テーマ変更</h2><p>演習画面の色と雰囲気を切り替えます。解放したテーマはこのアカウントに保存されます。</p><div className="theme-options" role="radiogroup" aria-label="テーマ変更">{availableThemes.map((theme) => <button type="button" role="radio" aria-checked={theme.id === themeId} key={theme.id} className={`theme-option theme-option-${theme.id} ${theme.id === themeId ? 'selected' : ''}`} onClick={() => setThemeId(theme.id)}><span className="theme-preview" aria-hidden="true"><span /></span><span className="theme-option-copy"><strong>{theme.label}</strong><small>{theme.description}</small></span><span className="theme-radio" aria-hidden="true" /></button>)}</div></section><section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? 'Lesson 13〜15・Plus' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section><section className="settings-panel settings-panel-display"><h2>学習の表示</h2><p>解答後の画面の見え方を設定します。</p><label className="toggle-row"><span><strong>解説を自動で表示</strong><small>正誤判定のあとに解説を開きます</small></span><button type="button" className={`toggle ${autoExplanation ? 'on' : ''}`} aria-pressed={autoExplanation} onClick={() => setAutoExplanation(!autoExplanation)}><span /></button></label><div className="rule-note"><Icon name="document" size={19} /><span>正答数に応じてレートが変動し、履歴に保存されます。</span></div></section></div></div>
+  const unlocked = hasSession ? normalizeUnlockedThemes(unlockedThemes) : []
+  const availableThemes = THEME_OPTIONS.filter((theme) => !HIDDEN_THEME_IDS.has(theme.id) || unlocked.includes(theme.id))
+  return <div className="simple-view">
+    <div className="section-heading"><div><p className="section-kicker">SETTINGS</p><h1>設定</h1><p className="subcopy">出題レベル、表示方法、テーマを自分の学習スタイルに合わせて変更できます。</p></div></div>
+    <div className="settings-grid">
+      <section className="settings-panel"><h2>テーマ変更</h2><p>演習画面の色と雰囲気を切り替えます。解放したテーマはこのアカウントに保存されます。</p>
+        <div className="theme-options" role="radiogroup" aria-label="テーマ変更">{availableThemes.map((theme) => <button type="button" role="radio" aria-checked={theme.id === themeId} key={theme.id} className={`theme-option theme-option-${theme.id} ${theme.id === themeId ? 'selected' : ''}`} onClick={() => setThemeId(theme.id)}><span className="theme-preview" aria-hidden="true"><span /></span><span className="theme-option-copy"><strong>{theme.label}</strong><small>{theme.description}</small></span><span className="theme-radio" aria-hidden="true" /></button>)}</div>
+      </section>
+      <section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? 'Lesson 13〜15・Plus' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section>
+      <section className="settings-panel settings-panel-display"><h2>学習の表示</h2><p>解答後の画面の見え方を設定します。</p><label className="toggle-row"><span><strong>解説を自動で表示</strong><small>正誤判定のあとに解説を開きます</small></span><button type="button" className={`toggle ${autoExplanation ? 'on' : ''}`} aria-pressed={autoExplanation} onClick={() => setAutoExplanation(!autoExplanation)}><span /></button></label><div className="rule-note"><Icon name="document" size={19} /><span>正答数に応じてレートが変動し、履歴に保存されます。</span></div></section>
+    </div>
+  </div>
 }
 
 createRoot(document.getElementById('root')).render(<StrictMode><App /></StrictMode>)

@@ -1,10 +1,11 @@
 const COURSE_NAME = 'foundation-course'
 const RATING_MIN = 800
 const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash', 'grade', 'className', 'foundationMember', 'unlockedThemes']
-const THEME_UNLOCKS = ['moon', 'crystallium']
+const THEME_UNLOCKS = ['moon', 'crystallium', 'dignity', 'archive', 'eclipse', 'verdant', 'ember', 'aurora']
 const ANSWER_HEADERS = ['playerKey', 'course', 'questionId', 'correct', 'delta', 'answeredAt', 'answerId']
 const COURSE_PROFILE_HEADERS = ['playerKey', 'course', 'rating', 'answered', 'updatedAt']
 const POOL_PROFILE_HEADERS = ['playerKey', 'course', 'poolId', 'rating', 'answered', 'updatedAt']
+const ADMIN_AUDIT_HEADERS = ['timestamp', 'adminPlayerKey', 'targetPlayerKey', 'action', 'course', 'poolId', 'beforeValue', 'afterValue', 'reason']
 const RATING_POINTS = { starter: 12, standard: 18, advanced: 26 }
 const RATING_LOSS = { starter: 7, standard: 11, advanced: 16 }
 const ALLOWED_COURSES = ['foundation-course', 'regular-english-practice']
@@ -1423,12 +1424,160 @@ function doPost(e) {
     if (action === 'update-profile') return updatePlayerProfile_(params)
     if (action === 'unlock-theme') return unlockTheme_(params)
     if (action === 'answer') return recordAnswer_(params)
+    if (action === 'admin-auth') return adminAuth_(params)
+    if (action === 'admin-search') return adminSearch_(params)
+    if (action === 'admin-set-rating') return adminSetRating_(params)
     return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
   } catch (error) {
     const message = String(error && error.message || error || '')
     const retryable = isTransientBackendError_(message)
     console.error(message)
     return json_({ ok: false, reason: retryable ? 'server-busy' : 'server-error', retryable }, params.callback)
+  }
+}
+
+function adminPasswordHash_(salt, password) {
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(salt) + ':' + String(password), Utilities.Charset.UTF_8)
+  return Utilities.base64EncodeWebSafe(digest)
+}
+
+function adminCacheKey_(token) {
+  return 'admin-session:' + String(token || '')
+}
+
+function adminAuth_(params) {
+  const name = cleanName_(params.name)
+  const playerToken = String(params.authToken || '')
+  const password = String(params.password || '')
+  if (!name || !playerToken || password.length < 8 || password.length > 128) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
+
+  const lock = LockService.getScriptLock()
+  lock.waitLock(10000)
+  try {
+    const { players } = getRuntimeSheets_(getBook_())
+    const auth = authenticate_(players, name, playerToken)
+    if (!auth || auth.playerKey !== keyFor_('おとめ座')) return json_({ ok: false, reason: 'admin-forbidden' }, params.callback)
+
+    const properties = PropertiesService.getScriptProperties()
+    const cache = CacheService.getScriptCache()
+    const attemptsKey = 'admin-attempts:' + auth.playerKey
+    const attempts = Number(cache.get(attemptsKey)) || 0
+    if (attempts >= 5) return json_({ ok: false, reason: 'admin-rate-limited' }, params.callback)
+
+    let salt = properties.getProperty('ADMIN_PASSWORD_SALT')
+    let storedHash = properties.getProperty('ADMIN_PASSWORD_HASH')
+    if (!salt && !storedHash) {
+      salt = Utilities.getUuid()
+      storedHash = adminPasswordHash_(salt, password)
+      properties.setProperties({ ADMIN_PASSWORD_SALT: salt, ADMIN_PASSWORD_HASH: storedHash })
+    } else if (!salt || !storedHash) {
+      return json_({ ok: false, reason: 'admin-not-configured' }, params.callback)
+    } else if (adminPasswordHash_(salt, password) !== storedHash) {
+      cache.put(attemptsKey, String(attempts + 1), 600)
+      return json_({ ok: false, reason: attempts + 1 >= 5 ? 'admin-rate-limited' : 'admin-password-wrong' }, params.callback)
+    }
+
+    cache.remove(attemptsKey)
+    const adminToken = Utilities.getUuid()
+    cache.put(adminCacheKey_(adminToken), JSON.stringify({ playerKey: auth.playerKey, authHash: tokenHashFor_(playerToken, auth.playerKey) }), 900)
+    return json_({ ok: true, adminToken, expiresInSeconds: 900 }, params.callback)
+  } finally {
+    lock.releaseLock()
+  }
+}
+
+function authenticatedAdmin_(players, params) {
+  const name = cleanName_(params.name)
+  const playerToken = String(params.authToken || '')
+  const auth = authenticate_(players, name, playerToken)
+  if (!auth || auth.playerKey !== keyFor_('おとめ座')) return null
+  const cached = CacheService.getScriptCache().get(adminCacheKey_(params.adminToken))
+  if (!cached) return null
+  try {
+    const session = JSON.parse(cached)
+    if (session.playerKey !== auth.playerKey || session.authHash !== tokenHashFor_(playerToken, auth.playerKey)) return null
+    return auth
+  } catch (error) {
+    return null
+  }
+}
+
+function adminSearch_(params) {
+  const book = getBook_()
+  const { players, poolProfiles } = getRuntimeSheets_(book)
+  const admin = authenticatedAdmin_(players, params)
+  if (!admin) return json_({ ok: false, reason: 'admin-session-required', students: [] }, params.callback)
+  const query = String(params.query || '').trim().toLowerCase()
+  if (query.length < 2) return json_({ ok: false, reason: 'query-too-short', students: [] }, params.callback)
+
+  const playerRows = players.getDataRange().getValues().slice(1)
+  const profileRows = poolProfiles.getDataRange().getValues().slice(1)
+  const students = playerRows.filter((row) => row[0] && row[1] && [row[0], row[1], row[7], row[8]].some((value) => String(value || '').toLowerCase().includes(query)))
+    .slice(0, 25)
+    .map((row) => {
+      const playerKey = String(row[0])
+      const ratings = profileRows.filter((profile) => String(profile[0]) === playerKey).map((profile) => ({
+        course: String(profile[1] || ''),
+        poolId: String(profile[2] || ''),
+        rating: Number(profile[3]) || RATING_MIN,
+        answered: Number(profile[4]) || 0,
+      }))
+      return {
+        name: String(row[1]),
+        grade: cleanGrade_(row[7]),
+        className: cleanClassName_(row[8]),
+        foundationMember: String(row[9] || '').toLowerCase() === 'true',
+        pools: playerPools_(row),
+        ratings,
+      }
+    })
+  return json_({ ok: true, students }, params.callback)
+}
+
+function adminAuditSheet_(book) {
+  return book.getSheetByName('AdminAudit') || getOrCreateSheet_(book, 'AdminAudit', ADMIN_AUDIT_HEADERS)
+}
+
+function adminSetRating_(params) {
+  const name = cleanName_(params.name)
+  const targetName = cleanName_(params.targetName)
+  const course = cleanCourse_(params.course)
+  const poolId = cleanPoolId_(params.poolId)
+  const reason = String(params.reason || '').trim().slice(0, 240)
+  const ratingText = String(params.rating || '').trim()
+  const rating = /^\d{1,7}$/.test(ratingText) ? Number(ratingText) : NaN
+  if (!name || !targetName || !course || !poolId || !reason || !Number.isInteger(rating) || rating < RATING_MIN || rating > 1000000) {
+    return json_({ ok: false, reason: 'invalid-input' }, params.callback)
+  }
+
+  const lock = LockService.getScriptLock()
+  lock.waitLock(10000)
+  try {
+    const book = getBook_()
+    const { players, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
+    const admin = authenticatedAdmin_(players, params)
+    if (!admin) return json_({ ok: false, reason: 'admin-session-required' }, params.callback)
+    const rows = players.getDataRange().getValues()
+    const targetKey = keyFor_(targetName)
+    const targetIndex = rows.findIndex((row, index) => index > 0 && String(row[0]) === targetKey)
+    if (targetIndex < 0) return json_({ ok: false, reason: 'student-not-found' }, params.callback)
+    const target = rows[targetIndex]
+    const pools = playerPools_(target)
+    if (!pools.includes(poolId)) return json_({ ok: false, reason: 'pool-forbidden' }, params.callback)
+
+    const profile = ensurePoolProfile_(poolProfiles, courseProfiles, targetKey, course, poolId, Number(target[2]) || RATING_MIN, Number(target[3]) || 0)
+    const before = profile.rating
+    const now = new Date()
+    adminAuditSheet_(book).appendRow([now, admin.playerKey, targetKey, 'rating-set', course, poolId, before, rating, reason])
+    poolProfiles.getRange(profile.sheetRow, 4, 1, 3).setValues([[rating, profile.answered, now]])
+    if (poolId === FOUNDATION_POOL_ID && course === COURSE_NAME) {
+      const legacy = ensureCourseProfile_(courseProfiles, targetKey, course, before, profile.answered)
+      courseProfiles.getRange(legacy.sheetRow, 3, 1, 3).setValues([[rating, profile.answered, now]])
+    }
+    if (poolId === pools[0]) players.getRange(targetIndex + 1, 3, 1, 3).setValues([[rating, profile.answered, now]])
+    return json_({ ok: true, targetName: String(target[1]), course, poolId, before, rating, answered: profile.answered }, params.callback)
+  } finally {
+    lock.releaseLock()
   }
 }
 
@@ -1704,13 +1853,44 @@ function maxPlayerRating_(players, courseProfiles, poolProfiles, playerIndex, pl
   return Math.max(Number(playerRow[2]) || RATING_MIN, ...legacyRatings, ...poolRatings)
 }
 
-function eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey) {
+function eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey, answers) {
   const row = players.getDataRange().getValues()[playerIndex] || []
   const unlocks = themeUnlocksFromRow_(row)
+  if (playerKey === keyFor_('おとめ座')) {
+    THEME_UNLOCKS.forEach((themeId) => { if (!unlocks.includes(themeId)) unlocks.push(themeId) })
+  }
   if (maxPlayerRating_(players, courseProfiles, poolProfiles, playerIndex, playerKey) >= 10000 && !unlocks.includes('crystallium')) {
     unlocks.push('crystallium')
-    players.getRange(playerIndex + 1, 11).setValue(JSON.stringify(unlocks))
   }
+  const answerRows = Array.isArray(answers) ? answers : answers && answers.getDataRange ? answers.getDataRange().getValues() : []
+  const attempts = answerRows.slice(1).filter((answer) => String(answer[0] || '') === playerKey)
+  const questionKey = (answer) => String(answer[1] || '') + '::' + String(answer[2] || '')
+  const isCorrect = (answer) => answer[3] === true || String(answer[3] || '').toLowerCase() === 'true' || Number(answer[3]) === 1
+  const attemptedQuestions = new Set(attempts.map(questionKey))
+  const correctQuestions = new Set(attempts.filter(isCorrect).map(questionKey))
+  const unitsWithCorrectAnswers = new Set(attempts.filter(isCorrect).map((answer) => {
+    const course = String(answer[1] || '')
+    const questionId = String(answer[2] || '')
+    const unit = questionId.replace(/-[^-]+$/, '')
+    return course + '::' + unit
+  }))
+  const recoveredQuestions = new Set()
+  const previouslyMissed = new Set()
+  attempts.forEach((answer) => {
+    const key = questionKey(answer)
+    if (isCorrect(answer)) {
+      if (previouslyMissed.has(key)) recoveredQuestions.add(key)
+    } else {
+      previouslyMissed.add(key)
+    }
+  })
+  const latestTen = attempts.slice(-10)
+  if (attemptedQuestions.size >= 50 && !unlocks.includes('archive')) unlocks.push('archive')
+  if (latestTen.length === 10 && latestTen.every(isCorrect) && !unlocks.includes('eclipse')) unlocks.push('eclipse')
+  if (correctQuestions.size >= 30 && !unlocks.includes('verdant')) unlocks.push('verdant')
+  if (recoveredQuestions.size >= 5 && !unlocks.includes('ember')) unlocks.push('ember')
+  if (correctQuestions.size >= 20 && unitsWithCorrectAnswers.size >= 3 && !unlocks.includes('aurora')) unlocks.push('aurora')
+  if (JSON.stringify(themeUnlocksFromRow_(row)) !== JSON.stringify(unlocks)) players.getRange(playerIndex + 1, 11).setValue(JSON.stringify(unlocks))
   return unlocks
 }
 
@@ -1730,13 +1910,17 @@ function unlockTheme_(params) {
     if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
     const playerRows = players.getDataRange().getValues()
     const row = playerRows[auth.playerIndex] || []
-    const unlocks = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey)
+    const answerRows = answers.getDataRange().getValues()
+    const unlocks = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, answerRows)
     if (themeId === 'crystallium' && !unlocks.includes('crystallium')) return json_({ ok: false, reason: 'rating-threshold', unlockedThemes: unlocks }, params.callback)
+    if (themeId === 'dignity' && !unlocks.includes('dignity') && String(params.pdfSaved || '') !== 'true') return json_({ ok: false, reason: 'pdf-required', unlockedThemes: unlocks }, params.callback)
+    if (themeId === 'moon' && !unlocks.includes('moon') && String(params.secretTapSequence || '') !== 'brand-spaced-4') return json_({ ok: false, reason: 'criteria-not-met', unlockedThemes: unlocks }, params.callback)
+    if (!unlocks.includes(themeId) && themeId !== 'dignity' && themeId !== 'moon') return json_({ ok: false, reason: 'criteria-not-met', unlockedThemes: unlocks }, params.callback)
     if (!unlocks.includes(themeId)) {
       unlocks.push(themeId)
       players.getRange(auth.playerIndex + 1, 11).setValue(JSON.stringify(unlocks))
     }
-    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false }), params.callback)
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false, answerRows }), params.callback)
   } finally {
     lock.releaseLock()
   }
@@ -1746,7 +1930,8 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
   const includePlayers = options.includePlayers !== false
   const includeAnsweredIds = options.includeAnsweredIds !== false
   const row = players.getDataRange().getValues()[playerIndex]
-  const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey)
+  const answerRows = Array.isArray(options.answerRows) ? options.answerRows : answers.getDataRange().getValues()
+  const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey, answerRows)
   const poolIds = playerPools_(row)
   const profiles = poolIds.map((poolId) => ({
     poolId,
@@ -1763,7 +1948,7 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
     name: String(row[1]),
     rating: activeProfile.rating,
     answered: activeProfile.answered,
-    answeredIds: includeAnsweredIds ? answeredIds_(answers, playerKey, course) : [],
+    answeredIds: includeAnsweredIds ? answeredIds_(answers, playerKey, course, answerRows) : [],
     authToken: token,
     grade: cleanGrade_(row[7]),
     className: cleanClassName_(row[8]),
@@ -1899,7 +2084,7 @@ function recordAnswer_(params) {
     })
     // A retry may follow a lost response. Return the authoritative rating without scoring twice.
     if (duplicate) {
-      const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey)
+      const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey, rows)
       return json_({ ok: false, reason: 'already-answered', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles), unlockedThemes }, params.callback)
     }
     // New clients send the answer text. Older queued answers only have the
@@ -1910,7 +2095,9 @@ function recordAnswer_(params) {
       ? (correct ? RATING_POINTS[question.difficulty] : -RATING_LOSS[question.difficulty])
       : Math.max(-50, Math.min(50, Number(params.delta || 0)))
     const now = new Date()
-    answers.appendRow([playerKey, course, questionId, correct, safeDelta, now, answerId])
+    const savedAnswer = [playerKey, course, questionId, correct, safeDelta, now, answerId]
+    answers.appendRow(savedAnswer)
+    rows.push(savedAnswer)
     const updatedProfiles = profiles.map((profile) => {
       const rating = Math.max(RATING_MIN, profile.rating + safeDelta)
       poolProfiles.getRange(profile.sheetRow, 4, 1, 3).setValues([[rating, profile.answered + 1, now]])
@@ -1924,7 +2111,7 @@ function recordAnswer_(params) {
     players.getRange(playerIndex + 1, 3, 1, 2).setValues([[primaryProfile.rating, primaryProfile.answered]])
     players.getRange(playerIndex + 1, 5).setValue(now)
     const activeUpdated = updatedProfiles.find((profile) => profile.poolId === activePool) || primaryProfile
-    const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey)
+    const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey, rows)
     const result = { ok: true, rating: activeUpdated.rating, delta: safeDelta, correct, serverValidated, poolId: activePool, ratings: ratingsFromProfiles_(updatedProfiles), unlockedThemes }
     if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, poolProfiles, course, activePool, playerKey)
     return json_(result, params.callback)
@@ -2082,8 +2269,9 @@ function digest_(value) {
     .join('')
 }
 
-function answeredIds_(sheet, playerKey, course) {
-  return sheet.getDataRange().getValues().slice(1)
+function answeredIds_(sheet, playerKey, course, answerRows) {
+  const rows = Array.isArray(answerRows) ? answerRows : sheet.getDataRange().getValues()
+  return rows.slice(1)
     .filter((row) => row[0] === playerKey && rankingCourses_(course).includes(String(row[1])) && row[2])
     .map((row) => String(row[2]))
 }
