@@ -12,6 +12,7 @@ import { isModerationBlocked, MODERATION_NOTICE } from './contentModeration'
 import { buildRatingChartModel, projectSessionRating } from './ratingHistory'
 import { AUTH_REQUEST_TIMEOUT_MS, requestAuthWithRetry } from './authRetry'
 import { isSameRequestScope } from './requestScope'
+import { getLeaderboardRefreshDelay } from './leaderboardRefresh'
 import {
   ANSWER_SYNC_MAX_ATTEMPTS,
   ANSWER_SYNC_TIMEOUT_MS,
@@ -1080,10 +1081,19 @@ function App() {
 
   useEffect(() => {
     if (!SCORE_API_URL || !hasSession || view !== 'leaderboard') return undefined
-    const timer = window.setInterval(() => {
-      if (!document.hidden) void refreshLeaderboard()
-    }, 20000)
-    return () => window.clearInterval(timer)
+    let timer = null
+    let cancelled = false
+    const scheduleRefresh = () => {
+      timer = window.setTimeout(async () => {
+        if (!document.hidden) await refreshLeaderboard()
+        if (!cancelled) scheduleRefresh()
+      }, getLeaderboardRefreshDelay())
+    }
+    scheduleRefresh()
+    return () => {
+      cancelled = true
+      if (timer !== null) window.clearTimeout(timer)
+    }
   }, [view, modeId, rankingPoolId, hasSession, persisted.studentName, persisted.authToken])
 
   useEffect(() => {
