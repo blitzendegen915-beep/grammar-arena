@@ -45,6 +45,29 @@ test('平常授業バンクは出題に必要な正答を持つ', () => {
   }
 })
 
+test('日本語から英文を作る空欄なし問題は訳す対象を一文に限定する', () => {
+  const translationInputs = REGULAR_QUESTIONS.filter((question) =>
+    question.type === 'input'
+    && question.blankCount === 0
+    && !question.translation
+    && /[ぁ-んァ-ン一-龯]/.test(question.sentence || ''),
+  )
+
+  for (const question of translationInputs) {
+    assert.doesNotMatch(question.sentence, /[。！？]\s*\S/, question.id)
+  }
+})
+
+test('reg15-16 は英語のリード文と日本語の解答対象を分ける', () => {
+  const question = REGULAR_QUESTIONS.find(({ id }) => id === 'reg15-16')
+
+  assert.equal(question.topic, '使役動詞')
+  assert.equal(question.sentence, 'Why didn’t you come to the party yesterday?')
+  assert.equal(question.translation, 'お父さんが私に宿題をさせたんだ。')
+  assert.equal(question.answer, 'My father made me do my homework.')
+  assert.deepEqual(question.accepted, [question.answer])
+})
+
 test('訳問題は正答を選択肢として明示する', () => {
   const question = REGULAR_QUESTIONS.find(({ id }) => id === 'reg27-29')
   assert.equal(question.answer, '彼女は昨夜とても忙しかったのかもしれない。')

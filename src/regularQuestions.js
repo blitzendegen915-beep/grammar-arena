@@ -118,7 +118,7 @@ export const REGULAR_QUESTIONS = [
   reorder('reg15-13', 'Lesson 15', '完了形の不定詞', 'advanced', '私は彼らのリーダーに選ばれて運がよかった。', ['I', 'was', 'lucky', 'to', 'have', 'been', 'chosen', 'as', 'their', 'leader.'], 'I was lucky to have been chosen as their leader.', 'to have been + 過去分詞は、主語が過去に受けた出来事を表します。選ばれたのは lucky と感じた時点より前です。'),
   reorder('reg15-14', 'Lesson 15', '不定詞の受動態', 'advanced', '私はそのパーティーに招待されなくて悲しかった。', ['I', 'was', 'sad', 'not', 'to', 'have', 'been', 'invited', 'to', 'the', 'party.'], 'I was sad not to have been invited to the party.', 'not to have been + 過去分詞で、過去に招待されなかったことを表します。not は完了受動の不定詞全体を否定します。'),
   reorder('reg15-15', 'Lesson 15', '進行形の不定詞', 'standard', 'シンジは今、公園でサッカーをしているようだ。', ['Shinji', 'seems', 'to', 'be', 'playing', 'soccer', 'in', 'the', 'park', 'now.'], 'Shinji seems to be playing soccer in the park now.', 'seem to be doing は、推量する時点で進行中の動作を表します。now が「今している」ことを示す手がかりです。'),
-  fill('reg15-16', 'Lesson 15', '知覚動詞', 'standard', 'なぜ昨日パーティーに来なかったの？ お父さんが私に宿題をさせたんだ。', 'My father made me do my homework.', 'make + O + 動詞の原形は、人に何かをさせる形です。宿題をするのは me で、能動形の make の後ろには to を付けません。', '', ['My father made me do my homework.', 'My father made me study.']),
+  fill('reg15-16', 'Lesson 15', '使役動詞', 'standard', 'Why didn’t you come to the party yesterday?', 'My father made me do my homework.', 'Why didn’t you come to the party yesterday? は場面を示すリード文で、訳す対象ではありません。答えるのは「お父さんが私に宿題をさせたんだ」の部分です。make + O + 動詞の原形は「Oに〜させる」の形で、宿題をするのは me なので do を使います。', 'お父さんが私に宿題をさせたんだ。'),
 
   // Plus: 不定詞
   translateChoice('regplus-01', 'Plus', '不定詞・独立不定詞', 'advanced', 'We happened to know each other.', '私たちはたまたま知り合った。', 'happen to + 動詞の原形は、偶然そうなることを表します。ここでは互いを知っていたことが意図的でない点に合います。', ['私たちはたまたま知り合った。', '私たちはお互いを知ろうと努力した。', '私たちは以前からお互いを知っていた。', '私たちはたまたまお互いを避けた。']),
