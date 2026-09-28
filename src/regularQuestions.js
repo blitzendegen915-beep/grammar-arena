@@ -19,11 +19,11 @@ const make = (id, lesson, topic, difficulty, type, data) => ({
 })
 
 const choice = (id, lesson, topic, difficulty, sentence, choices, answer, explanation, japanese = '') => make(id, lesson, topic, difficulty, 'choice', { sentence, choices, answer, answerLabel: answer, explanation, japanese, translation: japanese })
-const fill = (id, lesson, topic, difficulty, sentence, answer, explanation, japanese = '', accepted = [answer]) => make(id, lesson, topic, difficulty, 'input', {
+const fill = (id, lesson, topic, difficulty, sentence, answer, explanation, japanese = '', accepted = [answer], answerLabel = answer) => make(id, lesson, topic, difficulty, 'input', {
   sentence,
   answer,
   accepted,
-  answerLabel: answer,
+  answerLabel,
   explanation,
   translation: japanese,
   ...(countSentenceBlanks(sentence) === 0 ? { prompt: '日本語に合う英文を入力しなさい。' } : {}),
@@ -193,7 +193,7 @@ export const REGULAR_QUESTIONS = [
   fill('regopt7-02', 'Option 7', 'at / in / on', 'starter', 'This library closes (　　　) 9 o\'clock.', 'at', 'at は時刻の一点に使います。9 o\'clock は閉館する正確な時刻です。', 'この図書館は9時に閉まります。'),
   fill('regopt7-03', 'Option 7', 'at / in / on', 'starter', 'My sister was born (　　　) July 20th.', 'on', 'on は特定の日付に使います。July 20th は誕生日の日を具体的に示しています。', '私の姉（妹）は7月20日に生まれました。'),
   fill('regopt7-04', 'Option 7', 'at / in / on', 'starter', 'Sarah and Tom are going to get married (　　　) June.', 'in', 'in は月のような幅のある期間に使います。June は結婚する月で、特定の日なら on を使います。', 'サラとトムは6月に結婚する予定です。'),
-  fill('regopt7-05', 'Option 7', 'at / in / on', 'starter', 'I put up a new clock (　　　) the wall (　　　) my room.', 'on ... in', '壁の表面に掛けるので on the wall、部屋の内側を示すので in my room です。接触面と空間の違いで前置詞を選びます。', '私は部屋の壁に新しい時計を掛けました。', ['on ... in', 'on the wall in']),
+  fill('regopt7-05', 'Option 7', 'at / in / on', 'starter', 'I put up a new clock (　　　) the wall (　　　) my room.', 'on in', '壁の表面に掛けるので on the wall、部屋の内側を示すので in my room です。接触面と空間の違いで前置詞を選びます。', '私は部屋の壁に新しい時計を掛けました。', ['on in'], 'on ... in'),
   choice('regopt7-06', 'Option 7', 'from / to / for', 'starter', 'The restaurant is open [from / to] 11 a.m. [from / to] 11 p.m.', ['from ... to', 'to ... from'], 'from ... to', '営業時間の始まりから終わりまでを示すので from A to B の語順です。11 a.m. が開始、11 p.m. が終了時刻です。'),
   choice('regopt7-07', 'Option 7', 'from / to / for', 'starter', 'I visited my grandparents [during / for] the winter vacation.', ['during', 'for'], 'during', 'during は冬休みという特定の期間の「その間に」を表します。the winter vacation のように期間名が続く形です。'),
   choice('regopt7-08', 'Option 7', 'from / to / for', 'starter', 'I stayed in Hong Kong [in / for] a week.', ['in', 'for'], 'for', 'for は a week のような期間の長さを示します。滞在が一週間続いた文で、in a week なら通常「一週間後に」です。'),

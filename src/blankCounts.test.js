@@ -54,6 +54,42 @@ test('each cloze has a correct answer that fits one word per input', () => {
   }
 })
 
+test('cloze answers match the exact text produced by joining the visible input fields', () => {
+  const banks = [...FOUNDATION_QUESTIONS, ...GERUND_QUESTIONS, ...PARTICIPLE_QUESTIONS, ...REGULAR_QUESTIONS]
+  const normalizeAnswer = (value) => String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[’']/g, "'")
+    .replace(/[。．,，!！?？]/g, '')
+    .replace(/\s+/g, ' ')
+    .replace(/[.,!?。、「」]/g, '')
+
+  for (const question of banks.filter((item) => item.type === 'input' && item.blankCount > 0)) {
+    const answerFromFields = String(question.answer).replace(/\.{3}|…/g, ' ').replace(/\s+/g, ' ').trim()
+    const accepted = question.accepted?.length ? question.accepted : [question.answer]
+    assert.ok(accepted.some((answer) => normalizeAnswer(answer) === normalizeAnswer(answerFromFields)), `${question.id}: ${answerFromFields}`)
+  }
+})
+
+test('reorder answer uses every displayed word exactly once', () => {
+  const banks = [...FOUNDATION_QUESTIONS, ...GERUND_QUESTIONS, ...PARTICIPLE_QUESTIONS, ...REGULAR_QUESTIONS]
+  const sortWords = (words) => words.map((word) => word.toLowerCase()).sort()
+
+  for (const question of banks.filter((item) => item.type === 'reorder')) {
+    assert.deepEqual(sortWords(question.answer.trim().split(/\s+/)), sortWords(question.words), question.id)
+  }
+})
+
+test('choice questions have distinct choices and include their keyed answer', () => {
+  const banks = [...FOUNDATION_QUESTIONS, ...GERUND_QUESTIONS, ...PARTICIPLE_QUESTIONS, ...REGULAR_QUESTIONS]
+
+  for (const question of banks.filter((item) => item.type === 'choice')) {
+    assert.ok(question.choices.length >= 2, question.id)
+    assert.equal(new Set(question.choices).size, question.choices.length, question.id)
+    assert.ok(question.choices.includes(question.answer), question.id)
+  }
+})
+
 test('input questions render one input field per visible blank', () => {
   const inputQuestions = [...FOUNDATION_QUESTIONS, ...GERUND_QUESTIONS, ...PARTICIPLE_QUESTIONS, ...REGULAR_QUESTIONS]
     .filter((question) => question.type === 'input')
