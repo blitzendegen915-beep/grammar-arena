@@ -366,8 +366,7 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice",
     "difficulty": "starter",
     "accepted": [
-      "Do have to",
-      "Do I have to"
+      "Do have to"
     ]
   },
   "reg27-11": {
@@ -423,7 +422,7 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice",
     "difficulty": "starter",
     "accepted": [
-      "May"
+      "Will"
     ]
   },
   "reg27-19": {
@@ -602,8 +601,7 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice",
     "difficulty": "starter",
     "accepted": [
-      "to live in",
-      "to live in it"
+      "to live in"
     ]
   },
   "reg13-09": {
@@ -1052,8 +1050,7 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice",
     "difficulty": "advanced",
     "accepted": [
-      "being compared",
-      "being compared with"
+      "being compared"
     ]
   },
   "reg16-12": {

@@ -25,3 +25,25 @@ test('every regular frontend question is registered with all of its accepted ans
     }
   }
 })
+
+test('backend excludes known answer variants that duplicate displayed words or break the sentence', () => {
+  const invalidVariants = {
+    'reg13-08': 'to live in it',
+    'reg16-11': 'being compared with',
+    'reg27-10': 'Do I have to',
+  }
+
+  for (const [questionId, invalidAnswer] of Object.entries(invalidVariants)) {
+    const accepted = (QUESTION_REGISTRY[questionId].accepted || []).map(normalizeAnswer)
+    assert.equal(accepted.includes(normalizeAnswer(invalidAnswer)), false, questionId)
+  }
+})
+
+test('the grammatical gerund alternative for regopt4-02 remains accepted by both app and backend', () => {
+  const frontendQuestion = REGULAR_QUESTIONS.find(({ id }) => id === 'regopt4-02')
+  const backendQuestion = QUESTION_REGISTRY['regopt4-02']
+
+  assert.ok(frontendQuestion.accepted.includes('your accepting'))
+  assert.ok((backendQuestion.accepted || []).map(normalizeAnswer).includes('your accepting'))
+  assert.match(frontendQuestion.explanation, /your accepting of my invitation/)
+})

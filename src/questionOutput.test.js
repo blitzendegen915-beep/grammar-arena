@@ -5,7 +5,7 @@ import { REGULAR_QUESTIONS } from './regularQuestions.js'
 test('so as to input question renders only the cloze sentence', () => {
   const question = REGULAR_QUESTIONS.find(({ id }) => id === 'regplus-09')
 
-  assert.equal(question.sentence, 'The man was so kind as (　　　) (　　　) me the way.')
+  assert.equal(question.sentence, 'The man was so kind as (　　　) (　　　) me the way to the station.')
   assert.equal(question.blankCount, 2)
   assert.equal((question.sentence.match(/The man was so kind as/g) || []).length, 1)
 })
