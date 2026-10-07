@@ -3,7 +3,10 @@ const cache = new Map()
 const loaders = {
   'foundation-gerund': () => import('./questionBanks.js').then(({ GERUND_QUESTIONS }) => GERUND_QUESTIONS),
   'foundation-participles': () => import('./questionBanks.js').then(({ PARTICIPLE_QUESTIONS }) => PARTICIPLE_QUESTIONS),
-  'regular-english-practice': () => import('./regularQuestions.js').then(({ REGULAR_QUESTIONS }) => REGULAR_QUESTIONS),
+  'regular-english-practice': () => Promise.all([
+    import('./regularQuestions.js'),
+    import('./workbookQuestionData.js'),
+  ]).then(([{ REGULAR_QUESTIONS }, { WORKBOOK_QUESTIONS }]) => [...REGULAR_QUESTIONS, ...WORKBOOK_QUESTIONS]),
 }
 
 export function loadQuestionBank(modeId, foundationQuestions = []) {

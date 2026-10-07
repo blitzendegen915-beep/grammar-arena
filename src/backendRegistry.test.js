@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import { REGULAR_QUESTIONS } from './regularQuestions.js'
+import { WORKBOOK_QUESTIONS } from './workbookQuestionData.js'
 
 const backendSource = fs.readFileSync(new URL('../backend/Code.gs', import.meta.url), 'utf8')
 const marker = 'const QUESTION_REGISTRY = '
@@ -14,10 +15,13 @@ function normalizeAnswer(value = '') {
 }
 
 test('every regular frontend question is registered with all of its accepted answers', () => {
-  for (const question of REGULAR_QUESTIONS) {
+  assert.equal(Object.keys(QUESTION_REGISTRY).filter((id) => id.startsWith('workbook-')).length, WORKBOOK_QUESTIONS.length)
+
+  for (const question of [...REGULAR_QUESTIONS, ...WORKBOOK_QUESTIONS]) {
     const backendQuestion = QUESTION_REGISTRY[question.id]
     assert.ok(backendQuestion, `${question.id} is missing from backend/Code.gs`)
     assert.equal(backendQuestion.course, 'regular-english-practice', `${question.id} has the wrong course`)
+    assert.equal(backendQuestion.difficulty, question.difficulty, `${question.id} has the wrong difficulty`)
     const expected = question.accepted?.length ? question.accepted : [question.answer]
     const actual = (backendQuestion.accepted || []).map(normalizeAnswer)
     for (const answer of expected) {

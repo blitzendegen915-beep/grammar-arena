@@ -1403,6 +1403,1571 @@ const QUESTION_REGISTRY = {
       "by"
     ]
   }
+  // WORKBOOK_QUESTION_REGISTRY_START
+  ,
+  "workbook-l13-s1-1-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "It to learn"
+    ]
+  },
+  "workbook-l13-s1-1-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "it to"
+    ]
+  },
+  "workbook-l13-s1-1-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "is to win"
+    ]
+  },
+  "workbook-l13-s1-1-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "hopes to have",
+      "wants to have"
+    ]
+  },
+  "workbook-l13-s1-1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to leave"
+    ]
+  },
+  "workbook-l13-s1-1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to swim"
+    ]
+  },
+  "workbook-l13-s1-1-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "To study"
+    ]
+  },
+  "workbook-l13-s1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "something to give"
+    ]
+  },
+  "workbook-l13-s1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "student to arrive"
+    ]
+  },
+  "workbook-l13-s1-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "chance to talk",
+      "opportunity to talk",
+      "chance to speak"
+    ]
+  },
+  "workbook-l13-s1-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to play soccer with",
+      "to play football with"
+    ]
+  },
+  "workbook-l13-s2-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "私は数学を教えてくれる家庭教師が必要だ。",
+      "数学を教えてもらうための家庭教師が必要だ。"
+    ]
+  },
+  "workbook-l13-s2-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "今日はやらなければならない仕事がたくさんある。",
+      "今日はするべき仕事がたくさんある。"
+    ]
+  },
+  "workbook-l13-s2-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "成功の鍵は一生懸命練習することだ。",
+      "成功するには、熱心に練習することが大切だ。"
+    ]
+  },
+  "workbook-l13-s2-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "話の全体を知るのは難しい。",
+      "全体の事情を知ることは難しい。"
+    ]
+  },
+  "workbook-l13-s2-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Our plan is to leave Osaka in the morning"
+    ]
+  },
+  "workbook-l13-s2-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "not easy to get a degree in physics"
+    ]
+  },
+  "workbook-l13-s2-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "My dream is to become a doctor like Dr. Kato"
+    ]
+  },
+  "workbook-l13-s2-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "We agreed to discuss the matter again next week"
+    ]
+  },
+  "workbook-l13-s2-2-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "I think it a good idea to ask him for advice"
+    ]
+  },
+  "workbook-l13-s2-2-6": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "are looking for a big tree to sleep under"
+    ]
+  },
+  "workbook-l13-s2-2-7": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "music has the power to change the world"
+    ]
+  },
+  "workbook-l13-s2-3-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "it easy to master that skill"
+    ]
+  },
+  "workbook-l13-s2-3-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "time to close the store",
+      "time to close the shop"
+    ]
+  },
+  "workbook-l13-s2-3-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "is dangerous to use a smartphone"
+    ]
+  },
+  "workbook-l14-s1-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "私は叔父を見送るために空港へ行った。",
+      "叔父を見送りに空港へ行った。"
+    ]
+  },
+  "workbook-l14-s1-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "彼女は目を覚ますと、自分が病院にいることに気づいた。",
+      "目覚めたところ、自分が病院にいるとわかった。"
+    ]
+  },
+  "workbook-l14-s1-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "私がそこにいたと知って、彼は驚いた。",
+      "私がそこにいると知り、彼は驚いた。"
+    ]
+  },
+  "workbook-l14-s1-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "私のために誕生日ケーキを作ってくれるとは、彼女は親切だった。",
+      "彼女は私に誕生日ケーキを作ってくれるほど親切だった。"
+    ]
+  },
+  "workbook-l14-s1-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "間違った電車に乗るなんて、あなたは不注意だった。",
+      "あなたが間違った電車に乗ったのは不注意だった。"
+    ]
+  },
+  "workbook-l14-s1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I would like you to explain"
+    ]
+  },
+  "workbook-l14-s1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "The doctor advised me to stay"
+    ]
+  },
+  "workbook-l14-s1-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "This train enables us to get to"
+    ]
+  },
+  "workbook-l14-s1-3-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "It may be possible for him to lift this big box."
+    ]
+  },
+  "workbook-l14-s1-3-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "It is easy for Katie to get along with everyone."
+    ]
+  },
+  "workbook-l14-s1-3-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "It was brave of you to tell her the truth."
+    ]
+  },
+  "workbook-l14-s1-4-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "not to make careless mistakes"
+    ]
+  },
+  "workbook-l14-s1-4-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "never to spend a lot of money"
+    ]
+  },
+  "workbook-l14-s2-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "He was disappointed not to get the job."
+    ]
+  },
+  "workbook-l14-s2-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "arrived there to find that he had already left"
+    ]
+  },
+  "workbook-l14-s2-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "It was wise of him to refuse the offer."
+    ]
+  },
+  "workbook-l14-s2-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I was born to make you happy."
+    ]
+  },
+  "workbook-l14-s2-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "My parents didn’t allow me to work"
+    ]
+  },
+  "workbook-l14-s2-1-6": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "warned everyone not to go out at night"
+    ]
+  },
+  "workbook-l14-s2-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "My dog lived to be twenty years old.",
+      "My dog lived to be 20."
+    ]
+  },
+  "workbook-l14-s2-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "My father always tells me to practice tennis."
+    ]
+  },
+  "workbook-l14-s2-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "It is important to eat healthy food.",
+      "It’s important to eat healthy food."
+    ]
+  },
+  "workbook-l14-s2-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "My mother wants me to clean up my room."
+    ]
+  },
+  "workbook-l15-s1-1-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "introduce"
+    ]
+  },
+  "workbook-l15-s1-1-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "to be"
+    ]
+  },
+  "workbook-l15-s1-1-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "made"
+    ]
+  },
+  "workbook-l15-s1-1-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "call"
+    ]
+  },
+  "workbook-l15-s1-1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "felt touch",
+      "felt touching"
+    ]
+  },
+  "workbook-l15-s1-1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "had cut"
+    ]
+  },
+  "workbook-l15-s1-1-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "made change"
+    ]
+  },
+  "workbook-l15-s1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "seems to",
+      "appears to"
+    ]
+  },
+  "workbook-l15-s1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "It made"
+    ]
+  },
+  "workbook-l15-s1-3-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "to have passed"
+    ]
+  },
+  "workbook-l15-s1-3-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "be raining"
+    ]
+  },
+  "workbook-l15-s1-3-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "to have eaten"
+    ]
+  },
+  "workbook-l15-s1-3-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "to be invited"
+    ]
+  },
+  "workbook-l15-s2-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "The train schedule seemed to have returned to"
+    ]
+  },
+  "workbook-l15-s2-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "My mother made me clean the bathroom."
+    ]
+  },
+  "workbook-l15-s2-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "My dog appears to be sleeping on"
+    ]
+  },
+  "workbook-l15-s2-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "Haruki seems to have been brought up"
+    ]
+  },
+  "workbook-l15-s2-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "I didn’t notice them enter the room."
+    ]
+  },
+  "workbook-l15-s2-1-6": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "They appeared to understand what was"
+    ]
+  },
+  "workbook-l15-s2-1-7": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "Everyone watched the last runner cross the goal line."
+    ]
+  },
+  "workbook-l15-s2-1-8": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "They were made to wait outside"
+    ]
+  },
+  "workbook-l15-s2-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "have a carpenter repair"
+    ]
+  },
+  "workbook-l15-s2-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "was heard to criticize her",
+      "was heard criticizing her"
+    ]
+  },
+  "workbook-l15-s2-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "seems to be waiting for someone"
+    ]
+  },
+  "workbook-l15-s2-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "want to be called Nicky",
+      "would like to be called Nicky"
+    ]
+  },
+  "workbook-plus-s1-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "アリスはパーティーで彼にまた偶然会った。",
+      "パーティーで、アリスは彼に再び偶然出会った。"
+    ]
+  },
+  "workbook-plus-s1-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "今日は夕食前に帰宅することになっている。",
+      "今日は夕食前に帰ってきなさい。"
+    ]
+  },
+  "workbook-plus-s1-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "コンサートは午後6時に始まる予定だ。",
+      "コンサートは午後6時に始まることになっている。"
+    ]
+  },
+  "workbook-plus-s1-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "通りには誰も見当たらなかった。",
+      "通りには誰の姿も見えなかった。"
+    ]
+  },
+  "workbook-plus-s1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "was difficult to",
+      "was hard to"
+    ]
+  },
+  "workbook-plus-s1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "too to"
+    ]
+  },
+  "workbook-plus-s1-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "old enough to"
+    ]
+  },
+  "workbook-plus-s1-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "what to buy"
+    ]
+  },
+  "workbook-plus-s1-2-5": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "so to learn",
+      "so to study"
+    ]
+  },
+  "workbook-plus-s1-2-6": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "so as to"
+    ]
+  },
+  "workbook-plus-s1-3-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "まず第一に",
+      "まず初めに"
+    ]
+  },
+  "workbook-plus-s1-3-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "不思議なことに",
+      "奇妙なことに"
+    ]
+  },
+  "workbook-plus-s1-3-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "実を言うと",
+      "本当のことを言うと"
+    ]
+  },
+  "workbook-plus-s1-3-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "そうするように言った",
+      "ジムに助けを求めるように言った"
+    ]
+  },
+  "workbook-plus-s2-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "to be"
+    ]
+  },
+  "workbook-plus-s2-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "enough to"
+    ]
+  },
+  "workbook-plus-s2-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "order to"
+    ]
+  },
+  "workbook-plus-s2-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "easy to"
+    ]
+  },
+  "workbook-plus-s2-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "too to"
+    ]
+  },
+  "workbook-plus-s2-1-6": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "enough to"
+    ]
+  },
+  "workbook-plus-s2-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "My brother doesn’t know how to ride a bike."
+    ]
+  },
+  "workbook-plus-s2-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "I kept silent so as not to wake her up.",
+      "So as not to wake her up, I kept silent."
+    ]
+  },
+  "workbook-plus-s2-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "We are to hand in the report on Friday."
+    ]
+  },
+  "workbook-plus-s2-3-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "is too hot for me to eat"
+    ]
+  },
+  "workbook-plus-s2-3-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "are always difficult to answer"
+    ]
+  },
+  "workbook-plus-s2-3-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "kind enough to tell me the way to the station",
+      "kind enough to show me the way to the station"
+    ]
+  },
+  "workbook-l16-s1-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Riding"
+    ]
+  },
+  "workbook-l16-s1-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "watching"
+    ]
+  },
+  "workbook-l16-s1-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "laughing"
+    ]
+  },
+  "workbook-l16-s1-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "swimming"
+    ]
+  },
+  "workbook-l16-s1-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "repairing",
+      "to be repaired"
+    ]
+  },
+  "workbook-l16-s1-1-6": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "playing"
+    ]
+  },
+  "workbook-l16-s1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Do you mind my asking"
+    ]
+  },
+  "workbook-l16-s1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "I don’t like Billy’s talking to me"
+    ]
+  },
+  "workbook-l16-s1-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "I can’t imagine living without movies"
+    ]
+  },
+  "workbook-l16-s1-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "for not writing back to you sooner"
+    ]
+  },
+  "workbook-l16-s1-3-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "being asked"
+    ]
+  },
+  "workbook-l16-s1-3-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "being criticized"
+    ]
+  },
+  "workbook-l16-s1-3-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "having climbed",
+      "climbing"
+    ]
+  },
+  "workbook-l16-s1-3-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "having broken",
+      "breaking"
+    ]
+  },
+  "workbook-l16-s1-3-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "being hit"
+    ]
+  },
+  "workbook-l16-s2-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "決してあきらめないことはとても大切です。",
+      "決してあきらめないことが非常に重要です。"
+    ]
+  },
+  "workbook-l16-s2-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "両親は犬を飼わないと言い張っています。",
+      "両親は犬を飼わないことにこだわっています。"
+    ]
+  },
+  "workbook-l16-s2-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "彼と話すのは時間の無駄でした。",
+      "彼と話したのは時間の無駄だった。"
+    ]
+  },
+  "workbook-l16-s2-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Turn off the lights before leaving"
+    ]
+  },
+  "workbook-l16-s2-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "with the proposal being changed"
+    ]
+  },
+  "workbook-l16-s2-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "her not being able to catch"
+    ]
+  },
+  "workbook-l16-s2-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "We are disappointed at having lost the game"
+    ]
+  },
+  "workbook-l16-s2-2-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "Finding out the truth will be difficult"
+    ]
+  },
+  "workbook-l16-s2-3-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "having parties",
+      "having a party"
+    ]
+  },
+  "workbook-l16-s2-3-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "his coming to the party",
+      "him coming to the party"
+    ]
+  },
+  "workbook-l16-s2-3-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "is running ten kilometers in the morning",
+      "is running ten kilometres in the morning"
+    ]
+  },
+  "workbook-l16-s2-3-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "My grandmother enjoys swimming"
+    ]
+  },
+  "workbook-l16-s2-3-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "I don’t like being told"
+    ]
+  },
+  "workbook-l17-s1-1-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "forward to reading"
+    ]
+  },
+  "workbook-l17-s1-1-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "is no telling",
+      "is no knowing"
+    ]
+  },
+  "workbook-l17-s1-1-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "mind helping",
+      "please help"
+    ]
+  },
+  "workbook-l17-s1-1-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "about going"
+    ]
+  },
+  "workbook-l17-s1-1-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "no use asking",
+      "no good asking"
+    ]
+  },
+  "workbook-l17-s1-1-1-6": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "kept from going",
+      "prevented from going",
+      "stopped from going"
+    ]
+  },
+  "workbook-l17-s1-1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "accustomed",
+      "used"
+    ]
+  },
+  "workbook-l17-s1-1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "about having",
+      "about eating"
+    ]
+  },
+  "workbook-l17-s1-1-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "like going"
+    ]
+  },
+  "workbook-l17-s1-2-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "driving",
+      "traveling",
+      "travelling"
+    ]
+  },
+  "workbook-l17-s1-2-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "traveling",
+      "travelling",
+      "driving"
+    ]
+  },
+  "workbook-l17-s1-2-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "to accept"
+    ]
+  },
+  "workbook-l17-s1-2-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "to buy"
+    ]
+  },
+  "workbook-l17-s1-2-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "訪れたことを覚えていますか",
+      "訪れたのを覚えていますか"
+    ]
+  },
+  "workbook-l17-s1-2-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "料理を注文しすぎたことを後悔しました",
+      "料理を頼みすぎたのを残念に思いました"
+    ]
+  },
+  "workbook-l17-s1-2-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "満足させようとしています",
+      "満足させるよう努めています"
+    ]
+  },
+  "workbook-l17-s1-2-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "私に電話をするのを忘れないでください",
+      "私に電話することを忘れないでね"
+    ]
+  },
+  "workbook-l17-s2-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "It’s no good expecting financial support"
+    ]
+  },
+  "workbook-l17-s2-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I don’t feel like playing video games"
+    ]
+  },
+  "workbook-l17-s2-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "There is no telling what she will say"
+    ]
+  },
+  "workbook-l17-s2-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I’m not used to living in big cities"
+    ]
+  },
+  "workbook-l17-s2-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "kept me from going on the ski trip"
+    ]
+  },
+  "workbook-l17-s2-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "forget meeting that singer",
+      "forget having met that singer"
+    ]
+  },
+  "workbook-l17-s2-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "Please remember to send her",
+      "Remember to send her"
+    ]
+  },
+  "workbook-l17-s2-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "We wish to reserve a room at a hotel",
+      "We wish to reserve a hotel room",
+      "We wish to reserve a room in a hotel"
+    ]
+  },
+  "workbook-l17-s2-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "Can you imagine living in"
+    ]
+  },
+  "workbook-l17-s2-2-5": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "likes reading mystery novels",
+      "likes to read mystery novels"
+    ]
+  },
+  "workbook-l17-s2-2-6": {
+    "course": "regular-english-practice",
+    "difficulty": "standard",
+    "accepted": [
+      "I tried skiing"
+    ]
+  },
+  "workbook-o4-s1-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "arrival"
+    ]
+  },
+  "workbook-o4-s1-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "silence"
+    ]
+  },
+  "workbook-o4-s1-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "help",
+      "assistance"
+    ]
+  },
+  "workbook-o4-s1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "good speaker"
+    ]
+  },
+  "workbook-o4-s1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "decision"
+    ]
+  },
+  "workbook-o4-s1-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "have look"
+    ]
+  },
+  "workbook-o4-s1-3-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "台風のせいで、私たちは山でのハイキングをやめた。",
+      "台風によって、私たちは山でハイキングを中止した。"
+    ]
+  },
+  "workbook-o4-s1-3-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "高熱のため、私は家にいなければならなかった。",
+      "高熱が原因で、私は家にいることを余儀なくされた。"
+    ]
+  },
+  "workbook-o4-s1-3-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "自転車に乗れば、かなりお金を節約できます。",
+      "自転車に乗ることは、あなたに多くのお金を節約させてくれる。"
+    ]
+  },
+  "workbook-o4-s1-3-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "けがのため、彼は決勝戦に出られなかった。",
+      "彼のけがが原因で、彼は決勝戦でプレーできなかった。"
+    ]
+  },
+  "workbook-o4-s1-3-5": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "彼女の表情から、彼女が私の計画に賛成していないことが分かった。",
+      "彼女の顔つきは、彼女が私の計画に同意していないことを示していた。"
+    ]
+  },
+  "workbook-o4-s2-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "sorrow",
+      "sadness",
+      "grief"
+    ]
+  },
+  "workbook-o4-s2-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "made"
+    ]
+  },
+  "workbook-o4-s2-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "saved"
+    ]
+  },
+  "workbook-o4-s2-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "offer"
+    ]
+  },
+  "workbook-o4-s2-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "enabled",
+      "helped",
+      "allowed"
+    ]
+  },
+  "workbook-o4-s2-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "good guitarist"
+    ]
+  },
+  "workbook-o4-s2-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "made"
+    ]
+  },
+  "workbook-o4-s2-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "take"
+    ]
+  },
+  "workbook-o4-s2-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "give call"
+    ]
+  },
+  "workbook-o4-s2-3-1": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "A strong wind prevented the plane from taking off"
+    ]
+  },
+  "workbook-o4-s2-3-2": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "The plan’s failure surprised us"
+    ]
+  },
+  "workbook-o4-s2-3-3": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "This song reminds me of my childhood"
+    ]
+  },
+  "workbook-o4-s2-3-4": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "Medical advances have allowed us to stay healthy"
+    ]
+  },
+  "workbook-o4-s2-3-5": {
+    "course": "regular-english-practice",
+    "difficulty": "advanced",
+    "accepted": [
+      "This street leads you to the post office"
+    ]
+  },
+  "workbook-o7-s1-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "at"
+    ]
+  },
+  "workbook-o7-s1-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "in"
+    ]
+  },
+  "workbook-o7-s1-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "on"
+    ]
+  },
+  "workbook-o7-s1-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "on"
+    ]
+  },
+  "workbook-o7-s1-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "in"
+    ]
+  },
+  "workbook-o7-s1-1-6": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "at"
+    ]
+  },
+  "workbook-o7-s1-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "from"
+    ]
+  },
+  "workbook-o7-s1-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to"
+    ]
+  },
+  "workbook-o7-s1-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "from to"
+    ]
+  },
+  "workbook-o7-s1-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "from"
+    ]
+  },
+  "workbook-o7-s1-2-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "in"
+    ]
+  },
+  "workbook-o7-s1-2-6": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to"
+    ]
+  },
+  "workbook-o7-s1-2-7": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "for"
+    ]
+  },
+  "workbook-o7-s1-2-8": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "during"
+    ]
+  },
+  "workbook-o7-s1-3-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "with"
+    ]
+  },
+  "workbook-o7-s1-3-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "by"
+    ]
+  },
+  "workbook-o7-s1-3-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "until"
+    ]
+  },
+  "workbook-o7-s1-3-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "by"
+    ]
+  },
+  "workbook-o7-s1-3-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "with"
+    ]
+  },
+  "workbook-o7-s1-3-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "You should check the size of the window"
+    ]
+  },
+  "workbook-o7-s1-3-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "A thief robbed me of my wallet"
+    ]
+  },
+  "workbook-o7-s2-1-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "on"
+    ]
+  },
+  "workbook-o7-s2-1-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to"
+    ]
+  },
+  "workbook-o7-s2-1-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "to by"
+    ]
+  },
+  "workbook-o7-s2-1-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "on"
+    ]
+  },
+  "workbook-o7-s2-1-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "on"
+    ]
+  },
+  "workbook-o7-s2-1-6": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "on"
+    ]
+  },
+  "workbook-o7-s2-1-7": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "for"
+    ]
+  },
+  "workbook-o7-s2-2-1": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "What did you do during the holidays"
+    ]
+  },
+  "workbook-o7-s2-2-2": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "He will be back in an hour"
+    ]
+  },
+  "workbook-o7-s2-2-3": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "My mother has been working for the company for twenty years"
+    ]
+  },
+  "workbook-o7-s2-2-4": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "I was waiting for you until nine o’clock"
+    ]
+  },
+  "workbook-o7-s2-2-5": {
+    "course": "regular-english-practice",
+    "difficulty": "starter",
+    "accepted": [
+      "I’m living with an exchange student from India"
+    ]
+  }
+  // WORKBOOK_QUESTION_REGISTRY_END
 }
 
 function doGet(e) {

@@ -4,6 +4,7 @@ import assert from 'node:assert/strict'
 import { countSentenceBlanks, inputSlotCount, withBlankCount } from './questionQuality.js'
 import { GERUND_QUESTIONS, PARTICIPLE_QUESTIONS } from './questionBanks.js'
 import { REGULAR_QUESTIONS } from './regularQuestions.js'
+import { WORKBOOK_QUESTIONS } from './workbookQuestionData.js'
 
 const mainSource = fs.readFileSync(new URL('./main.jsx', import.meta.url), 'utf8')
 const foundationSource = mainSource.match(/const QUESTIONS = ([\s\S]*?)\r?\n\r?\nconst DIFFICULTY/)?.[1]
@@ -99,4 +100,36 @@ test('input questions render one input field per visible blank', () => {
 
   const soAs = REGULAR_QUESTIONS.find((question) => question.id === 'regplus-13')
   assert.equal(inputSlotCount(soAs), 2)
+})
+
+test('Workbook regular-class questions keep their displayed slots, answer keys, and explanations aligned', () => {
+  assert.equal(WORKBOOK_QUESTIONS.length, 213)
+  assert.equal(new Set(WORKBOOK_QUESTIONS.map(({ id }) => id)).size, 213)
+
+  for (const question of WORKBOOK_QUESTIONS) {
+    assert.ok(question.id.startsWith('workbook-'), question.id)
+    assert.ok(question.explanation.trim(), `${question.id} has no explanation`)
+
+    if (question.type === 'input') {
+      assert.equal(question.blankCount, countSentenceBlanks(question.sentence || ''), question.id)
+      assert.equal(inputSlotCount(question), Math.max(1, question.blankCount), question.id)
+      assert.ok((question.accepted || [question.answer]).includes(question.answer), question.id)
+    } else if (question.type === 'choice') {
+      assert.ok(question.choices.length >= 2, question.id)
+      assert.equal(new Set(question.choices).size, question.choices.length, question.id)
+      assert.ok(question.choices.includes(question.answer), question.id)
+    } else if (question.type === 'reorder') {
+      const normalize = (value) => String(value)
+        .toLowerCase()
+        .replace(/[.,!?;:]/g, '')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim()
+      const words = question.words.flatMap((word) => normalize(word).split(/\s+/)).sort()
+      const answerWords = normalize(question.answer).split(/\s+/).sort()
+      assert.deepEqual(words, answerWords, question.id)
+    } else {
+      assert.fail(`${question.id} has unsupported type ${question.type}`)
+    }
+  }
 })

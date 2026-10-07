@@ -1,13 +1,15 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { loadQuestionBank } from './questionBankLoader.js'
+import { WORKBOOK_QUESTIONS } from './workbookQuestionData.js'
 
 test('問題バンクは単元を選んだときに読み込める', async () => {
   const regular = await loadQuestionBank('regular-english-practice')
   const gerund = await loadQuestionBank('foundation-gerund')
   const participles = await loadQuestionBank('foundation-participles')
 
-  assert.equal(regular.length, 155)
+  assert.equal(regular.length, 155 + WORKBOOK_QUESTIONS.length)
+  assert.deepEqual(regular.slice(155).map(({ id }) => id), WORKBOOK_QUESTIONS.map(({ id }) => id))
   assert.equal(gerund.length, 12)
   assert.equal(participles.length, 12)
   assert.equal(regular[0].id, 'reg27-01')
