@@ -3010,6 +3010,13 @@ function adminCacheKey_(token) {
   return 'admin-session:' + String(token || '')
 }
 
+function adminCredentialVersion_() {
+  const properties = PropertiesService.getScriptProperties()
+  const salt = properties.getProperty('ADMIN_PASSWORD_SALT')
+  const hash = properties.getProperty('ADMIN_PASSWORD_HASH')
+  return salt && hash ? adminPasswordHash_(salt, hash) : ''
+}
+
 function adminAuth_(params) {
   const name = cleanName_(params.name)
   const playerToken = String(params.authToken || '')
@@ -3044,7 +3051,7 @@ function adminAuth_(params) {
 
     cache.remove(attemptsKey)
     const adminToken = Utilities.getUuid()
-    cache.put(adminCacheKey_(adminToken), JSON.stringify({ playerKey: auth.playerKey, authHash: tokenHashFor_(playerToken, auth.playerKey) }), 900)
+    cache.put(adminCacheKey_(adminToken), JSON.stringify({ playerKey: auth.playerKey, authHash: tokenHashFor_(playerToken, auth.playerKey), credentialVersion: adminCredentialVersion_() }), 900)
     return json_({ ok: true, adminToken, expiresInSeconds: 900 }, params.callback)
   } finally {
     lock.releaseLock()
@@ -3061,6 +3068,8 @@ function authenticatedAdmin_(players, params) {
   try {
     const session = JSON.parse(cached)
     if (session.playerKey !== auth.playerKey || session.authHash !== tokenHashFor_(playerToken, auth.playerKey)) return null
+    const credentialVersion = adminCredentialVersion_()
+    if (!credentialVersion || session.credentialVersion !== credentialVersion) return null
     return auth
   } catch (error) {
     return null

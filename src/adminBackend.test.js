@@ -114,6 +114,29 @@ test('only the authenticated owner account can bootstrap admin access, and the p
   assert.equal(second.ok, true)
 })
 
+test('password rotation rejects existing and legacy admin sessions without affecting student login tokens', () => {
+  const { backend, players, properties, cache } = configuredBackend()
+  const owner = { name: 'おとめ座', authToken: 'session:おとめ座' }
+  const oldLogin = backend.adminAuth_({ ...owner, password: 'old-test-password' })
+  const oldSession = { ...owner, adminToken: oldLogin.adminToken }
+  assert.ok(backend.authenticatedAdmin_(players, oldSession))
+  const before = JSON.stringify(players.rows)
+  properties.set('ADMIN_PASSWORD_SALT', 'rotated-test-salt')
+  properties.set('ADMIN_PASSWORD_HASH', backend.adminPasswordHash_('rotated-test-salt', 'new-test-password'))
+  assert.equal(backend.authenticatedAdmin_(players, oldSession), null)
+  assert.equal(backend.adminAuth_({ ...owner, password: 'old-test-password' }).reason, 'admin-password-wrong')
+  const newLogin = backend.adminAuth_({ ...owner, password: 'new-test-password' })
+  assert.equal(newLogin.ok, true)
+  const newSession = { ...owner, adminToken: newLogin.adminToken }
+  assert.ok(backend.authenticatedAdmin_(players, newSession))
+  const legacy = JSON.parse(cache.get(`admin-session:${newLogin.adminToken}`))
+  delete legacy.credentialVersion
+  cache.set(`admin-session:${newLogin.adminToken}`, JSON.stringify(legacy))
+  assert.equal(backend.authenticatedAdmin_(players, newSession), null)
+  assert.ok(backend.authenticate_(players, 'Alice', 'session:alice'))
+  assert.equal(JSON.stringify(players.rows), before)
+})
+
 test('student rosters require a live owner-bound admin token and expose no PIN or session secrets', () => {
   const { backend } = configuredBackend()
   const hidden = backend.adminSearch_({ name: 'Alice', authToken: 'session:alice', adminToken: '', query: 'Al' })
