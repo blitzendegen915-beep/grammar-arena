@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 const CLASSES = 'ABCDEFGHIJKLM'.split('')
 const UPDATED_TIME = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit' })
 
-export default function AdminRanking({ name, authToken, adminToken, initialCourse, request, onReauthenticate }) {
+export default function AdminRanking({ name, authToken, adminToken, initialCourse, request, onReauthenticate, onDelete }) {
   const [filters, setFilters] = useState(() => ({ course: initialCourse, grade: '', className: '', query: '' }))
   const [draftQuery, setDraftQuery] = useState('')
   const [page, setPage] = useState(1)
@@ -86,13 +86,14 @@ export default function AdminRanking({ name, authToken, adminToken, initialCours
       <div className="teacher-ranking-scroll" role="region" aria-label="全体ランキングの一覧" tabIndex={0}>
         <table className="teacher-ranking-table">
           <caption className="visually-hidden">{filters.course === 'foundation-course' ? '基礎講座' : '平常授業'}の全体順位、学年、クラス、生徒名、レート</caption>
-          <thead><tr><th scope="col">全体順位</th><th scope="col">学年</th><th scope="col">クラス</th><th scope="col">ユーザー名</th><th scope="col">レート</th></tr></thead>
+          <thead><tr><th scope="col">全体順位</th><th scope="col">学年</th><th scope="col">クラス</th><th scope="col">ユーザー名</th><th scope="col">レート</th><th scope="col">操作</th></tr></thead>
           <tbody>{data.students.length ? data.students.map((student) => <tr key={student.name}>
             <td className="teacher-rank">{student.rank === null ? '—' : `${student.rank.toLocaleString()}位`}</td>
             <td>{student.grade ? `${student.grade}年` : '未登録'}</td><td>{student.className ? `${student.className}組` : '未登録'}</td>
             <th scope="row">{student.name}{student.foundationMember && <small className="teacher-member-badge">基礎講座受講</small>}</th>
             <td className="teacher-rate">{student.rating === null ? <span className="teacher-unranked">未参加</span> : <><strong>{student.rating.toLocaleString()}</strong><small>{student.ratingPoolId === 'foundation' ? '基礎講座プール' : student.ratingPoolId === 'legacy' ? '旧講座記録' : student.ratingPoolId}</small></>}</td>
-          </tr>) : <tr><td colSpan={5} className="teacher-ranking-empty">条件に一致する生徒はいません。検索条件を変更してください。</td></tr>}</tbody>
+            <td><button type="button" className="admin-delete-trigger" disabled={student.name.trim().toLowerCase() === 'おとめ座'} aria-label={`${student.name}のアカウントを削除`} onClick={() => onDelete(student.name)}>削除</button></td>
+          </tr>) : <tr><td colSpan={6} className="teacher-ranking-empty">条件に一致する生徒はいません。検索条件を変更してください。</td></tr>}</tbody>
         </table>
       </div>
       <div className="teacher-ranking-pagination" aria-label="ランキングのページ切り替え">

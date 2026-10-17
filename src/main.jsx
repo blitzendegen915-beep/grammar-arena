@@ -37,6 +37,7 @@ const DEFAULT_MODE_ID = 'foundation-infinitive'
 const DEFAULT_THEME_ID = 'ascention'
 const ThemeUnlockContext = createContext(null)
 const AdminRanking = lazy(() => import('./AdminRanking.jsx'))
+const AdminDeleteAccount = lazy(() => import('./AdminDeleteAccount.jsx'))
 
 const THEME_OPTIONS = [
   { id: 'ascention', label: 'Ascention', description: 'The original yellow and black theme' },
@@ -845,6 +846,7 @@ function App() {
       if (!result.ok) {
         const messages = {
           'already-registered': 'この生徒名は登録済みです。ログインを選んでください。',
+          'account-deleted': 'このアカウントは削除されています。担当の教員に確認してください。',
           'not-found': '登録されていない生徒名です。初回登録を選んでください。',
           'not-registered': 'この生徒名には暗証番号が設定されていません。初回登録を選んでください。',
           'wrong-pin': '暗証番号が一致しません。',
@@ -1755,6 +1757,11 @@ function AdminPasswordDialog({ password, setPassword, error, busy, onSubmit, onC
 
 function AdminConsole({ name, authToken, adminToken, course: initialCourse, onClose, onReauthenticate }) {
   const [panel, setPanel] = useState('ranking')
+  const [deleteTarget, setDeleteTarget] = useState('')
+  const [deleteBusy, setDeleteBusy] = useState(false)
+  const [deleteNotice, setDeleteNotice] = useState('')
+  const beginDelete = (studentName) => { setDeleteNotice(''); setDeleteTarget(studentName) }
+  const closePage = () => { if (!deleteBusy) { if (deleteTarget) setDeleteTarget(''); else onClose() } }
   const dialogRef = useRef(null)
   useEffect(() => {
     const previousFocus = document.activeElement
@@ -1762,7 +1769,7 @@ function AdminConsole({ name, authToken, adminToken, course: initialCourse, onCl
     return () => { if (previousFocus?.isConnected) previousFocus.focus() }
   }, [])
   const handleDialogKey = (event) => {
-    if (event.key === 'Escape') { event.preventDefault(); onClose(); return }
+    if (event.key === 'Escape') { event.preventDefault(); closePage(); return }
     if (event.key !== 'Tab') return
     const controls = [...dialogRef.current.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]')]
     const first = controls[0]
@@ -1781,6 +1788,12 @@ function AdminConsole({ name, authToken, adminToken, course: initialCourse, onCl
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const accountDeleted = (studentName) => {
+    setStudents((current) => current.filter((student) => student.name !== studentName))
+    setTarget((current) => current?.name === studentName ? null : current)
+    setDeleteTarget('')
+    setDeleteNotice(`${studentName}さんのアカウントを削除しました。全講座・全プールでログインとランキング表示が無効になりました。`)
+  }
 
   const selectedProfile = target?.ratings?.find((profile) => profile.course === course && profile.poolId === poolId)
   const currentRating = selectedProfile?.rating ?? ''
@@ -1856,14 +1869,16 @@ function AdminConsole({ name, authToken, adminToken, course: initialCourse, onCl
   }
 
   return <div className="admin-overlay" role="presentation"><section ref={dialogRef} className="admin-dialog admin-console" role="dialog" aria-modal="true" aria-labelledby="admin-console-title" onKeyDown={handleDialogKey}>
-    <button type="button" className="admin-close" aria-label="閉じる" onClick={onClose}>×</button>
+    <button type="button" className="admin-close" aria-label="閉じる" onClick={closePage} disabled={deleteBusy}>×</button>
     <p className="section-kicker">GRAMMAR ARENA / TEACHER</p><h2 id="admin-console-title" tabIndex={-1}>教員ページ</h2>
+    {deleteNotice && <p className="admin-delete-success" role="status">{deleteNotice}</p>}
+    {deleteTarget ? <Suspense fallback={<p role="status">削除確認を準備しています…</p>}><AdminDeleteAccount key={deleteTarget} name={name} authToken={authToken} adminToken={adminToken} targetName={deleteTarget} request={requestScoreApi} onCancel={() => setDeleteTarget('')} onDeleted={accountDeleted} onReauthenticate={onReauthenticate} onBusyChange={setDeleteBusy} /></Suspense> : <>
     <nav className="teacher-tabs" aria-label="教員ページの表示"><button type="button" aria-pressed={panel === 'ranking'} onClick={() => setPanel('ranking')}>全体ランキング</button><button type="button" aria-pressed={panel === 'accounts'} onClick={() => setPanel('accounts')}>アカウント対応</button></nav>
-    {panel === 'ranking' && <Suspense fallback={<p role="status">ランキング画面を準備しています…</p>}><AdminRanking name={name} authToken={authToken} adminToken={adminToken} initialCourse={initialCourse === 'regular-english-practice' ? initialCourse : 'foundation-course'} request={requestScoreApi} onReauthenticate={onReauthenticate} /></Suspense>}
+    {panel === 'ranking' && <Suspense fallback={<p role="status">ランキング画面を準備しています…</p>}><AdminRanking name={name} authToken={authToken} adminToken={adminToken} initialCourse={initialCourse === 'regular-english-practice' ? initialCourse : 'foundation-course'} request={requestScoreApi} onReauthenticate={onReauthenticate} onDelete={beginDelete} /></Suspense>}
     {panel === 'accounts' && <div className="admin-feature-grid"><section className="admin-feature-card"><h3>生徒検索</h3><p>2文字以上で検索できます。表示される情報は運営者のみに限定されています。</p>
       <form className="admin-search-form" onSubmit={search}><input aria-label="生徒名またはクラス" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="名前・学年・クラス" minLength={2} /><button type="submit" className="primary-button" disabled={busy || query.trim().length < 2}>{busy ? '検索中…' : '検索'}</button></form>
       {message && <p className="admin-status" role="status">{message}</p>}{error && <p className="admin-error" role="alert">{error}</p>}
-      {students.length > 0 && <div className="admin-student-results" aria-label="検索結果">{students.map((student) => <button type="button" key={student.name} className={`admin-student-result ${target?.name === student.name ? 'selected' : ''}`} onClick={() => chooseStudent(student)}><strong>{student.name}</strong><span>{student.grade ? `${student.grade}年${student.className}組` : 'クラス未登録'}{student.foundationMember ? ' ・ 基礎講座' : ''}</span></button>)}</div>}
+      {students.length > 0 && <div className="admin-student-results" aria-label="検索結果">{students.map((student) => <div key={student.name} className="admin-student-actions"><button type="button" className={`admin-student-result ${target?.name === student.name ? 'selected' : ''}`} onClick={() => chooseStudent(student)}><strong>{student.name}</strong><span>{student.grade ? `${student.grade}年${student.className}組` : 'クラス未登録'}{student.foundationMember ? ' ・ 基礎講座' : ''}</span></button><button type="button" className="admin-delete-trigger" disabled={student.name.trim().toLowerCase() === 'おとめ座'} aria-label={`${student.name}のアカウントを削除`} onClick={() => beginDelete(student.name)}>削除</button></div>)}</div>}
     </section>
     <section className="admin-feature-card"><h3>レート修正</h3><p>対象プールと講座を確認し、理由を記録して修正します。</p>
       {!target ? <div className="admin-empty">まず生徒を検索して選択してください。</div> : <div className="admin-rate-form">
@@ -1877,7 +1892,8 @@ function AdminConsole({ name, authToken, adminToken, course: initialCourse, onCl
         <button type="button" className="primary-button" onClick={saveRating} disabled={busy || !rating || Number(rating) < 800 || Number(rating) > 1000000 || !reason.trim() || !poolId || String(currentRating) === String(rating)}>{busy ? '保存中…' : confirming ? 'この内容で確定' : '変更内容を確認'}</button>
       </div>}
     </section></div>}
-    <div className="admin-footer"><span>操作は記録されます。学生アカウントからは利用できません。</span><button type="button" className="secondary-button" onClick={onClose}>終了</button></div>
+    </>}
+    {!deleteTarget && <div className="admin-footer"><span>操作は記録されます。学生アカウントからは利用できません。</span><button type="button" className="secondary-button" onClick={closePage} disabled={deleteBusy}>終了</button></div>}
   </section></div>
 }
 

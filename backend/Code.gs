@@ -1,6 +1,6 @@
 const COURSE_NAME = 'foundation-course'
 const RATING_MIN = 800
-const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash', 'grade', 'className', 'foundationMember', 'unlockedThemes']
+const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash', 'grade', 'className', 'foundationMember', 'unlockedThemes', 'deletedAt', 'deletedBy', 'deleteReason', 'deleteOperationId']
 const THEME_UNLOCKS = ['moon', 'crystallium', 'dignity', 'archive', 'eclipse', 'verdant', 'ember', 'aurora']
 const ANSWER_HEADERS = ['playerKey', 'course', 'questionId', 'correct', 'delta', 'answeredAt', 'answerId']
 const COURSE_PROFILE_HEADERS = ['playerKey', 'course', 'rating', 'answered', 'updatedAt']
@@ -2989,6 +2989,8 @@ function doPost(e) {
     if (action === 'admin-auth') return adminAuth_(params)
     if (action === 'admin-search') return adminSearch_(params)
     if (action === 'admin-ranking') return adminRanking_(params)
+    if (action === 'admin-delete-preview') return adminDeletePreview_(params)
+    if (action === 'admin-delete-account') return adminDeleteAccount_(params)
     if (action === 'admin-set-rating') return adminSetRating_(params)
     return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
   } catch (error) {
@@ -3075,7 +3077,7 @@ function adminSearch_(params) {
 
   const playerRows = players.getDataRange().getValues().slice(1)
   const profileRows = poolProfiles.getDataRange().getValues().slice(1)
-  const students = playerRows.filter((row) => row[0] && row[1] && [row[0], row[1], row[7], row[8]].some((value) => String(value || '').toLowerCase().includes(query)))
+  const students = playerRows.filter((row) => row[0] && row[1] && !row[11] && [row[0], row[1], row[7], row[8]].some((value) => String(value || '').toLowerCase().includes(query)))
     .slice(0, 25)
     .map((row) => {
       const playerKey = String(row[0])
@@ -3131,7 +3133,7 @@ function adminRanking_(params) {
   const seen = new Set()
   const students = players.getDataRange().getValues().slice(1).filter((row) => {
     const key = String(row[0] || '')
-    if (!key || !row[1] || seen.has(key)) return false
+    if (!key || !row[1] || row[11] || seen.has(key)) return false
     seen.add(key)
     return true
   }).map((row) => {
@@ -3174,6 +3176,85 @@ function adminRanking_(params) {
     filteredTotal: filtered.length, page, pageSize, pageCount, updatedAt: new Date().toISOString(),
     students: filtered.slice((page - 1) * pageSize, page * pageSize),
   }, params.callback)
+}
+
+function adminDeleteFingerprint_(row) {
+  // Ignore answers/rating changes while confirmation is open, but reject an
+  // account replacement, a fresh login, or a changed name/class placement.
+  return digest_(JSON.stringify([row[0], row[1], row[5], row[6], row[7], row[8], row[9]]))
+}
+
+function adminDeletePreview_(params) {
+  const { players } = getRuntimeSheets_(getBook_())
+  const admin = authenticatedAdmin_(players, params)
+  if (!admin) return json_({ ok: false, reason: 'admin-session-required' }, params.callback)
+  const targetKey = keyFor_(cleanName_(params.targetName))
+  if (targetKey === admin.playerKey) return json_({ ok: false, reason: 'owner-protected' }, params.callback)
+  if (!targetKey) return json_({ ok: false, reason: 'student-not-found' }, params.callback)
+  const row = players.getDataRange().getValues().slice(1).find((item) => item[0] === targetKey)
+  if (!row || row[11]) return json_({ ok: false, reason: 'student-not-found' }, params.callback)
+  const confirmationToken = Utilities.getUuid()
+  CacheService.getScriptCache().put('admin-delete:' + confirmationToken, JSON.stringify({
+    ownerKey: admin.playerKey, adminHash: tokenHashFor_(String(params.adminToken), admin.playerKey),
+    targetKey, fingerprint: adminDeleteFingerprint_(row),
+  }), 300)
+  return json_({ ok: true, confirmationToken, expiresInSeconds: 300, student: {
+    name: String(row[1]), grade: cleanGrade_(row[7]), className: cleanClassName_(row[8]),
+    foundationMember: String(row[9] || '').toLowerCase() === 'true',
+  } }, params.callback)
+}
+
+function adminDeleteAccount_(params) {
+  const lock = LockService.getScriptLock()
+  lock.waitLock(10000)
+  try {
+    const book = getBook_()
+    const { players } = getRuntimeSheets_(book)
+    const admin = authenticatedAdmin_(players, params)
+    if (!admin) return json_({ ok: false, reason: 'admin-session-required' }, params.callback)
+    const targetKey = keyFor_(cleanName_(params.targetName))
+    if (targetKey === admin.playerKey) return json_({ ok: false, reason: 'owner-protected' }, params.callback)
+    const reason = String(params.reason || '').trim()
+    const confirmationToken = String(params.confirmationToken || '')
+    if (!targetKey || !reason || reason.length > 240 || !confirmationToken || confirmationToken.length > 128) {
+      return json_({ ok: false, reason: 'invalid-input' }, params.callback)
+    }
+    const cached = CacheService.getScriptCache().get('admin-delete:' + confirmationToken)
+    let confirmation
+    try { confirmation = JSON.parse(cached || 'null') } catch (error) { confirmation = null }
+    if (!confirmation || confirmation.ownerKey !== admin.playerKey || confirmation.targetKey !== targetKey ||
+      confirmation.adminHash !== tokenHashFor_(String(params.adminToken), admin.playerKey)) {
+      return json_({ ok: false, reason: 'delete-confirmation-required' }, params.callback)
+    }
+    const rows = players.getDataRange().getValues()
+    const index = rows.findIndex((row, rowIndex) => rowIndex > 0 && row[0] === targetKey)
+    if (index < 0) return json_({ ok: false, reason: 'student-not-found' }, params.callback)
+    const target = rows[index]
+    if (String(params.confirmName || '') !== String(target[1])) return json_({ ok: false, reason: 'confirmation-name-mismatch' }, params.callback)
+    if (target[11]) return json_({ ok: target[14] === confirmationToken, reason: target[14] === confirmationToken ? '' : 'account-already-deleted', targetName: String(target[1]), alreadyDeleted: true }, params.callback)
+    if (confirmation.fingerprint !== adminDeleteFingerprint_(target)) return json_({ ok: false, reason: 'target-changed' }, params.callback)
+
+    // Keep a recoverable record in the private book. Only the account's access
+    // and visibility are removed; no rows in other students' history are moved.
+    const headers = players.getRange(1, 12, 1, 4).getValues()[0]
+    if (headers.some((header, offset) => header && header !== PLAYER_HEADERS[11 + offset])) return json_({ ok: false, reason: 'deletion-columns-conflict' }, params.callback)
+    players.getRange(1, 12, 1, 4).setValues([PLAYER_HEADERS.slice(11)])
+    const now = new Date()
+    const safeText = (value) => /^[=+@-]/.test(value) ? "'" + value : value
+    // Record intent before changing access. The row's deletion metadata is the
+    // authoritative completion record, including the operation ID for retries.
+    adminAuditSheet_(book).appendRow([now, admin.playerKey, safeText(targetKey), 'account-delete-request', 'all', 'all', 'active', confirmationToken, safeText(reason)])
+    const updated = Array.from({ length: PLAYER_HEADERS.length }, (_, column) => target[column] ?? '')
+    updated[6] = ''
+    updated[11] = now
+    updated[12] = admin.playerKey
+    updated[13] = safeText(reason)
+    updated[14] = confirmationToken
+    players.getRange(index + 1, 1, 1, updated.length).setValues([updated])
+    return json_({ ok: true, targetName: String(target[1]), deleted: true }, params.callback)
+  } finally {
+    lock.releaseLock()
+  }
 }
 
 function adminAuditSheet_(book) {
@@ -3403,6 +3484,7 @@ function registerPlayer_(params) {
     const token = Utilities.getUuid()
     const pinSecret = pinSecretFor_(pinHash, playerKey)
     if (playerIndex >= 0) {
+      if (rows[playerIndex][11]) return json_({ ok: false, reason: 'account-deleted' }, params.callback)
       if (String(rows[playerIndex][5] || '')) {
         if (String(rows[playerIndex][5]) !== pinSecret) return json_({ ok: false, reason: 'already-registered' }, params.callback)
         // A lost response can make a successful registration look failed in
@@ -3441,6 +3523,7 @@ function loginPlayer_(params) {
     const rows = players.getDataRange().getValues()
     const playerIndex = rows.findIndex((row, index) => index > 0 && row[0] === playerKey)
     if (playerIndex < 0) return json_({ ok: false, reason: 'not-found' }, params.callback)
+    if (rows[playerIndex][11]) return json_({ ok: false, reason: 'account-deleted' }, params.callback)
     if (!String(rows[playerIndex][5] || '')) return json_({ ok: false, reason: 'not-registered' }, params.callback)
     if (String(rows[playerIndex][5]) !== pinSecretFor_(pinHash, playerKey)) return json_({ ok: false, reason: 'wrong-pin' }, params.callback)
 
@@ -3635,6 +3718,7 @@ function rankingCourses_(course) {
 }
 
 function playerPools_(row) {
+  if (row[11]) return []
   const grade = cleanGrade_(row[7])
   const className = cleanClassName_(row[8])
   const classPool = grade && className ? grade + '-' + className : ''
@@ -3681,7 +3765,7 @@ function authenticate_(players, name, token) {
   const playerKey = keyFor_(name)
   const rows = players.getDataRange().getValues()
   const playerIndex = rows.findIndex((row, index) => index > 0 && row[0] === playerKey)
-  if (playerIndex < 0 || !token || String(rows[playerIndex][6] || '') !== tokenHashFor_(token, playerKey)) return null
+  if (playerIndex < 0 || rows[playerIndex][11] || !token || String(rows[playerIndex][6] || '') !== tokenHashFor_(token, playerKey)) return null
   return { playerKey, playerIndex }
 }
 
@@ -3779,12 +3863,12 @@ function ratingsFromProfiles_(profiles) {
 }
 
 function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, course, poolId = 'all', viewerPlayerKey = '') {
-  const playerRows = playersSheet.getDataRange().getValues().slice(1).filter((row) => row[0] && row[1])
+  const playerRows = playersSheet.getDataRange().getValues().slice(1).filter((row) => row[0] && row[1] && !row[11])
   const rankingCourses = rankingCourses_(course)
   if (poolId === 'all') {
-    const profileRows = courseProfilesSheet.getDataRange().getValues().slice(1)
-      .filter((row) => row[0] && rankingCourses.includes(String(row[1])))
     const names = new Map(playerRows.map((row) => [String(row[0]), String(row[1])]))
+    const profileRows = courseProfilesSheet.getDataRange().getValues().slice(1)
+      .filter((row) => row[0] && rankingCourses.includes(String(row[1])) && names.has(String(row[0])))
     return profileRows.map((row) => {
       const playerKey = String(row[0])
       const player = { name: names.get(playerKey) || playerKey, rating: Number(row[2]) || 1240 }

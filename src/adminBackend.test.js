@@ -41,7 +41,7 @@ function player(name, { grade = '1', className = 'A', foundationMember = false }
   row[2] = 1240
   row[3] = 0
   row[5] = 'pin-hash'
-  row[6] = `session-hash:${key}`
+  row[6] = `session-hash:${key}:session:${key}`
   row[7] = grade
   row[8] = className
   row[9] = foundationMember
@@ -92,13 +92,8 @@ function configuredBackend() {
   backend.tokenHashFor_ = (token, key) => `session-hash:${key}:${token}`
   backend.getBook_ = () => book
   backend.getRuntimeSheets_ = () => ({ players, answers, courseProfiles, poolProfiles })
-  backend.authenticate_ = (_players, name, token) => {
-    const key = String(name || '').trim().toLowerCase()
-    const index = players.rows.findIndex((row, rowIndex) => rowIndex > 0 && row[0] === key)
-    return index > 0 && token === `session:${key}` ? { playerKey: key, playerIndex: index } : null
-  }
   backend.json_ = (payload) => payload
-  return { backend, players, courseProfiles, poolProfiles, properties, cache, audit }
+  return { backend, players, answers, courseProfiles, poolProfiles, properties, cache, audit }
 }
 
 test('only the authenticated owner account can bootstrap admin access, and the password is never stored in plaintext', () => {
@@ -267,4 +262,118 @@ test('teacher ranking rejects invalid course, filters and unbounded page sizes',
   for (const invalid of [{ course: 'unknown' }, { grade: '9' }, { className: 'Z' }, { page: -1 }, { page: 'NaN' }, { pageSize: 10000 }, { query: 'x'.repeat(81) }]) {
     assert.equal(backend.adminRanking_({ ...params, ...invalid }).reason, 'invalid-input')
   }
+})
+
+function deletionRequest(backend, owner, targetName = 'Alice') {
+  const preview = backend.adminDeletePreview_({ ...owner, targetName })
+  assert.equal(preview.ok, true)
+  assert.deepEqual(Object.keys(preview.student).sort(), ['className', 'foundationMember', 'grade', 'name'])
+  return { ...owner, targetName, confirmName: targetName, confirmationToken: preview.confirmationToken, reason: '重複登録の整理' }
+}
+
+test('deletion preview and execution require the live owner admin session; the owner cannot delete itself', () => {
+  const { backend, players, audit } = configuredBackend()
+  const owner = teacherSession(backend)
+  const request = deletionRequest(backend, owner)
+  for (const invalid of [
+    { ...request, name: 'Alice', authToken: 'session:alice' },
+    { ...request, authToken: 'fake-token' },
+    { ...request, adminToken: '' },
+  ]) {
+    assert.equal(backend.adminDeletePreview_(invalid).reason, 'admin-session-required')
+    assert.equal(backend.adminDeleteAccount_(invalid).reason, 'admin-session-required')
+  }
+  assert.equal(backend.adminDeletePreview_({ ...owner, targetName: 'おとめ座' }).reason, 'owner-protected')
+  assert.equal(backend.adminDeleteAccount_({ ...request, targetName: 'おとめ座' }).reason, 'owner-protected')
+  assert.equal(players.rows[2][11], undefined)
+  assert.equal(audit.size, 0)
+})
+
+test('deletion binds confirmation to one target and admin session and requires the exact name and a reason', () => {
+  const { backend, players, audit, cache } = configuredBackend()
+  const owner = teacherSession(backend)
+  const request = deletionRequest(backend, owner)
+  for (const [change, expected] of [
+    [{ targetName: 'Bob', confirmName: 'Bob' }, 'delete-confirmation-required'],
+    [{ confirmName: 'alice' }, 'confirmation-name-mismatch'],
+    [{ reason: ' ' }, 'invalid-input'],
+    [{ reason: 'x'.repeat(241) }, 'invalid-input'],
+    [{ confirmationToken: '' }, 'invalid-input'],
+  ]) assert.equal(backend.adminDeleteAccount_({ ...request, ...change }).reason, expected)
+  const otherAdminSession = teacherSession(backend)
+  assert.equal(backend.adminDeleteAccount_({ ...request, adminToken: otherAdminSession.adminToken }).reason, 'delete-confirmation-required')
+  cache.delete(`admin-delete:${request.confirmationToken}`)
+  assert.equal(backend.adminDeleteAccount_(request).reason, 'delete-confirmation-required')
+  assert.equal(players.rows[2][11], undefined)
+  assert.equal(audit.size, 0)
+})
+
+test('deletion invalidates login, registration and old tokens, hides every course and pool, and preserves other students and history', () => {
+  const { backend, players, answers, poolProfiles, courseProfiles, audit } = configuredBackend()
+  const owner = teacherSession(backend)
+  const ownerBefore = JSON.stringify(players.rows[1])
+  const bobBefore = JSON.stringify(players.rows[3])
+  const historiesBefore = JSON.stringify([answers.rows, poolProfiles.rows, courseProfiles.rows])
+  const request = deletionRequest(backend, owner)
+  const deleted = backend.adminDeleteAccount_(request)
+  assert.equal(deleted.ok, true)
+  assert.equal(deleted.deleted, true)
+  assert.equal(players.rows[2][6], '')
+  assert.ok(players.rows[2][11])
+  assert.equal(players.rows[2][12], 'おとめ座')
+  assert.equal(players.rows[2][13], '重複登録の整理')
+  assert.equal(backend.authenticate_(players, 'Alice', 'session:alice'), null)
+  const pupil = { name: 'Alice', pinHash: 'a'.repeat(64), grade: '1', className: 'A' }
+  assert.equal(backend.loginPlayer_(pupil).reason, 'account-deleted')
+  assert.equal(backend.registerPlayer_(pupil).reason, 'account-deleted')
+  assert.equal(backend.adminSearch_({ ...owner, query: 'Alice' }).students.length, 0)
+  assert.equal(backend.adminRanking_(owner).total, 2)
+  for (const course of ['foundation-course', 'regular-english-practice']) {
+    for (const pool of ['foundation', '1-A', 'all']) {
+      const rows = backend.leaderboard_(players, courseProfiles, poolProfiles, course, pool)
+      assert.equal(rows.some((row) => /alice/i.test(row.name)), false)
+    }
+  }
+  assert.equal(JSON.stringify(players.rows[1]), ownerBefore)
+  assert.equal(JSON.stringify(players.rows[3]), bobBefore)
+  assert.equal(JSON.stringify([answers.rows, poolProfiles.rows, courseProfiles.rows]), historiesBefore)
+  assert.equal(audit.get('AdminAudit').rows[1][3], 'account-delete-request')
+  assert.equal(audit.get('AdminAudit').rows[1][7], request.confirmationToken)
+})
+
+test('deletion retries are idempotent and do not rewrite deletion metadata or audit entries', () => {
+  const { backend, players, audit } = configuredBackend()
+  const request = deletionRequest(backend, teacherSession(backend))
+  assert.equal(backend.adminDeleteAccount_(request).ok, true)
+  const after = JSON.stringify(players.rows)
+  const repeated = backend.adminDeleteAccount_(request)
+  assert.equal(repeated.ok, true)
+  assert.equal(repeated.alreadyDeleted, true)
+  assert.equal(JSON.stringify(players.rows), after)
+  assert.equal(audit.get('AdminAudit').rows.length, 2)
+})
+
+test('identity changes require a new preview, while ordinary rating changes do not', () => {
+  const { backend, players } = configuredBackend()
+  const owner = teacherSession(backend)
+  const request = deletionRequest(backend, owner)
+  players.rows[2][8] = 'B'
+  assert.equal(backend.adminDeleteAccount_(request).reason, 'target-changed')
+  const refreshed = deletionRequest(backend, owner)
+  players.rows[2][2] += 18
+  assert.equal(backend.adminDeleteAccount_(refreshed).ok, true)
+})
+
+test('deletion stops safely when reserved columns are already used or audit recording fails', () => {
+  const { backend, players, audit } = configuredBackend()
+  const request = deletionRequest(backend, teacherSession(backend))
+  players.rows[0][11] = 'another-column'
+  assert.equal(backend.adminDeleteAccount_(request).reason, 'deletion-columns-conflict')
+  players.rows[0][11] = ''
+  const unavailableAudit = sheet([['headers']])
+  unavailableAudit.appendRow = () => { throw new Error('audit-unavailable') }
+  audit.set('AdminAudit', unavailableAudit)
+  assert.throws(() => backend.adminDeleteAccount_(request), /audit-unavailable/)
+  assert.equal(players.rows[2][11], undefined)
+  assert.ok(backend.authenticate_(players, 'Alice', 'session:alice'))
 })
