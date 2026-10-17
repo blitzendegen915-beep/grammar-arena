@@ -1,4 +1,4 @@
-import { StrictMode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { StrictMode, Suspense, createContext, lazy, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createPortal, flushSync } from 'react-dom'
 import { shouldResetThemeSelection } from './themeAccess.js'
@@ -36,6 +36,7 @@ const SESSION_LENGTH = 10
 const DEFAULT_MODE_ID = 'foundation-infinitive'
 const DEFAULT_THEME_ID = 'ascention'
 const ThemeUnlockContext = createContext(null)
+const AdminRanking = lazy(() => import('./AdminRanking.jsx'))
 
 const THEME_OPTIONS = [
   { id: 'ascention', label: 'Ascention', description: 'The original yellow and black theme' },
@@ -554,6 +555,7 @@ function App() {
   const question = queue[index]
   const isComplete = !question
   const hasSession = Boolean(cleanStudentName(persisted.studentName) && persisted.authToken)
+  const isTeacherAccount = hasSession && cleanStudentName(persisted.studentName).toLowerCase() === 'おとめ座'
   const answerSyncIdentity = hasSession ? {
     name: cleanStudentName(persisted.studentName),
     authToken: persisted.authToken,
@@ -748,6 +750,22 @@ function App() {
       return
     }
     adminTapSequenceRef.current = next
+  }
+
+  const openTeacherPage = () => {
+    if (!isTeacherAccount) return
+    setAdminError('')
+    setAdminPassword('')
+    if (adminToken) setAdminConsoleOpen(true)
+    else setAdminLoginOpen(true)
+  }
+
+  const reauthenticateAdmin = () => {
+    setAdminConsoleOpen(false)
+    setAdminToken('')
+    setAdminPassword('')
+    setAdminError('管理者セッションの期限が切れました。再認証してください。')
+    setAdminLoginOpen(true)
   }
 
   const handleAdminLogin = async (event) => {
@@ -1382,6 +1400,7 @@ function App() {
           <NavItem icon="leaderboard" label="ランキング" active={view === 'leaderboard'} onClick={() => selectNav('leaderboard')} />
           <NavItem icon="history" label="履歴" active={view === 'history'} onClick={() => selectNav('history')} />
           <NavItem icon="settings" label="設定" active={view === 'settings'} onClick={() => selectNav('settings')} />
+          {isTeacherAccount && <NavItem icon="leaderboard" label="教員ページ" active={adminConsoleOpen} onClick={openTeacherPage} />}
         </nav>
         <div className="sidebar-footer"><div className="footer-line" /><div className="footer-message"><span className="footer-cap">◆</span><span>学びが、未来をつくる。</span></div></div>
       </aside>
@@ -1411,7 +1430,7 @@ function App() {
     </div>
     {unlockCelebration && <ThemeUnlockOverlay themeId={unlockCelebration} onClose={() => setUnlockCelebration(null)} />}
     {adminLoginOpen && <AdminPasswordDialog password={adminPassword} setPassword={setAdminPassword} error={adminError} busy={adminBusy} onSubmit={handleAdminLogin} onClose={() => { setAdminLoginOpen(false); setAdminPassword(''); setAdminError('') }} />}
-    {adminConsoleOpen && adminToken && <AdminConsole name={persisted.studentName} authToken={persisted.authToken} adminToken={adminToken} course={getRankingCourseId(modeId)} onClose={() => { setAdminConsoleOpen(false); setAdminToken('') }} />}
+    {isTeacherAccount && adminConsoleOpen && adminToken && <AdminConsole name={persisted.studentName} authToken={persisted.authToken} adminToken={adminToken} course={getRankingCourseId(modeId)} onReauthenticate={reauthenticateAdmin} onClose={() => { setAdminConsoleOpen(false); setAdminToken('') }} />}
     </>
     </ThemeUnlockContext.Provider>
   )
@@ -1734,7 +1753,23 @@ function AdminPasswordDialog({ password, setPassword, error, busy, onSubmit, onC
   </section></div>
 }
 
-function AdminConsole({ name, authToken, adminToken, course: initialCourse, onClose }) {
+function AdminConsole({ name, authToken, adminToken, course: initialCourse, onClose, onReauthenticate }) {
+  const [panel, setPanel] = useState('ranking')
+  const dialogRef = useRef(null)
+  useEffect(() => {
+    const previousFocus = document.activeElement
+    dialogRef.current?.querySelector('h2')?.focus()
+    return () => { if (previousFocus?.isConnected) previousFocus.focus() }
+  }, [])
+  const handleDialogKey = (event) => {
+    if (event.key === 'Escape') { event.preventDefault(); onClose(); return }
+    if (event.key !== 'Tab') return
+    const controls = [...dialogRef.current.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]')]
+    const first = controls[0]
+    const last = controls[controls.length - 1]
+    if (event.shiftKey && (document.activeElement === first || document.activeElement.tagName === 'H2')) { event.preventDefault(); last?.focus() }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
+  }
   const [query, setQuery] = useState('')
   const [course, setCourse] = useState(initialCourse === 'regular-english-practice' ? initialCourse : 'foundation-course')
   const [students, setStudents] = useState([])
@@ -1820,10 +1855,12 @@ function AdminConsole({ name, authToken, adminToken, course: initialCourse, onCl
     }
   }
 
-  return <div className="admin-overlay" role="presentation"><section className="admin-dialog admin-console" role="dialog" aria-modal="true" aria-labelledby="admin-console-title">
+  return <div className="admin-overlay" role="presentation"><section ref={dialogRef} className="admin-dialog admin-console" role="dialog" aria-modal="true" aria-labelledby="admin-console-title" onKeyDown={handleDialogKey}>
     <button type="button" className="admin-close" aria-label="閉じる" onClick={onClose}>×</button>
-    <p className="section-kicker">GRAMMAR ARENA / ADMIN</p><h2 id="admin-console-title">運営メニュー</h2>
-    <div className="admin-feature-grid"><section className="admin-feature-card"><h3>生徒検索</h3><p>2文字以上で検索できます。表示される情報は運営者のみに限定されています。</p>
+    <p className="section-kicker">GRAMMAR ARENA / TEACHER</p><h2 id="admin-console-title" tabIndex={-1}>教員ページ</h2>
+    <nav className="teacher-tabs" aria-label="教員ページの表示"><button type="button" aria-pressed={panel === 'ranking'} onClick={() => setPanel('ranking')}>全体ランキング</button><button type="button" aria-pressed={panel === 'accounts'} onClick={() => setPanel('accounts')}>アカウント対応</button></nav>
+    {panel === 'ranking' && <Suspense fallback={<p role="status">ランキング画面を準備しています…</p>}><AdminRanking name={name} authToken={authToken} adminToken={adminToken} initialCourse={initialCourse === 'regular-english-practice' ? initialCourse : 'foundation-course'} request={requestScoreApi} onReauthenticate={onReauthenticate} /></Suspense>}
+    {panel === 'accounts' && <div className="admin-feature-grid"><section className="admin-feature-card"><h3>生徒検索</h3><p>2文字以上で検索できます。表示される情報は運営者のみに限定されています。</p>
       <form className="admin-search-form" onSubmit={search}><input aria-label="生徒名またはクラス" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="名前・学年・クラス" minLength={2} /><button type="submit" className="primary-button" disabled={busy || query.trim().length < 2}>{busy ? '検索中…' : '検索'}</button></form>
       {message && <p className="admin-status" role="status">{message}</p>}{error && <p className="admin-error" role="alert">{error}</p>}
       {students.length > 0 && <div className="admin-student-results" aria-label="検索結果">{students.map((student) => <button type="button" key={student.name} className={`admin-student-result ${target?.name === student.name ? 'selected' : ''}`} onClick={() => chooseStudent(student)}><strong>{student.name}</strong><span>{student.grade ? `${student.grade}年${student.className}組` : 'クラス未登録'}{student.foundationMember ? ' ・ 基礎講座' : ''}</span></button>)}</div>}
@@ -1839,7 +1876,7 @@ function AdminConsole({ name, authToken, adminToken, course: initialCourse, onCl
         {confirming && <p className="admin-confirm-note" role="alert">{target.name} / {poolLabel(poolId)}：{currentRating === '' ? '未記録' : Number(currentRating).toLocaleString()} → {Number(rating).toLocaleString()} を確定しますか？</p>}
         <button type="button" className="primary-button" onClick={saveRating} disabled={busy || !rating || Number(rating) < 800 || Number(rating) > 1000000 || !reason.trim() || !poolId || String(currentRating) === String(rating)}>{busy ? '保存中…' : confirming ? 'この内容で確定' : '変更内容を確認'}</button>
       </div>}
-    </section></div>
+    </section></div>}
     <div className="admin-footer"><span>操作は記録されます。学生アカウントからは利用できません。</span><button type="button" className="secondary-button" onClick={onClose}>終了</button></div>
   </section></div>
 }

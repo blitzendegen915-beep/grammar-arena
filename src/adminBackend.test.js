@@ -156,3 +156,115 @@ test('admin rating corrections are pool-scoped, reasoned, and audited', () => {
   assert.equal(forbidden.reason, 'pool-forbidden')
   assert.equal(poolProfiles.rows[3][3], 1500)
 })
+
+function teacherSession(backend) {
+  const login = backend.adminAuth_({ name: 'おとめ座', authToken: 'session:おとめ座', password: 'test-owner-secret' })
+  return { name: 'おとめ座', authToken: 'session:おとめ座', adminToken: login.adminToken, course: 'foundation-course' }
+}
+
+test('whole-course rankings reject students, forged identities, expired admin sessions and reused admin tokens', () => {
+  const { backend, cache } = configuredBackend()
+  const owner = teacherSession(backend)
+  for (const params of [
+    { ...owner, name: 'Alice', authToken: 'session:alice' },
+    { ...owner, name: 'おとめ座', authToken: 'session:alice' },
+    { ...owner, adminToken: '' },
+    { ...owner, authToken: 'rotated-owner-token' },
+  ]) {
+    const result = backend.adminRanking_(params)
+    assert.equal(result.ok, false)
+    assert.equal(result.reason, 'admin-session-required')
+    assert.equal(result.students.length, 0)
+  }
+  cache.delete(`admin-session:${owner.adminToken}`)
+  assert.equal(backend.adminRanking_(owner).ok, false)
+})
+
+test('teacher ranking is read-only, course-scoped, one row per account, and returns only display fields', () => {
+  const { backend, players, poolProfiles, courseProfiles, audit } = configuredBackend()
+  const before = JSON.stringify([players.rows, poolProfiles.rows, courseProfiles.rows])
+  const params = teacherSession(backend)
+  const result = backend.adminRanking_(params)
+  assert.equal(result.ok, true)
+  assert.equal(result.total, 3)
+  assert.equal(result.rankedTotal, 2)
+  assert.deepEqual(Array.from(result.students, (student) => [student.name, student.rating, student.rank]), [['Bob', 1300, 1], ['Alice', 1240, 2], ['おとめ座', null, null]])
+  assert.deepEqual(Object.keys(result.students[0]).sort(), ['className', 'foundationMember', 'grade', 'name', 'rank', 'rating', 'ratingPoolId'])
+  assert.equal(JSON.stringify([players.rows, poolProfiles.rows, courseProfiles.rows]), before)
+  assert.equal(audit.size, 0)
+  const regular = backend.adminRanking_({ ...params, course: 'regular-english-practice' })
+  assert.equal(regular.rankedTotal, 1)
+  assert.equal(regular.students[0].name, 'Alice')
+  assert.equal(regular.students[0].rating, 1800)
+})
+
+test('search and grade/class filters preserve global ranks including ties and full-width search text', () => {
+  const { backend, poolProfiles } = configuredBackend()
+  poolProfiles.rows[3][3] = 1300 // foundation member also has a separate class score
+  poolProfiles.rows[1][3] = 1300
+  const params = teacherSession(backend)
+  const all = backend.adminRanking_(params)
+  assert.deepEqual(Array.from(all.students, (student) => student.rank), [1, 1, null])
+  const filtered = backend.adminRanking_({ ...params, query: 'Ｂｏｂ', grade: '2', className: 'B' })
+  assert.equal(filtered.filteredTotal, 1)
+  assert.equal(filtered.students[0].rank, 1)
+  poolProfiles.rows[1][3] = 1500
+  const second = backend.adminRanking_({ ...params, query: 'Bob' })
+  assert.equal(second.students[0].rank, 2)
+  const classSearch = backend.adminRanking_({ ...params, query: '２－Ｂ' })
+  assert.equal(classSearch.students[0].name, 'Bob')
+})
+
+test('regular course prioritizes current class; stale pools and other-course ratings never leak into the rank', () => {
+  const { backend, poolProfiles, courseProfiles, players } = configuredBackend()
+  poolProfiles.appendRow(['alice', 'regular-english-practice', '1-A', 1900, 2])
+  poolProfiles.appendRow(['bob', 'regular-english-practice', '1-A', 99999, 99]) // not Bob's current class
+  courseProfiles.appendRow(['bob', 'regular-english-practice', 1600, 2])
+  players.rows[1][2] = 57452 // Players.rating does not identify a course
+  const result = backend.adminRanking_({ ...teacherSession(backend), course: 'regular-english-practice' })
+  assert.deepEqual(Array.from(result.students, (student) => [student.name, student.rating, student.ratingPoolId]), [
+    ['Alice', 1900, '1-A'], ['Bob', 1600, 'legacy'], ['おとめ座', null, ''],
+  ])
+})
+
+test('legacy foundation course aliases do not duplicate accounts or override canonical records', () => {
+  const { backend, poolProfiles, courseProfiles, players } = configuredBackend()
+  players.appendRow(player('Legacy', { grade: '', className: '', foundationMember: true }))
+  poolProfiles.appendRow(['alice', 'foundation-infinitive', 'foundation', 99999, 2])
+  courseProfiles.appendRow(['legacy', 'foundation-gerund', 1700, 2])
+  const params = teacherSession(backend)
+  const result = backend.adminRanking_(params)
+  assert.equal(result.students.find((student) => student.name === 'Alice').rating, 1240)
+  const unassigned = backend.adminRanking_({ ...params, grade: 'unassigned', className: 'unassigned' })
+  assert.equal(unassigned.students.length, 1)
+  assert.equal(unassigned.students[0].name, 'Legacy')
+  assert.equal(unassigned.students[0].rank, 1)
+})
+
+test('pagination works beyond the old 25-person limit and retains ranks on later pages and searches', () => {
+  const { backend, players, poolProfiles } = configuredBackend()
+  for (let index = 0; index < 110; index += 1) {
+    const name = `Student-${String(index).padStart(3, '0')}`
+    players.appendRow(player(name))
+    poolProfiles.appendRow([name.toLowerCase(), 'foundation-course', '1-A', 3000 - index, 1])
+  }
+  const params = teacherSession(backend)
+  const later = backend.adminRanking_({ ...params, page: 2, pageSize: 50 })
+  assert.equal(later.total, 113)
+  assert.equal(later.pageCount, 3)
+  assert.equal(later.students.length, 50)
+  assert.equal(later.students[0].rank, 51)
+  const search = backend.adminRanking_({ ...params, query: 'Student-099' })
+  assert.equal(search.students[0].rank, 100)
+  const none = backend.adminRanking_({ ...params, query: 'Not found', page: 9 })
+  assert.equal(none.students.length, 0)
+  assert.equal(none.page, 1)
+})
+
+test('teacher ranking rejects invalid course, filters and unbounded page sizes', () => {
+  const { backend } = configuredBackend()
+  const params = teacherSession(backend)
+  for (const invalid of [{ course: 'unknown' }, { grade: '9' }, { className: 'Z' }, { page: -1 }, { page: 'NaN' }, { pageSize: 10000 }, { query: 'x'.repeat(81) }]) {
+    assert.equal(backend.adminRanking_({ ...params, ...invalid }).reason, 'invalid-input')
+  }
+})

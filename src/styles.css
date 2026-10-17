@@ -1444,3 +1444,52 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 .theme-dignity .admin-student-result:hover, .theme-dignity .admin-student-result.selected { background: #57252c; border-color: #d6a43a; }
 @media (max-width: 780px) { .profile-orb { display: grid; flex: 0 0 38px; width: 38px; height: 38px; margin-left: 4px; } .admin-feature-grid { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .admin-overlay { place-items: start center; padding: 10px; } .admin-dialog { max-height: calc(100vh - 20px); padding: 26px 16px 18px; box-shadow: 6px 6px 0 #171717; } .admin-feature-card { padding: 14px; } .admin-actions, .admin-footer { align-items: stretch; flex-direction: column; } .admin-actions button, .admin-footer button { width: 100%; } }
+
+.teacher-tabs { display: flex; gap: 8px; margin: 20px 0 24px; border-bottom: 2px solid #d1c7af; }
+.teacher-tabs button { min-height: 46px; padding: 10px 16px; color: #4a504a; background: transparent; border-bottom: 4px solid transparent; font-weight: 700; }
+.teacher-tabs button[aria-pressed="true"] { color: #164c69; border-color: #286b91; background: #edf4f6; }
+.teacher-ranking { min-width: 0; color: #202c32; }
+.teacher-ranking-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.teacher-ranking-heading h3 { margin: 0 0 8px; color: #152d3b; font-size: 22px; }
+.teacher-ranking-heading p { margin: 0; color: #4c5960; line-height: 1.6; font-size: 14px; }
+.teacher-ranking .primary-button, .teacher-ranking .secondary-button { width: auto; flex-shrink: 0; justify-content: center; min-height: 44px; padding: 10px 14px; font-size: 14px; white-space: nowrap; }
+.teacher-ranking .primary-button { color: #fff; background: #285e7b; border: 2px solid #173a4f; box-shadow: none; }
+.teacher-ranking .secondary-button { color: #253f4d; background: #fffdf7; border: 2px solid #687f89; box-shadow: none; }
+.teacher-ranking button:disabled { cursor: default; opacity: .45; }
+.teacher-ranking-filters { display: grid; grid-template-columns: 1.3fr .8fr .8fr 1.8fr auto auto; align-items: end; gap: 10px; margin: 20px 0 16px; }
+.teacher-ranking-filters label { display: grid; gap: 6px; color: #334953; font-size: 13px; font-weight: 700; }
+.teacher-ranking-filters input, .teacher-ranking-filters select { width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; color: #192d38; background: #fff; border: 2px solid #8b9b9e; border-radius: 2px; font: inherit; font-size: 16px; }
+.teacher-ranking-status { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 18px; min-height: 38px; color: #41545d; font-size: 13px; }
+.teacher-ranking-status strong { color: #163e55; font-size: 16px; }
+.teacher-ranking-status small { margin-left: auto; font-size: 12px; }
+.teacher-ranking-scroll { max-height: 460px; overflow: auto; background: #fff; border: 1px solid #9babb1; }
+.teacher-ranking-table { width: 100%; min-width: 620px; border-collapse: separate; border-spacing: 0; text-align: left; font-size: 15px; }
+.teacher-ranking-table thead th { position: sticky; top: 0; z-index: 1; padding: 13px 16px; color: #fff; background: #233f51; white-space: nowrap; font-size: 13px; }
+.teacher-ranking-table td, .teacher-ranking-table tbody th { padding: 13px 16px; color: #243b48; border-bottom: 1px solid #dae1e3; vertical-align: middle; }
+.teacher-ranking-table tbody tr:nth-child(even) { background: #f1f5f6; }
+.teacher-ranking-table tbody th { width: 45%; overflow-wrap: anywhere; font-weight: 700; }
+.teacher-ranking-table .teacher-rank { color: #285e7b; font-variant-numeric: tabular-nums; font-weight: 800; white-space: nowrap; }
+.teacher-ranking-table .teacher-rate { text-align: right; font-variant-numeric: tabular-nums; }
+.teacher-rate strong { color: #173a4f; font-size: 20px; }
+.teacher-rate small { display: block; margin-top: 2px; color: #566a73; font-size: 11px; white-space: nowrap; }
+.teacher-member-badge { display: block; width: fit-content; margin-top: 5px; padding: 2px 6px; color: #62502b; background: #f4eacb; border-radius: 3px; font-size: 10px; font-weight: 600; }
+.teacher-unranked { color: #68767c; font-size: 13px; }
+.teacher-ranking-table .teacher-ranking-empty { padding: 36px 18px; color: #546871; text-align: center; }
+.teacher-ranking-pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 0 8px; font-size: 14px; }
+.teacher-ranking-pagination > span { white-space: nowrap; }
+.teacher-ranking-note { margin: 10px 0 0; color: #596974; font-size: 12px; line-height: 1.8; }
+.teacher-ranking .admin-error p { margin-top: 0; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 1040px) { .teacher-ranking-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); } .teacher-ranking-query { grid-column: span 2; } }
+@media (max-width: 520px) {
+  .teacher-ranking-heading { flex-direction: column; gap: 10px; }
+  .teacher-tabs { gap: 2px; margin-top: 14px; }
+  .teacher-tabs button { padding: 10px 9px; font-size: 14px; }
+  .teacher-ranking-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .teacher-ranking-filters > label:first-child { grid-column: span 2; }
+  .teacher-ranking-status { gap: 6px; padding-bottom: 12px; }
+  .teacher-ranking-status span, .teacher-ranking-status small { width: 100%; margin: 0; }
+  .teacher-ranking-scroll { max-height: 390px; }
+  .teacher-ranking-pagination { gap: 6px; font-size: 12px; }
+  .teacher-ranking .teacher-ranking-pagination button { padding: 9px 8px; font-size: 12px; }
+}

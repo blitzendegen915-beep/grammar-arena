@@ -44,3 +44,14 @@ Run queue regression checks with `node --test src/answerSync.test.js`.
 ## GitHub Pages
 
 The workflow in `.github/workflows/deploy.yml` builds and deploys `dist/` on every push to `main`. In the repository settings, set Pages > Build and deployment > Source to **GitHub Actions**.
+
+## 教員ページの全体ランキング
+
+「おとめ座」でログインすると、メニューに「教員ページ」が表示されます。既存の管理者パスワードで認証後、「全体ランキング」で基礎講座・平常授業を切り替え、学年・クラス・ユーザー名・レート・全体順位を確認できます。「アカウント対応」には従来の生徒検索・レート修正があります。
+
+- 名前・所属の検索、学年（1〜3年）、クラス（A〜M組・未登録）で絞り込めます。検索結果でも講座全体の順位を維持します。同点は同順位（1位、2位、2位、4位）です。
+- 平常授業は所属クラス、基礎講座は基礎講座プールのレートを優先します。優先する記録がなければ、別の現在の所属プール、旧講座記録の順に参照します。複数プールのレートを加算しません。講座ごとの記録がない人は「未参加」と表示します。
+- 一度に50人を表示し、ページ送りできます。「再読み込み」で最新の記録を取得します。全体一覧はブラウザーの永続ストレージに保存しません。
+- POST `admin-ranking` は「おとめ座」の有効なログイントークンと、それに結び付いた管理者セッションの両方が必要です。管理者セッションは15分で失効し、期限切れ時には再認証を案内します。生徒用のプール閲覧制限は従来どおりです。
+
+公開時はフロントエンドとApps Scriptの両方を更新してください。権限・検索・順位・ページングの回帰チェックは `node --test src/adminBackend.test.js src/poolAccess.test.js` で実行できます。

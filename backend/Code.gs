@@ -2988,6 +2988,7 @@ function doPost(e) {
     if (action === 'answer') return recordAnswer_(params)
     if (action === 'admin-auth') return adminAuth_(params)
     if (action === 'admin-search') return adminSearch_(params)
+    if (action === 'admin-ranking') return adminRanking_(params)
     if (action === 'admin-set-rating') return adminSetRating_(params)
     return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
   } catch (error) {
@@ -3094,6 +3095,85 @@ function adminSearch_(params) {
       }
     })
   return json_({ ok: true, students }, params.callback)
+}
+
+// Teacher-only, paginated view. Never use this response in student leaderboards.
+function adminRanking_(params) {
+  const { players, courseProfiles, poolProfiles } = getRuntimeSheets_(getBook_())
+  if (!authenticatedAdmin_(players, params)) return json_({ ok: false, reason: 'admin-session-required', students: [] }, params.callback)
+  const course = cleanCourse_(params.course)
+  const grade = String(params.grade || '')
+  const className = String(params.className || '')
+  const query = String(params.query || '').normalize('NFKC').trim().toLowerCase()
+  const pageSize = params.pageSize === undefined ? 50 : Number(params.pageSize)
+  const requestedPage = params.page === undefined ? 1 : Number(params.page)
+  if (!course || query.length > 80 || (grade && grade !== 'unassigned' && !ALLOWED_GRADES.includes(grade)) ||
+    (className && className !== 'unassigned' && !ALLOWED_CLASSES.includes(className)) ||
+    !Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100 || !Number.isInteger(requestedPage) || requestedPage < 1) {
+    return json_({ ok: false, reason: 'invalid-input', students: [] }, params.callback)
+  }
+
+  const poolRatings = new Map()
+  const legacyRatings = new Map()
+  const addProfile = (map, key, rawCourse, rawRating) => {
+    if (cleanCourse_(rawCourse) !== course || rawRating === '' || rawRating == null) return
+    const rating = Number(rawRating)
+    if (!Number.isFinite(rating) || rating < RATING_MIN) return
+    const canonical = String(rawCourse) === course
+    if (!map.has(key) || canonical || !map.get(key).canonical) map.set(key, { rating, canonical })
+  }
+  poolProfiles.getDataRange().getValues().slice(1).forEach((row) => {
+    if (row[0]) addProfile(poolRatings, String(row[0]) + '\u0000' + String(row[2]), row[1], row[3])
+  })
+  courseProfiles.getDataRange().getValues().slice(1).forEach((row) => {
+    if (row[0]) addProfile(legacyRatings, String(row[0]), row[1], row[2])
+  })
+  const seen = new Set()
+  const students = players.getDataRange().getValues().slice(1).filter((row) => {
+    const key = String(row[0] || '')
+    if (!key || !row[1] || seen.has(key)) return false
+    seen.add(key)
+    return true
+  }).map((row) => {
+    const playerKey = String(row[0])
+    const pools = playerPools_(row)
+    // Regular classes use the student's own class first; foundation courses use
+    // the foundation pool first. A second membership is a fallback, never a sum.
+    const orderedPools = course === 'regular-english-practice'
+      ? [...pools.filter((id) => id !== FOUNDATION_POOL_ID), ...pools.filter((id) => id === FOUNDATION_POOL_ID)]
+      : pools
+    const ratingPoolId = orderedPools.find((id) => poolRatings.has(playerKey + '\u0000' + id)) || ''
+    const profile = ratingPoolId ? poolRatings.get(playerKey + '\u0000' + ratingPoolId) : legacyRatings.get(playerKey)
+    return {
+      name: String(row[1]), grade: cleanGrade_(row[7]), className: cleanClassName_(row[8]),
+      foundationMember: String(row[9] || '').toLowerCase() === 'true',
+      rating: profile ? profile.rating : null, ratingPoolId: ratingPoolId || (profile ? 'legacy' : ''), rank: null,
+    }
+  }).sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1) || a.name.localeCompare(b.name, 'ja'))
+  let previousRating = null
+  let previousRank = null
+  students.forEach((student, index) => {
+    if (student.rating === null) return
+    student.rank = student.rating === previousRating ? previousRank : index + 1
+    previousRating = student.rating
+    previousRank = student.rank
+  })
+  // Assign ranks before filtering so searches always show the whole-course rank.
+  const terms = query.split(/\s+/).filter(Boolean)
+  const filtered = students.filter((student) => {
+    if (grade === 'unassigned' ? student.grade : grade && student.grade !== grade) return false
+    if (className === 'unassigned' ? student.className : className && student.className !== className) return false
+    const haystack = [student.name, student.grade, student.className, student.grade + '-' + student.className,
+      student.grade + '年' + student.className + '組'].join(' ').normalize('NFKC').toLowerCase()
+    return terms.every((term) => haystack.includes(term))
+  })
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const page = Math.min(requestedPage, pageCount)
+  return json_({
+    ok: true, course, total: students.length, rankedTotal: students.filter((student) => student.rank !== null).length,
+    filteredTotal: filtered.length, page, pageSize, pageCount, updatedAt: new Date().toISOString(),
+    students: filtered.slice((page - 1) * pageSize, page * pageSize),
+  }, params.callback)
 }
 
 function adminAuditSheet_(book) {
