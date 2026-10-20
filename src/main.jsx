@@ -1402,7 +1402,6 @@ function App() {
           <NavItem icon="leaderboard" label="ランキング" active={view === 'leaderboard'} onClick={() => selectNav('leaderboard')} />
           <NavItem icon="history" label="履歴" active={view === 'history'} onClick={() => selectNav('history')} />
           <NavItem icon="settings" label="設定" active={view === 'settings'} onClick={() => selectNav('settings')} />
-          {isTeacherAccount && <NavItem icon="leaderboard" label="教員ページ" active={adminConsoleOpen} onClick={openTeacherPage} />}
         </nav>
         <div className="sidebar-footer"><div className="footer-line" /><div className="footer-message"><span className="footer-cap">◆</span><span>学びが、未来をつくる。</span></div></div>
       </aside>
