@@ -1438,6 +1438,16 @@ function App() {
   )
 }
 
+const VOCABULARY_ARENA_URL = 'https://blitzendegen915-beep.github.io/vocab-battle/'
+
+function VocabularyArenaCard({ compact = false }) {
+  return <a className={`vocabulary-arena-card ${compact ? 'compact' : ''}`} href={VOCABULARY_ARENA_URL} target="_blank" rel="noopener noreferrer">
+    <span className="vocabulary-arena-mark" aria-hidden="true">Aa</span>
+    <span className="vocabulary-arena-copy"><span className="vocabulary-arena-eyebrow">VOCABULARY / ENGLISH</span><strong>Vocabulary Arena</strong><small>英単語・熟語のレート対戦に挑戦</small></span>
+    <span className="vocabulary-arena-arrow" aria-hidden="true"><Icon name="arrow" size={22} /></span>
+  </a>
+}
+
 function LandingView({ course, authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, placementSetup, submitAuth, authBusy, notice, setNotice, leaderboard, rankingPoolId }) {
   return <div className="landing-view">
     <div className="landing-layout">
@@ -1472,6 +1482,7 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
       </section>
       <PublicLeaderboard players={leaderboard} currentName={authName} courseLabel={course.label} poolLabel={poolLabel(rankingPoolId)} limit={5} />
     </div>
+    <VocabularyArenaCard />
     <div className="landing-footer"><span>NOW PLAYING</span><strong>{course.label} - {course.name}</strong><span className="landing-footer-muted">講座と所属別にランキングが分かれます</span></div>
   </div>
 }
@@ -1908,6 +1919,7 @@ function SettingsView({ filter, setFilter, autoExplanation, setAutoExplanation, 
       </section>
       <section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? 'Lesson 13〜15・Plus' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section>
       <section className="settings-panel settings-panel-display"><h2>学習の表示</h2><p>解答後の画面の見え方を設定します。</p><label className="toggle-row"><span><strong>解説を自動で表示</strong><small>正誤判定のあとに解説を開きます</small></span><button type="button" className={`toggle ${autoExplanation ? 'on' : ''}`} aria-pressed={autoExplanation} onClick={() => setAutoExplanation(!autoExplanation)}><span /></button></label><div className="rule-note"><Icon name="document" size={19} /><span>正答数に応じてレートが変動し、履歴に保存されます。</span></div></section>
+      <section className="settings-panel"><h2>ほかの学習アリーナ</h2><p>英単語・熟語の練習はこちらから。</p><VocabularyArenaCard compact /></section>
     </div>
   </div>
 }
