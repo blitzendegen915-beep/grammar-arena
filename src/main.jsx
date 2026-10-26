@@ -249,6 +249,7 @@ const COURSE_MODES = [
   { id: 'foundation-gerund', label: '基礎講座 - 動名詞', available: true },
   { id: 'foundation-participles', label: '基礎講座 - 分詞', available: true },
   { id: 'regular-english-practice', label: '英語演習 - 平常授業', available: true },
+  { id: 'regular-english-practice-2kimatsu', label: '英語演習 - 2学期期末', available: true },
 ]
 
 const FOUNDATION_QUESTIONS = QUESTIONS.map((question) => withBlankCount({
@@ -262,6 +263,7 @@ const COURSE_DETAILS = {
   'foundation-gerund': { label: '基礎講座', eyebrow: 'FOUNDATION COURSE', unit: 'UNIT 02', name: '動名詞', title: '動名詞を、解いて、理解する。', rankingId: 'foundation-course' },
   'foundation-participles': { label: '基礎講座', eyebrow: 'FOUNDATION COURSE', unit: 'UNIT 03', name: '分詞', title: '分詞を、解いて、理解する。', rankingId: 'foundation-course' },
   'regular-english-practice': { label: '英語演習', eyebrow: 'ENGLISH PRACTICE', unit: 'REGULAR CLASS', name: '平常授業', title: '平常授業を、解いて、理解する。', rankingId: 'regular-english-practice' },
+  'regular-english-practice-2kimatsu': { label: '英語演習', eyebrow: 'ENGLISH PRACTICE', unit: 'TERM 2 FINAL', name: '2学期期末', title: '2学期期末の範囲を、解いて、理解する。', rankingId: 'regular-english-practice-2kimatsu' },
 }
 
 const GRADE_OPTIONS = ['1', '2', '3']
@@ -1584,13 +1586,16 @@ function InputAnswerFields({ question, inputParts, setInputParts, submit, submit
 }
 
 function SentenceDisplay({ question, className = 'sentence' }) {
-  if (!question.rewrite) return <p className={className}>{renderSentence(question.sentence, question.inputPrefix)}</p>
+  if (!question.rewrite) return <p className={question.contextualPassage ? className + ' contextual-passage' : className}>{renderSentence(question.sentence, question.inputPrefix)}</p>
   return <div className="rewrite-sentences" aria-label="書き換え前と書き換え後">{splitRewriteSentences(question.sentence).map((sentence, index) => <p key={`${question.id}-sentence-${index}`} className={`${className} rewrite-sentence`}>{renderSentence(sentence, question.inputPrefix)}</p>)}</div>
 }
 
 function renderSentence(sentence = '') {
   if (!sentence) return null
-  return sentence.split(/(\(\s*\u3000+\s*\)|\uFF08\s*\u3000+\s*\uFF09|_{2,})/g).map((part, index) => isBlankPlaceholder(part) ? <span key={index} className="sentence-blank">　</span> : <span key={index}>{part}</span>)
+  return sentence.split(/(<u>[\s\S]*?<\/u>|\(\s*\u3000+\s*\)|\uFF08\s*\u3000+\s*\uFF09|_{2,})/g).map((part, index) => {
+    if (part.startsWith('<u>') && part.endsWith('</u>')) return <u key={index}>{renderSentence(part.slice(3, -4))}</u>
+    return isBlankPlaceholder(part) ? <span key={index} className="sentence-blank">　</span> : <span key={index}>{part}</span>
+  })
 }
 
 function Feedback({ question, result, onRetry }) {

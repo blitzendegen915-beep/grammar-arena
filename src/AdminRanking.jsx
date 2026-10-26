@@ -64,7 +64,7 @@ export default function AdminRanking({ name, authToken, adminToken, initialCours
     </div>
     <form className="teacher-ranking-filters" onSubmit={search}>
       <label>講座<select value={filters.course} onChange={(event) => updateFilters({ course: event.target.value })}>
-        <option value="foundation-course">基礎講座</option><option value="regular-english-practice">平常授業</option>
+        <option value="foundation-course">基礎講座</option><option value="regular-english-practice">平常授業</option><option value="regular-english-practice-2kimatsu">英語演習・2学期期末</option>
       </select></label>
       <label>学年<select value={filters.grade} onChange={(event) => updateFilters({ grade: event.target.value })}>
         <option value="">全学年</option>{['1', '2', '3'].map((grade) => <option key={grade} value={grade}>{grade}年</option>)}<option value="unassigned">未登録</option>

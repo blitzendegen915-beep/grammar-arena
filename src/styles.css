@@ -256,6 +256,8 @@ h1 { color: var(--ink); font-family: 'Arial Black', 'Noto Sans JP', sans-serif; 
 .prompt { color: #404040; font-weight: 600; }
 .japanese-prompt { color: var(--ink); }
 .sentence { color: var(--ink); }
+.sentence.contextual-passage { display: block; min-height: 0; white-space: pre-line; line-height: 1.75; font-size: 18px; }
+@media (max-width: 780px) { .sentence.contextual-passage { font-size: 16px; line-height: 1.7; } }
 .sentence-blank { border-color: var(--blue); }
 .choice-button { color: var(--ink); background: var(--paper); border: 2px solid var(--ink); border-radius: 0; box-shadow: 3px 3px 0 rgba(23,23,23,.13); }
 .choice-button:hover { background: #fff; border-color: var(--blue); }

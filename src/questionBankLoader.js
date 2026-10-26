@@ -7,6 +7,7 @@ const loaders = {
     import('./regularQuestions.js'),
     import('./workbookQuestionData.js'),
   ]).then(([{ REGULAR_QUESTIONS }, { WORKBOOK_QUESTIONS }]) => [...REGULAR_QUESTIONS, ...WORKBOOK_QUESTIONS]),
+  'regular-english-practice-2kimatsu': () => import('./regular2kimatsuQuestions.js').then(({ REGULAR_2KIMATSU_QUESTIONS }) => REGULAR_2KIMATSU_QUESTIONS),
 }
 
 export function loadQuestionBank(modeId, foundationQuestions = []) {

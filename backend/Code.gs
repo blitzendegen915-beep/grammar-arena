@@ -8,7 +8,7 @@ const POOL_PROFILE_HEADERS = ['playerKey', 'course', 'poolId', 'rating', 'answer
 const ADMIN_AUDIT_HEADERS = ['timestamp', 'adminPlayerKey', 'targetPlayerKey', 'action', 'course', 'poolId', 'beforeValue', 'afterValue', 'reason']
 const RATING_POINTS = { starter: 12, standard: 18, advanced: 26 }
 const RATING_LOSS = { starter: 7, standard: 11, advanced: 16 }
-const ALLOWED_COURSES = ['foundation-course', 'regular-english-practice']
+const ALLOWED_COURSES = ['foundation-course', 'regular-english-practice', 'regular-english-practice-2kimatsu']
 const ALLOWED_GRADES = ['1', '2', '3']
 const ALLOWED_CLASSES = 'ABCDEFGHIJKLM'.split('')
 const FOUNDATION_POOL_ID = 'foundation'
@@ -2966,8 +2966,3152 @@ const QUESTION_REGISTRY = {
     "accepted": [
       "I’m living with an exchange student from India"
     ]
-  }
+  },
   // WORKBOOK_QUESTION_REGISTRY_END
+  // TERM_FINAL_QUESTION_REGISTRY_START
+  "term2k-eg-p51-ex18-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "あなたは公園でバスケットボールをしている男の子たちを知っていますか。"
+    ]
+  },
+  "term2k-eg-p51-ex18-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "通りに停められている車は私のものです。"
+    ]
+  },
+  "term2k-eg-p51-ex18-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "私は彼女の笑顔(ほほえんでいる顔)が大好きです。"
+    ]
+  },
+  "term2k-eg-p51-ex18-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "彼は疲れた声で私にそれを説明した。"
+    ]
+  },
+  "term2k-eg-p51-ex18-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "hoping"
+    ]
+  },
+  "term2k-eg-p51-ex18-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "seated"
+    ]
+  },
+  "term2k-eg-p51-ex18-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "running"
+    ]
+  },
+  "term2k-eg-p51-ex18-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "amused"
+    ]
+  },
+  "term2k-eg-p51-ex18-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I found her crying alone"
+    ]
+  },
+  "term2k-eg-p51-ex18-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "She came running to me when"
+    ]
+  },
+  "term2k-eg-p51-ex18-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He left the computer broken"
+    ]
+  },
+  "term2k-eg-p51-ex18-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "The stolen bicycle was found"
+    ]
+  },
+  "term2k-eg-p53-ex19-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "washed"
+    ]
+  },
+  "term2k-eg-p53-ex19-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "broken"
+    ]
+  },
+  "term2k-eg-p53-ex19-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "working"
+    ]
+  },
+  "term2k-eg-p53-ex19-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "heard"
+    ]
+  },
+  "term2k-eg-p53-ex19-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "chasing"
+    ]
+  },
+  "term2k-eg-p53-ex19-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "祖父母は私がピアノを弾くのを聞くのが好きです。"
+    ]
+  },
+  "term2k-eg-p53-ex19-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "私たちはその選手がテレビで金メダルを授与されるのを見た。",
+          "私たちはその選手がテレビで金メダルを与えられるのを見た。"
+    ]
+  },
+  "term2k-eg-p53-ex19-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Opening"
+    ]
+  },
+  "term2k-eg-p53-ex19-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Heated",
+          "Being heated"
+    ]
+  },
+  "term2k-eg-p53-ex19-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Walking"
+    ]
+  },
+  "term2k-eg-p53-ex19-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Made",
+          "Being made"
+    ]
+  },
+  "term2k-eg-p53-ex19-4-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Not knowing"
+    ]
+  },
+  "term2k-eg-p53-ex19-4-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "listening to the radio"
+    ]
+  },
+  "term2k-eg-p53-ex19-4-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Written in French",
+          "Being written in French"
+    ]
+  },
+  "term2k-eg-p55-explus-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "It being"
+    ]
+  },
+  "term2k-eg-p55-explus-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Having seen"
+    ]
+  },
+  "term2k-eg-p55-explus-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "While cleaning"
+    ]
+  },
+  "term2k-eg-p55-explus-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Frankly speaking"
+    ]
+  },
+  "term2k-eg-p55-explus-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Speaking of"
+    ]
+  },
+  "term2k-eg-p55-explus-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Generally speaking"
+    ]
+  },
+  "term2k-eg-p55-explus-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Judging from"
+    ]
+  },
+  "term2k-eg-p55-explus-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "彼女は目を閉じて仕事のことを考えていた。"
+    ]
+  },
+  "term2k-eg-p55-explus-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "彼は目を輝かせて私の話を聞いた。"
+    ]
+  },
+  "term2k-eg-p55-explus-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "グラスにはワインが残っていない。"
+    ]
+  },
+  "term2k-eg-p55-explus-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "ドアのところに見知らぬ人が2人立っていた。"
+    ]
+  },
+  "term2k-eg-p55-explus-4-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "go shopping at",
+          "go shopping in"
+    ]
+  },
+  "term2k-eg-p55-explus-4-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "went swimming in",
+          "went swimming at"
+    ]
+  },
+  "term2k-eg-p55-explus-4-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "busy washing"
+    ]
+  },
+  "term2k-eg-p56-fe-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "singing"
+    ]
+  },
+  "term2k-eg-p56-fe-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "do"
+    ]
+  },
+  "term2k-eg-p56-fe-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "visiting"
+    ]
+  },
+  "term2k-eg-p56-fe-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to turn"
+    ]
+  },
+  "term2k-eg-p56-fe-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "going"
+    ]
+  },
+  "term2k-eg-p56-fe-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "being"
+    ]
+  },
+  "term2k-eg-p56-fe-1-7": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "cut"
+    ]
+  },
+  "term2k-eg-p56-fe-1-8": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Interested"
+    ]
+  },
+  "term2k-eg-p56-fe-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "where to study"
+    ]
+  },
+  "term2k-eg-p56-fe-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "happened to"
+    ]
+  },
+  "term2k-eg-p56-fe-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "want to study"
+    ]
+  },
+  "term2k-eg-p56-fe-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "about going"
+    ]
+  },
+  "term2k-eg-p56-fe-2-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "is rude of",
+          "is impolite of"
+    ]
+  },
+  "term2k-eg-p56-fe-2-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "feel doing"
+    ]
+  },
+  "term2k-eg-p56-fe-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Would you mind my opening the window?"
+    ]
+  },
+  "term2k-eg-p56-fe-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He is used to driving a big car."
+    ]
+  },
+  "term2k-eg-p56-fe-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "She left her dog waiting outside the shop."
+    ]
+  },
+  "term2k-eg-p56-fe-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Do you know that boy running in the park?"
+    ]
+  },
+  "term2k-eg-p56-fe-3-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Kelly is rich enough to buy a house."
+    ]
+  },
+  "term2k-eg-p57-fe-3-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I'm sure of his passing the entrance examination."
+    ]
+  },
+  "term2k-eg-p57-fe-4-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to be shaking"
+    ]
+  },
+  "term2k-eg-p57-fe-4-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to have been"
+    ]
+  },
+  "term2k-eg-p57-fe-4-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "no knowing"
+    ]
+  },
+  "term2k-eg-p57-fe-4-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "with crossed"
+    ]
+  },
+  "term2k-eg-p57-fe-4-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "easy to read"
+    ]
+  },
+  "term2k-eg-p57-fe-4-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to visit"
+    ]
+  },
+  "term2k-eg-p57-fe-6-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "私はうそをつくのは悪いことだと思う。"
+    ]
+  },
+  "term2k-eg-p57-fe-6-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "彼は終電に間に合うように駅まで走った。"
+    ]
+  },
+  "term2k-eg-p57-fe-6-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "言うまでもなく、早起きは大切だ。"
+    ]
+  },
+  "term2k-eg-p57-fe-6-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "それを探そうとしても無駄だ。"
+    ]
+  },
+  "term2k-eg-p59-ex20-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as as"
+    ]
+  },
+  "term2k-eg-p59-ex20-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "get as early as",
+          "get so early as"
+    ]
+  },
+  "term2k-eg-p59-ex20-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as much money as"
+    ]
+  },
+  "term2k-eg-p59-ex20-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "twice as high as",
+          "twice as tall as"
+    ]
+  },
+  "term2k-eg-p59-ex20-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as as possible"
+    ]
+  },
+  "term2k-eg-p59-ex20-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as as could"
+    ]
+  },
+  "term2k-eg-p59-ex20-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "bigger than",
+          "larger than"
+    ]
+  },
+  "term2k-eg-p59-ex20-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "heavier"
+    ]
+  },
+  "term2k-eg-p59-ex20-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "by three centimeters",
+          "by 3 centimeters"
+    ]
+  },
+  "term2k-eg-p59-ex20-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "better than"
+    ]
+  },
+  "term2k-eg-p59-ex20-2-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "less"
+    ]
+  },
+  "term2k-eg-p59-ex20-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He is not more popular than this actor."
+    ]
+  },
+  "term2k-eg-p59-ex20-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "That sofa is two hundred dollars more expensive than this one."
+    ]
+  },
+  "term2k-eg-p59-ex20-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Today is far busier than yesterday."
+    ]
+  },
+  "term2k-eg-p61-ex21-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the most beautiful of"
+    ]
+  },
+  "term2k-eg-p61-ex21-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the tallest in"
+    ]
+  },
+  "term2k-eg-p61-ex21-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the very"
+    ]
+  },
+  "term2k-eg-p61-ex21-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the least"
+    ]
+  },
+  "term2k-eg-p61-ex21-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "by far the"
+    ]
+  },
+  "term2k-eg-p61-ex21-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "He is one of the richest people in this city."
+    ]
+  },
+  "term2k-eg-p61-ex21-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "This is the fourth oldest castle in Europe."
+    ]
+  },
+  "term2k-eg-p61-ex21-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "He swims fastest in the swimming club.",
+          "In the swimming club he swims fastest."
+    ]
+  },
+  "term2k-eg-p61-ex21-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "She is the youngest of the four."
+    ]
+  },
+  "term2k-eg-p61-ex21-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "higher any other",
+          "higher every other"
+    ]
+  },
+  "term2k-eg-p61-ex21-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "No other hotter"
+    ]
+  },
+  "term2k-eg-p61-ex21-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "No fast as"
+    ]
+  },
+  "term2k-eg-p61-ex21-3-4b": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "nothing"
+    ]
+  },
+  "term2k-eg-p61-ex21-3-4c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "anything",
+          "everything"
+    ]
+  },
+  "term2k-eg-p63-explus-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "The elder",
+          "The older"
+    ]
+  },
+  "term2k-eg-p63-explus-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more more"
+    ]
+  },
+  "term2k-eg-p63-explus-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "superior to"
+    ]
+  },
+  "term2k-eg-p63-explus-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "この秋は，涼しいというよりむしろ寒い。"
+    ]
+  },
+  "term2k-eg-p63-explus-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "彼女は歌手というよりはむしろピアニストだ。"
+    ]
+  },
+  "term2k-eg-p63-explus-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "練習すればするほど，ますます上手に泳げるようになるだろう。"
+    ]
+  },
+  "term2k-eg-p63-explus-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "no less than",
+          "no fewer than"
+    ]
+  },
+  "term2k-eg-p63-explus-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "not less than"
+    ]
+  },
+  "term2k-eg-p63-explus-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "not more than"
+    ]
+  },
+  "term2k-eg-p63-explus-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "no more than"
+    ]
+  },
+  "term2k-eg-p63-explus-4-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "The puppy is no bigger than this doll."
+    ]
+  },
+  "term2k-eg-p63-explus-4-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I am no more busy than you are."
+    ]
+  },
+  "term2k-eg-p63-explus-4-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "no less valuable than our own lives are",
+          "The lives of animals are no less valuable than our own lives are."
+    ]
+  },
+  "term2k-eg-p64-fe-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "much"
+    ]
+  },
+  "term2k-eg-p64-fe-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the taller"
+    ]
+  },
+  "term2k-eg-p64-fe-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "more"
+    ]
+  },
+  "term2k-eg-p64-fe-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "no more than"
+    ]
+  },
+  "term2k-eg-p64-fe-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to"
+    ]
+  },
+  "term2k-eg-p64-fe-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as friendly a person"
+    ]
+  },
+  "term2k-eg-p64-fe-1-7": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more and more"
+    ]
+  },
+  "term2k-eg-p64-fe-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "The more we practiced, the stronger we became."
+    ]
+  },
+  "term2k-eg-p64-fe-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "The weather was much better than we expected."
+    ]
+  },
+  "term2k-eg-p64-fe-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Tokyo is one of the most crowded cities in the world."
+    ]
+  },
+  "term2k-eg-p64-fe-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I don't drink as much coffee as my father does."
+    ]
+  },
+  "term2k-eg-p64-fe-2-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Nothing is whiter than snow."
+    ]
+  },
+  "term2k-eg-p64-fe-2-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He worked hard not so much for himself as for his family."
+    ]
+  },
+  "term2k-eg-p64-fe-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "could"
+    ]
+  },
+  "term2k-eg-p64-fe-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "inferior to"
+    ]
+  },
+  "term2k-eg-p64-fe-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "than any other",
+          "than every other"
+    ]
+  },
+  "term2k-eg-p64-fe-3-4b": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "older"
+    ]
+  },
+  "term2k-eg-p64-fe-3-4c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "less"
+    ]
+  },
+  "term2k-eg-p64-fe-3-4d": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as young as",
+          "so young as"
+    ]
+  },
+  "term2k-eg-p65-fe-3-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "better than"
+    ]
+  },
+  "term2k-eg-p65-fe-3-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "no less"
+    ]
+  },
+  "term2k-eg-p65-fe-4-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "least"
+    ]
+  },
+  "term2k-eg-p65-fe-4-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "many books can"
+    ]
+  },
+  "term2k-eg-p65-fe-4-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the fifth tallest"
+    ]
+  },
+  "term2k-eg-p65-fe-4-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "better better"
+    ]
+  },
+  "term2k-eg-p65-fe-4-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "No other beautiful"
+    ]
+  },
+  "term2k-eg-p65-fe-4-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the very"
+    ]
+  },
+  "term2k-eg-p65-fe-5-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He arrived at the station earliest of",
+          "He arrived at the station the earliest of"
+    ]
+  },
+  "term2k-eg-p65-fe-5-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as old as Ann",
+          "as old as Ann is",
+          "as old as she is"
+    ]
+  },
+  "term2k-eg-p65-fe-5-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "three years older than my father",
+          "older than my father by three years",
+          "three years older than my father is"
+    ]
+  },
+  "term2k-eg-p65-fe-5-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "twice as many watches as I do",
+          "twice as many watches as I have",
+          "twice as many as I do",
+          "two times as many watches as I do",
+          "twice as many watches as I"
+    ]
+  },
+  "term2k-eg-p65-fe-6-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "駅に行くのにかかる時間は、せいぜい5分だ。",
+          "駅に着くのに多くても5分だ。"
+    ]
+  },
+  "term2k-eg-p65-fe-6-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "私は毎日少なくとも3杯の紅茶を飲む。",
+          "私は毎日3杯は紅茶を飲む。"
+    ]
+  },
+  "term2k-eg-p65-fe-6-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "今日はとても暑い。気温は38度もある。"
+    ]
+  },
+  "term2k-eg-p65-fe-6-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "私の携帯電話は卵と同じ程度の重さしかない。",
+          "私の携帯電話は卵ほどの重さしかない。"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "wearing"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "living"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "caught"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "sleeping"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "hidden"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "lying"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-1-7": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "boiled"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-1-8": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "taken"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "waiting"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "closed",
+          "shut"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "covered"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "surrounded"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-2-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "interested in"
+    ]
+  },
+  "term2k-wb-p48-l18-s1-2-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "ringing"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "あそこに立っている女の子は私のいとこです。"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "フェンスに囲まれたあの家が見えますか。"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "医者は私を隣の部屋で待たせておいた。"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "割れたグラスはテーブルの上にあります。"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "ドアは鍵をかけたままにしておいたほうがよい。"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "The price of the camera remained unchanged for a long time."
+    ]
+  },
+  "term2k-wb-p49-l18-s2-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "They stood looking at each other for a moment."
+    ]
+  },
+  "term2k-wb-p49-l18-s2-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "The mayor came surrounded by many reporters.",
+          "Surrounded by many reporters, the mayor came."
+    ]
+  },
+  "term2k-wb-p49-l18-s2-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I was satisfied with the special dinner prepared by my mother."
+    ]
+  },
+  "term2k-wb-p49-l18-s2-2-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Add some salt to the boiling water."
+    ]
+  },
+  "term2k-wb-p49-l18-s2-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "standing in the rain"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "bought at this store",
+          "bought in this store"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "running in the park"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "exciting news"
+    ]
+  },
+  "term2k-wb-p49-l18-s2-3-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "advanced",
+    "accepted": [
+          "tomorrow's meeting finished",
+          "the meeting finished tomorrow",
+          "the meeting tomorrow finished",
+          "tomorrow's meeting to be finished",
+          "the meeting to be finished tomorrow"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "shined"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "stolen"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "running"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "changing"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "understood"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "called"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "watching"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Being",
+          "being"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Made"
+    ]
+  },
+  "term2k-wb-p50-l19-s1-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Not knowing my new address, he asked me for it."
+    ]
+  },
+  "term2k-wb-p51-l19-s1-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Waking up, I heard my mother talking on the phone.",
+          "On waking up, I heard my mother talking on the phone.",
+          "When waking up, I heard my mother talking on the phone."
+    ]
+  },
+  "term2k-wb-p51-l19-s1-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He had lunch in a hurry, going back to work quickly."
+    ]
+  },
+  "term2k-wb-p51-l19-s1-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Cleaning her room, she found an old picture of her husband.",
+          "While cleaning her room, she found an old picture of her husband."
+    ]
+  },
+  "term2k-wb-p51-l19-s1-3-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Climbing slowly, we finally reached the top of Mt. Fuji."
+    ]
+  },
+  "term2k-wb-p51-l19-s1-3-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Born and raised in that area, I often enjoyed winter sports there.",
+          "Being born and raised in that area, I often enjoyed winter sports there."
+    ]
+  },
+  "term2k-wb-p51-l19-s2-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "ひとりごとを言いながら、彼は部屋に入ってきた。"
+    ]
+  },
+  "term2k-wb-p51-l19-s2-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "その講義に興味がなかったので、私は眠くなった。"
+    ]
+  },
+  "term2k-wb-p51-l19-s2-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "公園を歩いているとき、その作家は新しい考えをいくつか思いついた。"
+    ]
+  },
+  "term2k-wb-p51-l19-s2-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "さよならを言って、彼女は立ち去った。"
+    ]
+  },
+  "term2k-wb-p51-l19-s2-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I often leave my music playing while I'm reading.",
+          "Often I leave my music playing while I'm reading."
+    ]
+  },
+  "term2k-wb-p51-l19-s2-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I heard my sister singing in her room."
+    ]
+  },
+  "term2k-wb-p51-l19-s2-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He had his leg broken in the game."
+    ]
+  },
+  "term2k-wb-p51-l19-s2-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "In the noisy room, I was not able to make myself heard."
+    ]
+  },
+  "term2k-wb-p51-l19-s2-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "She felt her coat pulled",
+          "She felt her coat being pulled"
+    ]
+  },
+  "term2k-wb-p51-l19-s2-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "We watched him playing the piano",
+          "We watched him play the piano"
+    ]
+  },
+  "term2k-wb-p51-l19-s2-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Mika had lunch brought to her room",
+          "Mika had her lunch brought to her room"
+    ]
+  },
+  "term2k-wb-p52-plus-s1-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Having played"
+    ]
+  },
+  "term2k-wb-p52-plus-s1-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Having visited"
+    ]
+  },
+  "term2k-wb-p52-plus-s1-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "having"
+    ]
+  },
+  "term2k-wb-p52-plus-s1-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "studying"
+    ]
+  },
+  "term2k-wb-p52-plus-s1-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Judging from"
+    ]
+  },
+  "term2k-wb-p52-plus-s1-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Generally speaking"
+    ]
+  },
+  "term2k-wb-p52-plus-s1-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Frankly speaking",
+          "Speaking frankly",
+          "Frankly speaking,"
+    ]
+  },
+  "term2k-wb-p52-plus-s1-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "Speaking of painting",
+          "Speaking of paintings",
+          "Talking of painting",
+          "Talking of paintings"
+    ]
+  },
+  "term2k-wb-p52-plus-s1-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "She felt secure with her brother standing by her."
+    ]
+  },
+  "term2k-wb-p52-plus-s1-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I can't sleep with this noise going on."
+    ]
+  },
+  "term2k-wb-p52-plus-s1-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "My father was listening to music with his eyes closed."
+    ]
+  },
+  "term2k-wb-p53-plus-s1-4-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "There competing"
+    ]
+  },
+  "term2k-wb-p53-plus-s1-4-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "There left"
+    ]
+  },
+  "term2k-wb-p53-plus-s1-4-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "went skating"
+    ]
+  },
+  "term2k-wb-p53-plus-s1-4-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "busy working"
+    ]
+  },
+  "term2k-wb-p53-plus-s2-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Having read the news on the Internet, I know the singer got married."
+    ]
+  },
+  "term2k-wb-p53-plus-s2-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Speaking of the singer, do you know how old she is?"
+    ]
+  },
+  "term2k-wb-p53-plus-s2-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "My sister was sitting on the sofa with her legs crossed."
+    ]
+  },
+  "term2k-wb-p53-plus-s2-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "It being Friday night, I stayed up late."
+    ]
+  },
+  "term2k-wb-p53-plus-s2-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "When fishing at the riverside, I fell into the river."
+    ]
+  },
+  "term2k-wb-p53-plus-s2-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "advanced",
+    "accepted": [
+          "watched the movie with her eyes shining",
+          "saw the movie with her eyes shining"
+    ]
+  },
+  "term2k-wb-p53-plus-s2-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Frankly speaking, I didn't like",
+          "Frankly speaking, I did not like",
+          "Speaking frankly, I didn't like"
+    ]
+  },
+  "term2k-wb-p53-plus-s2-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I went skiing in Akita"
+    ]
+  },
+  "term2k-wb-p53-plus-s2-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "My brother is busy preparing for",
+          "My little brother is busy preparing for",
+          "My younger brother is busy preparing for"
+    ]
+  },
+  "term2k-wb-p54-fe-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "talking"
+    ]
+  },
+  "term2k-wb-p54-fe-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "going"
+    ]
+  },
+  "term2k-wb-p54-fe-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to enter"
+    ]
+  },
+  "term2k-wb-p54-fe-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to become"
+    ]
+  },
+  "term2k-wb-p54-fe-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "playing"
+    ]
+  },
+  "term2k-wb-p54-fe-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "my"
+    ]
+  },
+  "term2k-wb-p54-fe-1-7": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "interesting"
+    ]
+  },
+  "term2k-wb-p54-fe-1-8": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "excited"
+    ]
+  },
+  "term2k-wb-p54-fe-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "making"
+    ]
+  },
+  "term2k-wb-p54-fe-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to bake"
+    ]
+  },
+  "term2k-wb-p54-fe-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "seated"
+    ]
+  },
+  "term2k-wb-p54-fe-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "talking"
+    ]
+  },
+  "term2k-wb-p54-fe-2-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "understood"
+    ]
+  },
+  "term2k-wb-p54-fe-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "used to speaking",
+          "accustomed to speaking"
+    ]
+  },
+  "term2k-wb-p54-fe-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "forward to visiting"
+    ]
+  },
+  "term2k-wb-p54-fe-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "use talking",
+          "good talking"
+    ]
+  },
+  "term2k-wb-p54-fe-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "like taking"
+    ]
+  },
+  "term2k-wb-p54-fe-3-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "happened to meet",
+          "happened to see",
+          "chanced to meet",
+          "chanced to see"
+    ]
+  },
+  "term2k-wb-p54-fe-4-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "of to make"
+    ]
+  },
+  "term2k-wb-p54-fe-4-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to have been"
+    ]
+  },
+  "term2k-wb-p54-fe-4-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "to be feeling"
+    ]
+  },
+  "term2k-wb-p54-fe-4-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as to"
+    ]
+  },
+  "term2k-wb-p54-fe-4-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "too for to"
+    ]
+  },
+  "term2k-wb-p55-fe-5-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I'm sure of Sarah's succeeding as a singer.",
+          "I'm sure of Sarah succeeding as a singer.",
+          "I'm sure of her succeeding as a singer."
+    ]
+  },
+  "term2k-wb-p55-fe-5-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Being interested in Japanese culture, John has visited Japan several times.",
+          "Interested in Japanese culture, John has visited Japan several times."
+    ]
+  },
+  "term2k-wb-p55-fe-5-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He is made to wash the dishes after dinner by his parents.",
+          "He is made to wash the dishes by his parents after dinner."
+    ]
+  },
+  "term2k-wb-p55-fe-6-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "My brother wants me to help him with his homework."
+    ]
+  },
+  "term2k-wb-p55-fe-6-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Tom's parents tell him not to bother others."
+    ]
+  },
+  "term2k-wb-p55-fe-6-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I turned down the music in order not to wake my sister up."
+    ]
+  },
+  "term2k-wb-p55-fe-6-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "When I was a little child, I had no friends to play with."
+    ]
+  },
+  "term2k-wb-p55-fe-6-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "You are old enough to decide for yourself."
+    ]
+  },
+  "term2k-wb-p55-fe-6-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Kate saw a stranger running away from the scene of the crime."
+    ]
+  },
+  "term2k-wb-p55-fe-6-7": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Joe's classmates stopped him from leaving school."
+    ]
+  },
+  "term2k-wb-p55-fe-7-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "私は教室に駆け込んだが、結局だれもいなかった。"
+    ]
+  },
+  "term2k-wb-p55-fe-7-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "私たちはこのカーペットをクリーニングしてもらうべきだ。"
+    ]
+  },
+  "term2k-wb-p55-fe-7-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "忘れずにシャンプーを買いましたか。"
+    ]
+  },
+  "term2k-wb-p55-fe-7-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "3か月前にここで私に会ったことを覚えていますか。"
+    ]
+  },
+  "term2k-wb-p56-check-1-1c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "higher"
+    ]
+  },
+  "term2k-wb-p56-check-1-1s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "highest"
+    ]
+  },
+  "term2k-wb-p56-check-1-2c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "shorter"
+    ]
+  },
+  "term2k-wb-p56-check-1-2s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "shortest"
+    ]
+  },
+  "term2k-wb-p56-check-1-3c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "older"
+    ]
+  },
+  "term2k-wb-p56-check-1-3s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "oldest"
+    ]
+  },
+  "term2k-wb-p56-check-1-4c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "longer"
+    ]
+  },
+  "term2k-wb-p56-check-1-4s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "longest"
+    ]
+  },
+  "term2k-wb-p56-check-1-5c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "larger"
+    ]
+  },
+  "term2k-wb-p56-check-1-5s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "largest"
+    ]
+  },
+  "term2k-wb-p56-check-1-6c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "smarter"
+    ]
+  },
+  "term2k-wb-p56-check-1-6s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "smartest"
+    ]
+  },
+  "term2k-wb-p56-check-1-7c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "earlier"
+    ]
+  },
+  "term2k-wb-p56-check-1-7s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "earliest"
+    ]
+  },
+  "term2k-wb-p56-check-1-8c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "colder"
+    ]
+  },
+  "term2k-wb-p56-check-1-8s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "coldest"
+    ]
+  },
+  "term2k-wb-p56-check-1-9c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more tired"
+    ]
+  },
+  "term2k-wb-p56-check-1-9s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "most tired"
+    ]
+  },
+  "term2k-wb-p56-check-1-10c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more surprising"
+    ]
+  },
+  "term2k-wb-p56-check-1-10s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "most surprising"
+    ]
+  },
+  "term2k-wb-p56-check-1-11c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more interested"
+    ]
+  },
+  "term2k-wb-p56-check-1-11s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "most interested"
+    ]
+  },
+  "term2k-wb-p56-check-1-12c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more quickly"
+    ]
+  },
+  "term2k-wb-p56-check-1-12s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "most quickly"
+    ]
+  },
+  "term2k-wb-p56-check-1-13c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more famous"
+    ]
+  },
+  "term2k-wb-p56-check-1-13s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "most famous"
+    ]
+  },
+  "term2k-wb-p56-check-1-14c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more careful"
+    ]
+  },
+  "term2k-wb-p56-check-1-14s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "most careful"
+    ]
+  },
+  "term2k-wb-p56-check-1-15c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "better"
+    ]
+  },
+  "term2k-wb-p56-check-1-15s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "best"
+    ]
+  },
+  "term2k-wb-p56-check-1-16c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more"
+    ]
+  },
+  "term2k-wb-p56-check-1-16s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "most"
+    ]
+  },
+  "term2k-wb-p56-check-1-17c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "better"
+    ]
+  },
+  "term2k-wb-p56-check-1-17s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "best"
+    ]
+  },
+  "term2k-wb-p56-check-1-18c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more"
+    ]
+  },
+  "term2k-wb-p56-check-1-18s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "most"
+    ]
+  },
+  "term2k-wb-p56-check-1-19c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "worse"
+    ]
+  },
+  "term2k-wb-p56-check-1-19s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "worst"
+    ]
+  },
+  "term2k-wb-p56-check-1-20c": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "less"
+    ]
+  },
+  "term2k-wb-p56-check-1-20s": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "least"
+    ]
+  },
+  "term2k-wb-p56-check-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "as large as"
+    ]
+  },
+  "term2k-wb-p56-check-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "as kind as"
+    ]
+  },
+  "term2k-wb-p56-check-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "as slowly as"
+    ]
+  },
+  "term2k-wb-p56-check-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "as hard as"
+    ]
+  },
+  "term2k-wb-p56-check-2-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "as many as"
+    ]
+  },
+  "term2k-wb-p56-check-2-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "as much as"
+    ]
+  },
+  "term2k-wb-p57-check-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "bigger"
+    ]
+  },
+  "term2k-wb-p57-check-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more exciting"
+    ]
+  },
+  "term2k-wb-p57-check-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more interesting"
+    ]
+  },
+  "term2k-wb-p57-check-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "better"
+    ]
+  },
+  "term2k-wb-p57-check-3-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "less"
+    ]
+  },
+  "term2k-wb-p57-check-4-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the most important"
+    ]
+  },
+  "term2k-wb-p57-check-4-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the deepest"
+    ]
+  },
+  "term2k-wb-p57-check-4-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "hardest",
+          "the hardest"
+    ]
+  },
+  "term2k-wb-p57-check-4-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "earliest",
+          "the earliest"
+    ]
+  },
+  "term2k-wb-p57-check-4-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the most valuable"
+    ]
+  },
+  "term2k-wb-p57-check-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "as difficult as"
+    ]
+  },
+  "term2k-wb-p57-check-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "younger than"
+    ]
+  },
+  "term2k-wb-p57-check-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the widest",
+          "the broadest"
+    ]
+  },
+  "term2k-wb-p57-check-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "fastest",
+          "the fastest"
+    ]
+  },
+  "term2k-wb-p57-check-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the most popular"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as tall"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "not young"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as much milk"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "twice long"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "soon can",
+          "quickly can"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "many movies as"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-1-7": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as easy a test"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-2a-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "better"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-2a-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "faster"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-2a-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "more difficult"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-2a-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "not colder"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-2a-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "not more expensive"
+    ]
+  },
+  "term2k-wb-p58-l20-s1-2b-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Your car is much bigger than mine."
+    ]
+  },
+  "term2k-wb-p58-l20-s1-2b-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "This song is less familiar than the others."
+    ]
+  },
+  "term2k-wb-p59-l20-s1-2b-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "That sumo wrestler looks one hundred kilograms heavier than my son."
+    ]
+  },
+  "term2k-wb-p59-l20-s1-2b-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "His second movie is far more interesting than his first one."
+    ]
+  },
+  "term2k-wb-p59-l20-s1-2b-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Tokyo Skytree is higher than Tokyo Tower by about 300 meters.",
+          "Tokyo Skytree is higher by about 300 meters than Tokyo Tower."
+    ]
+  },
+  "term2k-wb-p59-l20-s2-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "You should keep the wound as clean as possible."
+    ]
+  },
+  "term2k-wb-p59-l20-s2-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Reply to the letter as soon as you can.",
+          "As soon as you can, reply to the letter."
+    ]
+  },
+  "term2k-wb-p59-l20-s2-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "My new job is not harder than my old one."
+    ]
+  },
+  "term2k-wb-p59-l20-s2-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He is wearing a watch more expensive than mine.",
+          "He is wearing a more expensive watch than mine."
+    ]
+  },
+  "term2k-wb-p59-l20-s2-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "My sister drives less carefully than my mother."
+    ]
+  },
+  "term2k-wb-p59-l20-s2-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Japanese history is much more interesting for me than science.",
+          "Japanese history is much more interesting than science for me.",
+          "For me Japanese history is much more interesting than science."
+    ]
+  },
+  "term2k-wb-p59-l20-s2-1-7": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "My temperature was two degrees higher than usual."
+    ]
+  },
+  "term2k-wb-p59-l20-s2-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "three times as large as that stadium",
+          "three times as large as that one",
+          "three times as big as that stadium"
+    ]
+  },
+  "term2k-wb-p59-l20-s2-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "is not as popular as",
+          "is not so popular as",
+          "isn't as popular as",
+          "isn't so popular as",
+          "is less popular than American"
+    ]
+  },
+  "term2k-wb-p59-l20-s2-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "half as many pictures as",
+          "half as many photos as"
+    ]
+  },
+  "term2k-wb-p59-l20-s2-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "is much milder than",
+          "is far milder than",
+          "is a lot milder than"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the tallest in"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the shortest of"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the most expensive in"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the earliest in"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the best of"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "most fluently of"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "much the worst",
+          "by far the worst",
+          "far the worst"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "one of the funniest"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the second smallest"
+    ]
+  },
+  "term2k-wb-p60-l21-s1-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the least expensive",
+          "the cheapest"
+    ]
+  },
+  "term2k-wb-p61-l21-s1-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "other book thicker"
+    ]
+  },
+  "term2k-wb-p61-l21-s1-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "larger any other"
+    ]
+  },
+  "term2k-wb-p61-l21-s1-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as hard as",
+          "so hard as"
+    ]
+  },
+  "term2k-wb-p61-l21-s1-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Nothing"
+    ]
+  },
+  "term2k-wb-p61-l21-s2-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "My mother is the most talkative in my family."
+    ]
+  },
+  "term2k-wb-p61-l21-s2-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Nobody else plays the guitar as well as he does."
+    ]
+  },
+  "term2k-wb-p61-l21-s2-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He said I was the least excited person at the party."
+    ]
+  },
+  "term2k-wb-p61-l21-s2-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Ramen is more popular than any other food among students."
+    ]
+  },
+  "term2k-wb-p61-l21-s2-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "He swims by far the fastest in this class.",
+          "He swims the fastest in this class by far."
+    ]
+  },
+  "term2k-wb-p61-l21-s2-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "No other planet is bigger than Jupiter."
+    ]
+  },
+  "term2k-wb-p61-l21-s2-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the most difficult of all",
+          "the most difficult of them all",
+          "the most difficult"
+    ]
+  },
+  "term2k-wb-p61-l21-s2-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "one of the most successful movies",
+          "one of the most successful films"
+    ]
+  },
+  "term2k-wb-p61-l21-s2-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Nothing is better"
+    ]
+  },
+  "term2k-wb-p61-l21-s2-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the third largest lake in Japan",
+          "the third-largest lake in Japan"
+    ]
+  },
+  "term2k-wb-p62-plus-s1-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "the larger of"
+    ]
+  },
+  "term2k-wb-p62-plus-s1-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "senior to"
+    ]
+  },
+  "term2k-wb-p62-plus-s1-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "superior"
+    ]
+  },
+  "term2k-wb-p62-plus-s1-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "not so much"
+    ]
+  },
+  "term2k-wb-p62-plus-s1-1b-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "そのニュースは興味深いというよりむしろ衝撃的だった。"
+    ]
+  },
+  "term2k-wb-p62-plus-s1-1b-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "最近、天気はだんだん涼しくなってきている。"
+    ]
+  },
+  "term2k-wb-p62-plus-s1-1b-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "starter",
+    "accepted": [
+          "ピアノを練習すればするほど、ますます上手になるでしょう。"
+    ]
+  },
+  "term2k-wb-p62-plus-s1-2a-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Today's test was no more difficult than yesterday's."
+    ]
+  },
+  "term2k-wb-p62-plus-s1-2a-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Getting enough rest is no less important than working hard."
+    ]
+  },
+  "term2k-wb-p62-plus-s1-2a-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "This tablet PC is no heavier than a magazine."
+    ]
+  },
+  "term2k-wb-p63-plus-s1-2b-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "no more than"
+    ]
+  },
+  "term2k-wb-p63-plus-s1-2b-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "not more than"
+    ]
+  },
+  "term2k-wb-p63-plus-s1-2b-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "no less than"
+    ]
+  },
+  "term2k-wb-p63-plus-s1-2b-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "not less than"
+    ]
+  },
+  "term2k-wb-p63-plus-s2-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Bob is not so much a singer as a poet."
+    ]
+  },
+  "term2k-wb-p63-plus-s2-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Jimmy's behavior was more childish than bad."
+    ]
+  },
+  "term2k-wb-p63-plus-s2-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "This cell phone is inferior to that one in sound quality."
+    ]
+  },
+  "term2k-wb-p63-plus-s2-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I am no more fluent in English than he is."
+    ]
+  },
+  "term2k-wb-p63-plus-s2-1-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Keita spent no less than 50,000 yen for clothes last month."
+    ]
+  },
+  "term2k-wb-p63-plus-s2-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "I drink not less than three cups of coffee every day."
+    ]
+  },
+  "term2k-wb-p63-plus-s2-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "blowing harder and harder"
+    ]
+  },
+  "term2k-wb-p63-plus-s2-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "The earlier you book, the cheaper",
+          "The sooner you book, the cheaper"
+    ]
+  },
+  "term2k-wb-p63-plus-s2-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "no less diligent than the other students",
+          "no less diligent than any other student",
+          "no less diligent than the others"
+    ]
+  },
+  "term2k-wb-p63-plus-s2-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the more expensive of the two coats",
+          "the more expensive coat of the two"
+    ]
+  },
+  "term2k-wb-p64-fe-1-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "cannot as well as",
+          "can't as well as",
+          "can not as well as",
+          "cannot so well as",
+          "can't so well as"
+    ]
+  },
+  "term2k-wb-p64-fe-1-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as possible"
+    ]
+  },
+  "term2k-wb-p64-fe-1-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "easier than",
+          "simpler than"
+    ]
+  },
+  "term2k-wb-p64-fe-1-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "worst of",
+          "poorest of"
+    ]
+  },
+  "term2k-wb-p64-fe-1-5a": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the highest",
+          "the tallest"
+    ]
+  },
+  "term2k-wb-p64-fe-1-5b": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the second highest",
+          "the second tallest"
+    ]
+  },
+  "term2k-wb-p64-fe-1-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "one of the best",
+          "one of the finest",
+          "one of the greatest"
+    ]
+  },
+  "term2k-wb-p64-fe-1-7": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the least"
+    ]
+  },
+  "term2k-wb-p64-fe-2-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "thirty minutes earlier"
+    ]
+  },
+  "term2k-wb-p64-fe-2-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "No more than",
+          "no more than"
+    ]
+  },
+  "term2k-wb-p64-fe-2-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "no less than"
+    ]
+  },
+  "term2k-wb-p64-fe-2-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "less difficult"
+    ]
+  },
+  "term2k-wb-p64-fe-3-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "No other lake in Japan is as large as Lake Biwa.",
+          "No lake in Japan is as large as Lake Biwa.",
+          "No other lake in Japan is so large as Lake Biwa.",
+          "No lake in Japan is so large as Lake Biwa.",
+          "No other lake in Japan is as big as Lake Biwa.",
+          "No lake in Japan is as big as Lake Biwa."
+    ]
+  },
+  "term2k-wb-p64-fe-3-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "No other prefecture in Japan is smaller than Kagawa.",
+          "No prefecture in Japan is smaller than Kagawa."
+    ]
+  },
+  "term2k-wb-p64-fe-3-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "The Tone River is longer than any other river in the Kanto region."
+    ]
+  },
+  "term2k-wb-p64-fe-3-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Nothing is more important than honesty."
+    ]
+  },
+  "term2k-wb-p64-fe-3-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Today is much hotter than yesterday.",
+          "Today is far hotter than yesterday.",
+          "Today is a lot hotter than yesterday."
+    ]
+  },
+  "term2k-wb-p64-fe-3-6": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Tokyo Skytree is by far the highest tower in Japan.",
+          "Tokyo Skytree is much the highest tower in Japan."
+    ]
+  },
+  "term2k-wb-p65-fe-4-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "My grandmother drinks as much tea as my mother."
+    ]
+  },
+  "term2k-wb-p65-fe-4-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Richie has grown up, and he is not as innocent as he used to be."
+    ]
+  },
+  "term2k-wb-p65-fe-4-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "Children there eat only half as much food as they need."
+    ]
+  },
+  "term2k-wb-p65-fe-4-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "The younger you are, the easier it is to learn a foreign language."
+    ]
+  },
+  "term2k-wb-p65-fe-4-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "This bike is the cheaper of the two."
+    ]
+  },
+  "term2k-wb-p65-fe-5-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "私たちの学校はあなたの学校より古いということはない。"
+    ]
+  },
+  "term2k-wb-p65-fe-5-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "アンは自分の2倍の年齢の人たちと話すのを楽しんだ。"
+    ]
+  },
+  "term2k-wb-p65-fe-5-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "私は紅茶よりコーヒーのほうが好きだ。"
+    ]
+  },
+  "term2k-wb-p65-fe-5-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "世界はますます小さくなってきている。"
+    ]
+  },
+  "term2k-wb-p65-fe-5-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "彼のふるまいは楽しいというよりむしろ愚かだった。"
+    ]
+  },
+  "term2k-wb-p65-fe-6-1": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "the biggest"
+    ]
+  },
+  "term2k-wb-p65-fe-6-2": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "bigger than"
+    ]
+  },
+  "term2k-wb-p65-fe-6-3": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "more crowded than"
+    ]
+  },
+  "term2k-wb-p65-fe-6-4": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "as warm-hearted as"
+    ]
+  },
+  "term2k-wb-p65-fe-6-5": {
+    "course": "regular-english-practice-2kimatsu",
+    "difficulty": "standard",
+    "accepted": [
+          "not less than"
+    ]
+  },
+  // TERM_FINAL_QUESTION_REGISTRY_END
 }
 
 function doGet(e) {
