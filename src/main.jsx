@@ -2,6 +2,7 @@ import { StrictMode, Suspense, createContext, lazy, useCallback, useContext, use
 import { createRoot } from 'react-dom/client'
 import { createPortal, flushSync } from 'react-dom'
 import { shouldResetThemeSelection } from './themeAccess.js'
+import { isCorrectAnswer } from './answerGrading.js'
 import './styles.css'
 import { FOUNDATION_TRANSLATIONS } from './foundationTranslations'
 import { loadQuestionBank } from './questionBankLoader'
@@ -326,15 +327,6 @@ function readPersisted() {
 
 function normalize(value = '') {
   return value.trim().toLowerCase().replace(/[’']/g, "'").replace(/[。．,，!！?？]/g, '').replace(/\s+/g, ' ')
-}
-
-function normalizeAnswer(value = '') {
-  return normalize(value).replace(/[.,!?。、「」]/g, '')
-}
-
-function isCorrectAnswer(question, userAnswer) {
-  const candidates = question.accepted?.length ? question.accepted : [question.answer]
-  return candidates.some((answer) => normalizeAnswer(answer) === normalizeAnswer(userAnswer))
 }
 
 function addAnsweredId(profile, courseId, questionId) {

@@ -7,7 +7,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 18",
     "topic": "分詞(1)",
     "difficulty": "starter",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "Do you know the boys <u>playing basketball in the park</u>?",
     "japanese": "",
     "translation": "あなたは公園でバスケットボールをしている男の子たちを知っていますか。",
@@ -34,7 +34,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 18",
     "topic": "分詞(1)",
     "difficulty": "starter",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "The car <u>parked on the street</u> is mine.",
     "japanese": "",
     "translation": "通りに停められている車は私のものです。",
@@ -61,7 +61,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 18",
     "topic": "分詞(1)",
     "difficulty": "starter",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "I love her <u>smiling face</u>.",
     "japanese": "",
     "translation": "私は彼女の笑顔(ほほえんでいる顔)が大好きです。",
@@ -88,7 +88,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 18",
     "topic": "分詞(1)",
     "difficulty": "starter",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "He explained it to me in <u>a tired voice</u>.",
     "japanese": "",
     "translation": "彼は疲れた声で私にそれを説明した。",
@@ -342,7 +342,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "get A 〜ed で「A を〜してもらう」という意味です。車は「洗われる」側なので、wash を過去分詞の washed にします。washing だと「車が洗っている」ことになってしまいます。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 19 1(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "wash"
+    ]
   },
   {
     "id": "term2k-eg-p53-ex19-1-2",
@@ -363,7 +366,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "have A 〜ed には「A を〜される」という意味もあります。カメラは「壊される」側で、by my brother（弟によって）が受け身の手がかりです。break を過去分詞の broken にします。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 19 1(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "break"
+    ]
   },
   {
     "id": "term2k-eg-p53-ex19-1-3",
@@ -384,7 +390,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "get A ～ing で「A を〜している状態にする」という意味です。コンピュータは「動く」側で、by などの受け身の手がかりもないので ing の形 working にします。worked だと形が合いません。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 19 1(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "work"
+    ]
   },
   {
     "id": "term2k-eg-p53-ex19-1-4",
@@ -405,7 +414,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "make A 〜ed で「A を〜されるようにする」という意味です。「私(myself)」は声を「聞かれる」側なので、hear を過去分詞の heard にします。make oneself heard は「自分の声を届かせる」という決まった言い方です。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 19 1(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "hear"
+    ]
   },
   {
     "id": "term2k-eg-p53-ex19-1-5",
@@ -422,11 +434,15 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "chasing",
     "answerLabel": "chasing",
     "accepted": [
-      "chasing"
+      "chasing",
+      "chase"
     ],
-    "explanation": "see A ～ing で「A が〜しているのを見る」という意味です。警察官は男性を「追いかけている」側で、a man という相手が後ろにあるので ing の形 chasing を使います。chased だと「追いかけられた」になり、意味が逆になります。",
+    "explanation": "see A ～ing で「A が〜しているのを見る」という意味です。chasing は追いかけている途中の場面を表し、動作をひとまとまりに捉える原形 chase も使えます。chased だと「追いかけられた」になり、意味が逆になります。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 19 1(5)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "chase"
+    ]
   },
   {
     "id": "term2k-eg-p53-ex19-2-1",
@@ -436,7 +452,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 19",
     "topic": "分詞(2)",
     "difficulty": "starter",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "My grandparents like to <u>hear me playing</u> the piano.",
     "japanese": "",
     "translation": "祖父母は私がピアノを弾くのを聞くのが好きです。",
@@ -463,7 +479,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 19",
     "topic": "分詞(2)",
     "difficulty": "starter",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "We saw the <u>player given</u> a gold medal on TV.",
     "japanese": "",
     "translation": "私たちはその選手がテレビで金メダルを授与されるのを見た。",
@@ -577,7 +593,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 19",
     "topic": "分詞(2)",
     "difficulty": "standard",
-    "prompt": "日本語の意味に合うように，分詞構文を使った英文を完成させない。",
+    "prompt": "日本語の意味に合うように，分詞構文を使った英文を完成させなさい。",
     "sentence": "(　　　　　　　　) the way to the station, I got lost.",
     "japanese": "駅までの道を知らなくて，私は道に迷ってしまった。",
     "translation": "駅までの道を知らなくて，私は道に迷ってしまった。",
@@ -598,7 +614,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 19",
     "topic": "分詞(2)",
     "difficulty": "standard",
-    "prompt": "日本語の意味に合うように，分詞構文を使った英文を完成させない。",
+    "prompt": "日本語の意味に合うように，分詞構文を使った英文を完成させなさい。",
     "sentence": "He was fixing the car, (　　　　　　　　　　).",
     "japanese": "彼はラジオを聴きながら車の修理をしていた。",
     "translation": "彼はラジオを聴きながら車の修理をしていた。",
@@ -619,7 +635,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 19",
     "topic": "分詞(2)",
     "difficulty": "standard",
-    "prompt": "日本語の意味に合うように，分詞構文を使った英文を完成させない。",
+    "prompt": "日本語の意味に合うように，分詞構文を使った英文を完成させなさい。",
     "sentence": "(　　　　　　　　), the menu was impossible for me to understand.",
     "japanese": "フランス語で書かれていたので，私にはそのメニューを理解するのは無理だった。",
     "translation": "フランス語で書かれていたので，私にはそのメニューを理解するのは無理だった。",
@@ -671,7 +687,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "Having seen"
     ],
-    "explanation": "last Sunday に見たのは「今」より前のことなので、「〜したので」を having と過去分詞で表します。see の過去分詞は seen なので Having seen です。Seeing だけだと、見たのが同じ時になってしまいます。",
+    "explanation": "Seeing は主節と同時のことを表す場合がありますが、ここでは last Sunday に見たことが主節より前なので Having seen を使います。Having seen は、主節より前に見たことを明示します。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 1(2)",
     "blankCount": 2
   },
@@ -704,7 +720,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "分詞",
     "difficulty": "starter",
-    "prompt": "意味が通る英文になるように，下線部に入る語句を[ ]から選びなさい。ただし，同じ語句は1度しか使えません。",
+    "prompt": "日本語の意味に合うように、空欄に入る語句を選びなさい。",
     "sentence": "(　　　　　　　　), I don't agree with his plan.",
     "japanese": "",
     "translation": "率直に言うと、私は彼の計画に賛成できない。",
@@ -713,7 +729,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "Frankly speaking"
     ],
-    "explanation": "「彼の計画に賛成しない」と本音を言う文なので、「率直に言うと」の Frankly speaking が合います。Generally speaking（一般的に言うと）も文法上は入りますが、(3) で使うのでここでは使えません。",
+    "explanation": "Frankly speaking は「率直に言うと」という意味です。文全体では、自分の考えを率直に述べています。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 2(1)",
     "choices": [
       "Speaking of",
@@ -731,7 +747,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "分詞",
     "difficulty": "starter",
-    "prompt": "意味が通る英文になるように，下線部に入る語句を[ ]から選びなさい。ただし，同じ語句は1度しか使えません。",
+    "prompt": "日本語の意味に合うように、空欄に入る語句を選びなさい。",
     "sentence": "(　　　　　　　　) movies, 3D movies are popular among young people.",
     "japanese": "",
     "translation": "映画といえば、3D映画は若者に人気がある。",
@@ -740,7 +756,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "Speaking of"
     ],
-    "explanation": "文の頭の movies が話題を示しているので、「〜といえば」の Speaking of が合います。Speaking of のあとには話題になる名詞を置きます。",
+    "explanation": "Speaking of は「〜といえば」という意味です。後ろに話題となる名詞 movies が続いています。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 2(2)",
     "choices": [
       "Speaking of",
@@ -758,7 +774,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "分詞",
     "difficulty": "starter",
-    "prompt": "意味が通る英文になるように，下線部に入る語句を[ ]から選びなさい。ただし，同じ語句は1度しか使えません。",
+    "prompt": "日本語の意味に合うように、空欄に入る語句を選びなさい。",
     "sentence": "(　　　　　　　　), the trains run on time in Japan.",
     "japanese": "",
     "translation": "一般的に言うと、日本では電車は時間どおりに走る。",
@@ -767,7 +783,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "Generally speaking"
     ],
-    "explanation": "「日本では電車は時間どおり」という一般的な傾向なので、「一般的に言うと」の Generally speaking が合います。Frankly speaking（率直に言うと）は意味が合いません。",
+    "explanation": "Generally speaking は「一般的に言うと」という意味です。日本の電車について一般的な傾向を述べています。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 2(3)",
     "choices": [
       "Speaking of",
@@ -785,7 +801,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "分詞",
     "difficulty": "starter",
-    "prompt": "意味が通る英文になるように，下線部に入る語句を[ ]から選びなさい。ただし，同じ語句は1度しか使えません。",
+    "prompt": "日本語の意味に合うように、空欄に入る語句を選びなさい。",
     "sentence": "(　　　　　　　　) his voice, he must be young.",
     "japanese": "",
     "translation": "声から判断すると、彼は若いにちがいない。",
@@ -794,7 +810,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "Judging from"
     ],
-    "explanation": "his voice が判断の手がかりなので、「〜から判断すると」の Judging from を使います。from のあとに手がかりになる名詞を置きます。",
+    "explanation": "Judging from は「〜から判断すると」という意味です。his voice が判断の手がかりになっています。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 2(4)",
     "choices": [
       "Speaking of",
@@ -812,8 +828,8 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "分詞",
     "difficulty": "standard",
-    "prompt": "意味が通る英文になるように，[ ]から適切な語を選び，完成した英文を日本語に直しなさい。",
-    "sentence": "She was thinking about her work with her eyes [ closing / closed ].",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
+    "sentence": "She was thinking about her work with her eyes <u>closed</u>.",
     "japanese": "",
     "translation": "彼女は目を閉じて仕事のことを考えていた。",
     "answer": "彼女は目を閉じて仕事のことを考えていた。",
@@ -821,12 +837,12 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "彼女は目を閉じて仕事のことを考えていた。"
     ],
-    "explanation": "with A 〜ed で「A を〜された状態で」の意味です。目は「閉じられた」側なので、受け身の意味の closed を選びます。closing だと「目が（何かを）閉じている」になってしまいます。",
+    "explanation": "with her eyes closed は「目を閉じた状態で」という意味です。eyes は「閉じられる」側なので、過去分詞 closed を使います。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 3(1)",
     "choices": [
       "彼女は目を閉じて仕事のことを考えていた。",
       "彼女は目を閉じようとしながら仕事のことを考えていた。",
-      "彼女は目を閉じられた状態で仕事のことを考えていた。",
+      "彼女は目を開けて仕事のことを考えていた。",
       "彼女は仕事を閉じた目で考えていた。"
     ],
     "blankCount": 0
@@ -839,8 +855,8 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "分詞",
     "difficulty": "standard",
-    "prompt": "意味が通る英文になるように，[ ]から適切な語を選び，完成した英文を日本語に直しなさい。",
-    "sentence": "He listened to me with his eyes [ shining / shone ].",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
+    "sentence": "He listened to me with his eyes <u>shining</u>.",
     "japanese": "",
     "translation": "彼は目を輝かせて私の話を聞いた。",
     "answer": "彼は目を輝かせて私の話を聞いた。",
@@ -848,7 +864,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "彼は目を輝かせて私の話を聞いた。"
     ],
-    "explanation": "with A ～ing で「A が〜している状態で」の意味です。目は自分で「輝いている」側なので ing の形 shining を選びます。過去分詞の shone を使うと「〜された状態」の意味になりますが、目は「輝かされる」ものではないので合いません。",
+    "explanation": "with his eyes shining は「目を輝かせて」という意味です。shine はここでは自動詞で、shining が目の輝いている様子を表します。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 3(2)",
     "choices": [
       "彼は目を輝かせて私の話を聞いた。",
@@ -866,8 +882,8 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "分詞",
     "difficulty": "standard",
-    "prompt": "意味が通る英文になるように，[ ]から適切な語を選び，完成した英文を日本語に直しなさい。",
-    "sentence": "There is no wine [ leaving / left ] in the glass.",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
+    "sentence": "There is no wine <u>left</u> in the glass.",
     "japanese": "",
     "translation": "グラスにはワインが残っていない。",
     "answer": "グラスにはワインが残っていない。",
@@ -875,7 +891,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "グラスにはワインが残っていない。"
     ],
-    "explanation": "wine を後ろから説明して、「残された」→「残っている」を表します。ワインは「残される」側なので、受け身の意味の left を選びます。leaving だと「去っているワイン」になってしまいます。",
+    "explanation": "left は wine を後ろから説明する過去分詞で、「残っている」という状態を表します。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 3(3)",
     "choices": [
       "グラスにはワインが残っていない。",
@@ -893,8 +909,8 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "分詞",
     "difficulty": "standard",
-    "prompt": "意味が通る英文になるように，[ ]から適切な語を選び，完成した英文を日本語に直しなさい。",
-    "sentence": "There were two strangers [ standing / stood ] at the door.",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
+    "sentence": "There were two strangers <u>standing</u> at the door.",
     "japanese": "",
     "translation": "ドアのところに見知らぬ人が2人立っていた。",
     "answer": "ドアのところに見知らぬ人が2人立っていた。",
@@ -902,7 +918,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "ドアのところに見知らぬ人が2人立っていた。"
     ],
-    "explanation": "two strangers を後ろから説明して、「立っている」を表します。見知らぬ人は自分で「立っている」側なので ing の形 standing を選びます。過去分詞の stood は「〜された」という意味になるので、ここでは合いません。",
+    "explanation": "standing at the door は strangers を後ろから修飾し、「ドアのところに立っている」という状態を表します。ここでは動詞 stand の過去形 stood をそのまま名詞の後ろに置くことはできません。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 3(4)",
     "choices": [
       "ドアのところに見知らぬ人が2人立っていた。",
@@ -952,7 +968,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
       "went swimming in",
       "went swimming at"
     ],
-    "explanation": "「〜しに行く」は go ～ing で、yesterday があるので過去形の went にします。「泳ぎに行く」は went swimming で、「海で」の in the sea が続きます。go to swim とは言いません。",
+    "explanation": "yesterday があるので go を went にします。went swimming in the sea は「海に泳ぎに行った」という意味で、go のあとには活動を表す ～ing 形を続けます。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 4(2)",
     "blankCount": 3
   },
@@ -1437,14 +1453,14 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように [ ] 内の語句を並べかえ，全文を書きなさい。",
     "sentence": "（　　　）.",
-    "japanese": "ケリーは家が買えるくらい十分に裕福だ。(1語不足)",
+    "japanese": "ケリーは家が買えるくらい十分に裕福だ。",
     "translation": "ケリーは家が買えるくらい十分に裕福だ。",
     "answer": "Kelly is rich enough to buy a house.",
     "answerLabel": "Kelly is rich enough to buy a house.",
     "accepted": [
       "Kelly is rich enough to buy a house."
     ],
-    "explanation": "「〜できるくらい十分に…だ」は ... enough to ～ で表します。rich enough のあとに to buy a house を置くので、不足している1語は to です。enough は rich のあとに置く点に注意しましょう。",
+    "explanation": "enough to ～で「～するのに十分な」という意味です。rich enough to buy a house。enoughは形容詞richの後に置き、toの後には動詞の原形buyを続けます。",
     "source": "英語演習I 2学期期末・平常授業・Further Exercises 3(5)",
     "words": [
       "is",
@@ -1452,7 +1468,8 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
       "enough",
       "Kelly",
       "a house",
-      "rich"
+      "rich",
+      "to"
     ],
     "blankCount": 1
   },
@@ -1523,7 +1540,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "to have been"
     ],
-    "explanation": "(a) の had been は、seemed より前に起こったことを表します。これを to のあとで表すときは to have been にします。to be だと「ひかれている最中」になって意味が変わります。",
+    "explanation": "(a) の had been run over は seemed より前に起こった受け身の出来事です。これを不定詞で表すと to have been run over となり、完了不定詞 to have been が過去の受け身を示します。",
     "source": "英語演習I 2学期期末・平常授業・Further Exercises 4(2)",
     "blankCount": 3
   },
@@ -1619,7 +1636,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "準動詞",
     "difficulty": "standard",
-    "prompt": "次の英文を日本語に直しなさい。",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "I think it wrong to tell a lie.",
     "japanese": "",
     "translation": "私はうそをつくのは悪いことだと思う。",
@@ -1646,7 +1663,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "準動詞",
     "difficulty": "standard",
-    "prompt": "次の英文を日本語に直しなさい。",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "He ran to the station in order to catch the last train.",
     "japanese": "",
     "translation": "彼は終電に間に合うように駅まで走った。",
@@ -1673,7 +1690,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "準動詞",
     "difficulty": "standard",
-    "prompt": "次の英文を日本語に直しなさい。",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "Needless to say, getting up early is important.",
     "japanese": "",
     "translation": "言うまでもなく、早起きは大切だ。",
@@ -1700,7 +1717,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "準動詞",
     "difficulty": "standard",
-    "prompt": "次の英文を日本語に直しなさい。",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "It is no use trying to look for it.",
     "japanese": "",
     "translation": "それを探そうとしても無駄だ。",
@@ -2450,7 +2467,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "比較",
     "difficulty": "starter",
-    "prompt": "下線部の意味に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "This autumn is <u>more</u> cold <u>than</u> cool.",
     "japanese": "",
     "translation": "この秋は，涼しいというよりむしろ寒い。",
@@ -2477,7 +2494,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "比較",
     "difficulty": "starter",
-    "prompt": "下線部の意味に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "She is <u>not so much</u> a singer <u>as</u> a pianist.",
     "japanese": "",
     "translation": "彼女は歌手というよりはむしろピアニストだ。",
@@ -2504,7 +2521,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "比較",
     "difficulty": "starter",
-    "prompt": "下線部の意味に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "<u>The more</u> you practice, <u>the better</u> you will be able to swim.",
     "japanese": "",
     "translation": "練習すればするほど，ますます上手に泳げるようになるだろう。",
@@ -2649,10 +2666,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） you are.",
     "japanese": "私はあなたと同様に忙しくない。",
     "translation": "私はあなたと同様に忙しくない。",
-    "answer": "I am no more busy than you are.",
+    "answer": "I am no more busy than",
     "answerLabel": "I am no more busy than you are.",
     "accepted": [
-      "I am no more busy than you are."
+      "I am no more busy than"
     ],
     "explanation": "「AはBと同じように…でない」は A is no more ... than B で表します。語群に more があるので、no more busy than you are の形にします。「私が忙しくないのは、あなたが忙しくないのと同じだ」という意味です。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 4(2)",
@@ -2681,8 +2698,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "no less valuable than our own lives are",
     "answerLabel": "no less valuable than our own lives are",
     "accepted": [
-      "no less valuable than our own lives are",
-      "The lives of animals are no less valuable than our own lives are."
+      "no less valuable than our own lives are"
     ],
     "explanation": "問題文の are のあとに no less valuable than our own lives を続け、[ ]内の are は最後（our own lives のあと）に置きます。A is no less ... than B は「Bにおとらず A も…だ（Bと同じくらい…だ）」の意味です。no more ... than（Bと同じく…でない）とは逆の意味になります。",
     "source": "英語演習I 2学期期末・平常授業・EXERCISE 4(3)",
@@ -3458,7 +3474,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "比較",
     "difficulty": "standard",
-    "prompt": "次の英文を日本語に直しなさい。",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "It takes not more than five minutes to get to the station.",
     "japanese": "",
     "translation": "駅に行くのにかかる時間は、せいぜい5分だ。",
@@ -3486,7 +3502,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "比較",
     "difficulty": "standard",
-    "prompt": "次の英文を日本語に直しなさい。",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "I drink not less than three cups of tea every day.",
     "japanese": "",
     "translation": "私は毎日少なくとも3杯の紅茶を飲む。",
@@ -3514,7 +3530,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "比較",
     "difficulty": "standard",
-    "prompt": "次の英文を日本語に直しなさい。",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "It's very hot today. The temperature is no less than 38℃.",
     "japanese": "",
     "translation": "今日はとても暑い。気温は38度もある。",
@@ -3541,7 +3557,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "比較",
     "difficulty": "standard",
-    "prompt": "次の英文を日本語に直しなさい。",
+    "prompt": "次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "My mobile phone is no heavier than an egg.",
     "japanese": "",
     "translation": "私の携帯電話は卵ほどの重さしかない。",
@@ -3570,7 +3586,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "Do you know the girl (　　) the sunglasses?",
+    "sentence": "Do you know the girl (　　) the sunglasses? [ 指定語: wear ]",
     "japanese": "あなたはサングラスをかけているあの女の子を知っていますか。",
     "translation": "あなたはサングラスをかけているあの女の子を知っていますか。",
     "answer": "wearing",
@@ -3580,7 +3596,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "girl が「サングラスをかけている」側なので、「〜している」を表す ing の形 wearing を使います。the girl の後ろに置いて、女の子を後ろから説明します。worn にすると「着られている」という意味になってしまいます。",
     "source": "２学期期末Workbook p.48・Lesson 18 分詞(1)・Step 1 1(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "wear"
+    ]
   },
   {
     "id": "term2k-wb-p48-l18-s1-1-2",
@@ -3591,7 +3610,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "Our brain is like a (　　) computer.",
+    "sentence": "Our brain is like a (　　) computer. [ 指定語: live ]",
     "japanese": "私たちの脳は,生きているコンピュータのようなものです。",
     "translation": "私たちの脳は,生きているコンピュータのようなものです。",
     "answer": "living",
@@ -3601,7 +3620,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "computer は「生きている」状態なので、ing の形 living を使います。1語だけで名詞を説明するときは、名詞の直前に置きます。lived は「生きた」という過去の意味になり、合いません。",
     "source": "２学期期末Workbook p.48・Lesson 18 分詞(1)・Step 1 1(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "live"
+    ]
   },
   {
     "id": "term2k-wb-p48-l18-s1-1-3",
@@ -3612,7 +3634,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "We used to eat the fish (　　) in this river.",
+    "sentence": "We used to eat the fish (　　) in this river. [ 指定語: catch ]",
     "japanese": "私たちはかつて,この川で捕れた魚を食べていた。",
     "translation": "私たちはかつて,この川で捕れた魚を食べていた。",
     "answer": "caught",
@@ -3622,7 +3644,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "fish は「捕られる」側なので、受け身の意味を表す過去分詞 caught を使います。in this river とセットで fish を後ろから説明しています。catching だと魚が何かを捕ることになってしまいます。catch の過去分詞は catched ではなく caught です。",
     "source": "２学期期末Workbook p.48・Lesson 18 分詞(1)・Step 1 1(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "catch"
+    ]
   },
   {
     "id": "term2k-wb-p48-l18-s1-1-4",
@@ -3633,7 +3658,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "I tried not to wake the (　　) baby.",
+    "sentence": "I tried not to wake the (　　) baby. [ 指定語: sleep ]",
     "japanese": "私は眠っている赤ん坊を起こさないように気をつけた。",
     "translation": "私は眠っている赤ん坊を起こさないように気をつけた。",
     "answer": "sleeping",
@@ -3643,7 +3668,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "baby は「眠っている」側なので、ing の形 sleeping を使います。1語なので baby の直前に置きます。slept にすると「眠られた」となり、意味が成り立ちません。",
     "source": "２学期期末Workbook p.48・Lesson 18 分詞(1)・Step 1 1(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "sleep"
+    ]
   },
   {
     "id": "term2k-wb-p48-l18-s1-1-5",
@@ -3654,7 +3682,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "They finally discovered the (　　) treasure.",
+    "sentence": "They finally discovered the (　　) treasure. [ 指定語: hide ]",
     "japanese": "彼らはついに,隠された宝を発見した。",
     "translation": "彼らはついに,隠された宝を発見した。",
     "answer": "hidden",
@@ -3664,7 +3692,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "treasure は「隠される」側なので、受け身の意味を表す過去分詞 hidden を使います。hide の変化は hide - hid - hidden です。hiding だと宝が何かを隠すことになってしまいます。",
     "source": "２学期期末Workbook p.48・Lesson 18 分詞(1)・Step 1 1(5)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "hide"
+    ]
   },
   {
     "id": "term2k-wb-p48-l18-s1-1-6",
@@ -3675,7 +3706,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "I took a picture of the cat (　　) on the sofa.",
+    "sentence": "I took a picture of the cat (　　) on the sofa. [ 指定語: lie ]",
     "japanese": "私はソファーで横になっているネコの写真を撮った。",
     "translation": "私はソファーで横になっているネコの写真を撮った。",
     "answer": "lying",
@@ -3685,7 +3716,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "cat が「横になっている」側なので、ing の形を使います。on the sofa と一緒に cat を後ろから説明します。lie の ing は lieing ではなく lying です。laying は「〜を置く」の別の動詞なので注意しましょう。",
     "source": "２学期期末Workbook p.48・Lesson 18 分詞(1)・Step 1 1(6)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "lie"
+    ]
   },
   {
     "id": "term2k-wb-p48-l18-s1-1-7",
@@ -3696,7 +3730,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "Would you like to have some (　　) vegetables?",
+    "sentence": "Would you like to have some (　　) vegetables? [ 指定語: boil ]",
     "japanese": "ゆでた野菜はいかがですか。",
     "translation": "ゆでた野菜はいかがですか。",
     "answer": "boiled",
@@ -3706,7 +3740,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "vegetables は「ゆでられる」側なので、受け身の意味を表す過去分詞 boiled を使います。1語なので vegetables の直前に置きます。boiling にすると「ぐつぐつ煮立っている」という意味になり、料理された野菜には合いません。",
     "source": "２学期期末Workbook p.48・Lesson 18 分詞(1)・Step 1 1(7)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "boil"
+    ]
   },
   {
     "id": "term2k-wb-p48-l18-s1-1-8",
@@ -3717,7 +3754,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "Is this the picture (　　) by Beth?",
+    "sentence": "Is this the picture (　　) by Beth? [ 指定語: take ]",
     "japanese": "これはベスによって撮られた写真ですか。",
     "translation": "これはベスによって撮られた写真ですか。",
     "answer": "taken",
@@ -3727,7 +3764,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "by Beth（ベスによって）があるので、picture は「撮られた」側です。受け身の意味は過去分詞 taken で表します。take の変化は take - took - taken で、took ではありません。",
     "source": "２学期期末Workbook p.48・Lesson 18 分詞(1)・Step 1 1(8)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "take"
+    ]
   },
   {
     "id": "term2k-wb-p48-l18-s1-2-1",
@@ -3864,7 +3904,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 18",
     "topic": "分詞(1)",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "The girl <u>standing over there</u> is my cousin.",
     "japanese": "",
     "translation": "あそこに立っている女の子は私のいとこです。",
@@ -3891,7 +3931,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 18",
     "topic": "分詞(1)",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "Can you see that house <u>surrounded by the fence</u>?",
     "japanese": "",
     "translation": "フェンスに囲まれたあの家が見えますか。",
@@ -3918,7 +3958,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 18",
     "topic": "分詞(1)",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "The doctor kept me <u>waiting in the next room</u>.",
     "japanese": "",
     "translation": "医者は私を隣の部屋で待たせておいた。",
@@ -3932,7 +3972,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "choices": [
       "医者は私を隣の部屋で待たせておいた。",
       "医者は隣の部屋で私を待っていた。",
-      "医者は私に隣の部屋で待ち続けさせた。",
+      "医者は私を隣の部屋で待つのをやめさせた",
       "私は医者を隣の部屋で待たせておいた。"
     ],
     "blankCount": 0
@@ -3945,7 +3985,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 18",
     "topic": "分詞(1)",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "The <u>broken</u> glass is on the table.",
     "japanese": "",
     "translation": "割れたグラスはテーブルの上にあります。",
@@ -3972,7 +4012,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 18",
     "topic": "分詞(1)",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "We had better <u>leave the door locked</u>.",
     "japanese": "",
     "translation": "ドアは鍵をかけたままにしておいたほうがよい。",
@@ -4003,10 +4043,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） a long time.",
     "japanese": "そのカメラの値段は長いあいだ変更されないままだった。",
     "translation": "そのカメラの値段は長いあいだ変更されないままだった。",
-    "answer": "The price of the camera remained unchanged for a long time.",
+    "answer": "The price of the camera remained unchanged for",
     "answerLabel": "The price of the camera remained unchanged for a long time.",
     "accepted": [
-      "The price of the camera remained unchanged for a long time."
+      "The price of the camera remained unchanged for"
     ],
     "explanation": "remained の後ろに過去分詞 unchanged を置くと「変更されないままだった」になります。「カメラの値段」は the price of the camera の順で、of の後ろに the camera を続けます。for a long time は最後に残ります。",
     "source": "２学期期末Workbook p.49・Lesson 18 分詞(1)・Step 2 2(1)",
@@ -4032,10 +4072,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） for a moment.",
     "japanese": "彼らはちょっとのあいだ,お互いを見ながら立っていた。",
     "translation": "彼らはちょっとのあいだ,お互いを見ながら立っていた。",
-    "answer": "They stood looking at each other for a moment.",
+    "answer": "They stood looking at each other",
     "answerLabel": "They stood looking at each other for a moment.",
     "accepted": [
-      "They stood looking at each other for a moment."
+      "They stood looking at each other"
     ],
     "explanation": "「〜しながら立っていた」は stood + looking の形で表します。「お互いを見る」は look at each other です。each と other の順番、at の位置に注意しましょう。",
     "source": "２学期期末Workbook p.49・Lesson 18 分詞(1)・Step 2 2(2)",
@@ -4067,7 +4107,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
       "The mayor came surrounded by many reporters.",
       "Surrounded by many reporters, the mayor came."
     ],
-    "explanation": "「やって来た」の came の後ろに、過去分詞 surrounded by 〜 を続けると「〜に囲まれて」の意味になります。many reporters は by の後ろに置きます。「来た」のは市長なので The mayor が最初です。",
+    "explanation": "came の後ろに過去分詞 surrounded by 〜 を続けると「〜に囲まれてやって来た」と表せます。また、Surrounded by many reporters, the mayor came. のように、Surrounded ... を文頭に置く語順もできます。",
     "source": "２学期期末Workbook p.49・Lesson 18 分詞(1)・Step 2 2(3)",
     "words": [
       "surrounded",
@@ -4091,10 +4131,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） by my mother.",
     "japanese": "私は母によって準備された特別な夕食に満足した。",
     "translation": "私は母によって準備された特別な夕食に満足した。",
-    "answer": "I was satisfied with the special dinner prepared by my mother.",
+    "answer": "I was satisfied with the special dinner prepared",
     "answerLabel": "I was satisfied with the special dinner prepared by my mother.",
     "accepted": [
-      "I was satisfied with the special dinner prepared by my mother."
+      "I was satisfied with the special dinner prepared"
     ],
     "explanation": "「満足した」は was satisfied with 〜 で表します。「母によって準備された」は dinner を後ろから説明する prepared by my mother です。special は dinner の直前に置きます。",
     "source": "２学期期末Workbook p.49・Lesson 18 分詞(1)・Step 2 2(4)",
@@ -4148,7 +4188,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,英文を完成させなさい。",
-    "sentence": "He remained (　　　　　　).",
+    "sentence": "He remained (　　　　　　). [ 指定語: stand ]",
     "japanese": "彼は雨の中,立ったままでいた。",
     "translation": "彼は雨の中,立ったままでいた。",
     "answer": "standing in the rain",
@@ -4158,7 +4198,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "remain の後ろに ing の形を置くと「〜したままでいる」の意味になります。立っている動作が続くので standing です。「雨の中」は in the rain です。",
     "source": "２学期期末Workbook p.49・Lesson 18 分詞(1)・Step 2 3(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "stand"
+    ]
   },
   {
     "id": "term2k-wb-p49-l18-s2-3-2",
@@ -4169,7 +4212,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,英文を完成させなさい。",
-    "sentence": "All the books (　　　　　　) are delivered for free.",
+    "sentence": "All the books (　　　　　　) are delivered for free. [ 指定語: buy ]",
     "japanese": "この店で購入された本はすべて無料で配達されます。",
     "translation": "この店で購入された本はすべて無料で配達されます。",
     "answer": "bought at this store",
@@ -4180,7 +4223,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "books は「購入される」側なので、過去分詞 bought を使い、books を後ろから説明します。「この店で」は at this store です。buying だと本が買うことになってしまいます。",
     "source": "２学期期末Workbook p.49・Lesson 18 分詞(1)・Step 2 3(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "buy"
+    ]
   },
   {
     "id": "term2k-wb-p49-l18-s2-3-3",
@@ -4191,7 +4237,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,英文を完成させなさい。",
-    "sentence": "The woman (　　　　　　) is our PE teacher.",
+    "sentence": "The woman (　　　　　　) is our PE teacher. [ 指定語: run ]",
     "japanese": "公園で走っている女性は,私たちの体育の先生です。",
     "translation": "公園で走っている女性は,私たちの体育の先生です。",
     "answer": "running in the park",
@@ -4201,7 +4247,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "woman が「走っている」側なので、ing の形 running を使って woman を後ろから説明します。in the park も一緒に続けます。run の ing は n を重ねて running です。",
     "source": "２学期期末Workbook p.49・Lesson 18 分詞(1)・Step 2 3(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "run"
+    ]
   },
   {
     "id": "term2k-wb-p49-l18-s2-3-4",
@@ -4212,7 +4261,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,英文を完成させなさい。",
-    "sentence": "I have some (　　　　　　) to tell you.",
+    "sentence": "I have some (　　　　　　) to tell you. [ 指定語: excite ]",
     "japanese": "あなたに伝えたいわくわくするニュースがあります。",
     "translation": "あなたに伝えたいわくわくするニュースがあります。",
     "answer": "exciting news",
@@ -4222,7 +4271,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "ニュースが人を「わくわくさせる」ので、ing の形 exciting を使います。1語なので news の直前に置きます。excited は「人がわくわくしている」ときに使うので、news には使えません。",
     "source": "２学期期末Workbook p.49・Lesson 18 分詞(1)・Step 2 3(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "excite"
+    ]
   },
   {
     "id": "term2k-wb-p49-l18-s2-3-5",
@@ -4233,7 +4285,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(1)",
     "difficulty": "advanced",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,英文を完成させなさい。",
-    "sentence": "We all want (　　　　　　) by noon.",
+    "sentence": "We all want (　　　　　　) by noon. [ 指定語: finish ]",
     "japanese": "私たちはみな,明日の会議が正午までに終わることを望んでいる。",
     "translation": "私たちはみな,明日の会議が正午までに終わることを望んでいる。",
     "answer": "tomorrow's meeting finished",
@@ -4247,7 +4299,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "want + 目的語 + 過去分詞で「〜が…されることを望む」です。会議は「終えられる」側なので、過去分詞 finished を使います。「明日の会議」は tomorrow's meeting です。",
     "source": "２学期期末Workbook p.49・Lesson 18 分詞(1)・Step 2 3(5)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "finish"
+    ]
   },
   {
     "id": "term2k-wb-p50-l19-s1-1-1",
@@ -4258,7 +4313,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "I got my shoes (　　) at the shop.",
+    "sentence": "I got my shoes (　　) at the shop. [ 指定語: shine ]",
     "japanese": "私はその店で靴を磨いてもらった。",
     "translation": "私はその店で靴を磨いてもらった。",
     "answer": "shined",
@@ -4268,7 +4323,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "get + 目的語 + 過去分詞で「〜してもらう」です。靴は「磨かれる」側なので、過去分詞を使います。shine を「磨く」の意味で使うときの変化は shined です。shining だと靴が光を放つ意味になります。",
     "source": "２学期期末Workbook p.50・Lesson 19 分詞(2)・Step 1 1(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "shine"
+    ]
   },
   {
     "id": "term2k-wb-p50-l19-s1-1-2",
@@ -4279,7 +4337,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "Peggy had her bag (　　) on the train.",
+    "sentence": "Peggy had her bag (　　) on the train. [ 指定語: steal ]",
     "japanese": "ペギーは電車でかばんを盗まれた。",
     "translation": "ペギーは電車でかばんを盗まれた。",
     "answer": "stolen",
@@ -4289,7 +4347,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "have + 目的語 + 過去分詞は「〜される」という被害も表します。かばんは「盗まれる」側なので過去分詞 stolen です。steal の変化は steal - stole - stolen で、stole ではありません。",
     "source": "２学期期末Workbook p.50・Lesson 19 分詞(2)・Step 1 1(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "steal"
+    ]
   },
   {
     "id": "term2k-wb-p50-l19-s1-1-3",
@@ -4300,7 +4361,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "It's hard to get this old car (　　) on cold winter days.",
+    "sentence": "It's hard to get this old car (　　) on cold winter days. [ 指定語: run ]",
     "japanese": "冬の寒い日にこの古い車を始動させるのは大変だ。",
     "translation": "冬の寒い日にこの古い車を始動させるのは大変だ。",
     "answer": "running",
@@ -4310,7 +4371,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "get + 目的語 + ing の形で「〜を…の状態にさせる」です。車は「動いている（エンジンがかかっている）」側なので running を使います。ran や run だと形が合いません。",
     "source": "２学期期末Workbook p.50・Lesson 19 分詞(2)・Step 1 1(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "run"
+    ]
   },
   {
     "id": "term2k-wb-p50-l19-s1-1-4",
@@ -4321,7 +4385,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "Can you see the clouds (　　) their shapes?",
+    "sentence": "Can you see the clouds (　　) their shapes? [ 指定語: change ]",
     "japanese": "雲が形を変えているのが見えますか。",
     "translation": "雲が形を変えているのが見えますか。",
     "answer": "changing",
@@ -4331,7 +4395,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "see + 目的語 + ing で「〜が…しているのを見る」です。雲が自分で形を変えている最中なので changing を使います。後ろに their shapes（目的語）があるので、能動の ing の形になります。",
     "source": "２学期期末Workbook p.50・Lesson 19 分詞(2)・Step 1 1(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "change"
+    ]
   },
   {
     "id": "term2k-wb-p50-l19-s1-1-5",
@@ -4342,7 +4409,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "Were you able to make yourself (　　) in Spanish?",
+    "sentence": "Were you able to make yourself (　　) in Spanish? [ 指定語: understand ]",
     "japanese": "自分の意思をスペイン語で伝えることができましたか。",
     "translation": "自分の意思をスペイン語で伝えることができましたか。",
     "answer": "understood",
@@ -4352,7 +4419,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "make oneself understood は「自分の考えを理解してもらう」という決まった形です。自分は「理解される」側なので過去分詞 understood を使います。understanding だと自分が理解することになってしまいます。",
     "source": "２学期期末Workbook p.50・Lesson 19 分詞(2)・Step 1 1(5)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "understand"
+    ]
   },
   {
     "id": "term2k-wb-p50-l19-s1-1-6",
@@ -4363,7 +4433,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように,[ ] の動詞を適切な形にして使って,( )に入れなさい。",
-    "sentence": "I didn't hear my name (　　).",
+    "sentence": "I didn't hear my name (　　). [ 指定語: call ]",
     "japanese": "私は自分の名前が呼ばれるのが聞こえなかった。",
     "translation": "私は自分の名前が呼ばれるのが聞こえなかった。",
     "answer": "called",
@@ -4371,9 +4441,12 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "called"
     ],
-    "explanation": "hear + 目的語 + 過去分詞で「〜が…されるのが聞こえる」です。name は「呼ばれる」側で、後ろに by などの目的語もないので、過去分詞 called にします。calling だと名前が誰かを呼ぶことになります。",
+    "explanation": "hear + 目的語 + 過去分詞で「〜が…されるのが聞こえる」です。name は呼ばれる対象なので、過去分詞 called を使います。calling だと名前が誰かを呼んでいる意味になります。",
     "source": "２学期期末Workbook p.50・Lesson 19 分詞(2)・Step 1 1(6)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "call"
+    ]
   },
   {
     "id": "term2k-wb-p50-l19-s1-2-1",
@@ -4577,7 +4650,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 19",
     "topic": "分詞(2)",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "<u>Talking to himself</u>, he came into the room.",
     "japanese": "",
     "translation": "ひとりごとを言いながら、彼は部屋に入ってきた。",
@@ -4604,7 +4677,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 19",
     "topic": "分詞(2)",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "<u>Not being interested in the lecture</u>, I became sleepy.",
     "japanese": "",
     "translation": "その講義に興味がなかったので、私は眠くなった。",
@@ -4631,7 +4704,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 19",
     "topic": "分詞(2)",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "<u>Walking in the park</u>, the writer came up with some new ideas.",
     "japanese": "",
     "translation": "公園を歩いているとき、その作家は新しい考えをいくつか思いついた。",
@@ -4658,7 +4731,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "Lesson 19",
     "topic": "分詞(2)",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "<u>Saying goodbye</u>, she walked away.",
     "japanese": "",
     "translation": "さよならを言って、彼女は立ち去った。",
@@ -4689,11 +4762,11 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） I'm reading.",
     "japanese": "私は読書をしているときによく音楽をかけっぱなしにしておく。",
     "translation": "私は読書をしているときによく音楽をかけっぱなしにしておく。",
-    "answer": "I often leave my music playing while I'm reading.",
+    "answer": "I often leave my music playing while",
     "answerLabel": "I often leave my music playing while I'm reading.",
     "accepted": [
-      "I often leave my music playing while I'm reading.",
-      "Often I leave my music playing while I'm reading."
+      "I often leave my music playing while",
+      "Often I leave my music playing while"
     ],
     "explanation": "leave + 目的語 + ing で「〜を…のままにしておく」です。「音楽をかけっぱなしに」は leave my music playing です。often は leave の前、while の後ろに I'm reading が続きます。",
     "source": "２学期期末Workbook p.51・Lesson 19 分詞(2)・Step 2 2(1)",
@@ -4748,10 +4821,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） the game.",
     "japanese": "彼は試合中に脚を折ってしまった。",
     "translation": "彼は試合中に脚を折ってしまった。",
-    "answer": "He had his leg broken in the game.",
+    "answer": "He had his leg broken in",
     "answerLabel": "He had his leg broken in the game.",
     "accepted": [
-      "He had his leg broken in the game."
+      "He had his leg broken in"
     ],
     "explanation": "have + 目的語 + 過去分詞で「〜される」という被害を表します。脚は「折られる」側なので have his leg broken です。in the game は最後に置きます。",
     "source": "２学期期末Workbook p.51・Lesson 19 分詞(2)・Step 2 2(3)",
@@ -4776,10 +4849,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "In the noisy room, （　　　）.",
     "japanese": "さわがしい部屋にいたので,私は自分の声を届かせることができなかった。",
     "translation": "さわがしい部屋にいたので,私は自分の声を届かせることができなかった。",
-    "answer": "In the noisy room, I was not able to make myself heard.",
+    "answer": "I was not able to make myself heard.",
     "answerLabel": "In the noisy room, I was not able to make myself heard.",
     "accepted": [
-      "In the noisy room, I was not able to make myself heard."
+      "I was not able to make myself heard."
     ],
     "explanation": "「自分の声を届かせる」は make oneself heard です。「できなかった」は was not able to で表します。I was not able to make myself heard の順になります。",
     "source": "２学期期末Workbook p.51・Lesson 19 分詞(2)・Step 2 2(4)",
@@ -4804,7 +4877,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(2)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,英文を完成させなさい。",
-    "sentence": "(　　　　　　) from behind.",
+    "sentence": "(　　　　　　) from behind. [ 指定語: feel / pull ]",
     "japanese": "彼女は,後ろからコートを引っ張られるのを感じた。",
     "translation": "彼女は,後ろからコートを引っ張られるのを感じた。",
     "answer": "She felt her coat pulled",
@@ -4815,7 +4888,11 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "feel + 目的語 + 過去分詞で「〜が…されるのを感じる」です。コートは「引っ張られる」側なので過去分詞 pulled を使います。felt は feel の過去形です。",
     "source": "２学期期末Workbook p.51・Lesson 19 分詞(2)・Step 2 3(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "feel",
+      "pull"
+    ]
   },
   {
     "id": "term2k-wb-p51-l19-s2-3-2",
@@ -4826,7 +4903,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(2)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,英文を完成させなさい。",
-    "sentence": "(　　　　　　) on stage.",
+    "sentence": "(　　　　　　) on stage. [ 指定語: watch / play ]",
     "japanese": "私たちは,彼がステージ上でピアノを演奏するのを見た。",
     "translation": "私たちは,彼がステージ上でピアノを演奏するのを見た。",
     "answer": "We watched him playing the piano",
@@ -4837,7 +4914,11 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "watch + 目的語 + ing で「〜が…しているのを見る」です。彼は「演奏している」側なので playing を使います。「ピアノを演奏する」は play the piano です。",
     "source": "２学期期末Workbook p.51・Lesson 19 分詞(2)・Step 2 3(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "watch",
+      "play"
+    ]
   },
   {
     "id": "term2k-wb-p51-l19-s2-3-3",
@@ -4848,7 +4929,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞(2)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,英文を完成させなさい。",
-    "sentence": "(　　　　　　) around noon.",
+    "sentence": "(　　　　　　) around noon. [ 指定語: have / bring ]",
     "japanese": "正午ごろ,ミカは自分の部屋に昼食を持ってきてもらった。",
     "translation": "正午ごろ,ミカは自分の部屋に昼食を持ってきてもらった。",
     "answer": "Mika had lunch brought to her room",
@@ -4859,7 +4940,11 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "have + 目的語 + 過去分詞で「〜してもらう」です。昼食は「持ってこられる」側なので過去分詞 brought を使います。had は have の過去形です。",
     "source": "２学期期末Workbook p.51・Lesson 19 分詞(2)・Step 2 3(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "have",
+      "bring"
+    ]
   },
   {
     "id": "term2k-wb-p52-plus-s1-1-1",
@@ -5046,10 +5131,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "She felt secure （　　　）.",
     "japanese": "彼女は兄がそばに立っていて,安心した。",
     "translation": "彼女は兄がそばに立っていて,安心した。",
-    "answer": "She felt secure with her brother standing by her.",
+    "answer": "with her brother standing by her.",
     "answerLabel": "She felt secure with her brother standing by her.",
     "accepted": [
-      "She felt secure with her brother standing by her."
+      "with her brother standing by her."
     ],
     "explanation": "「兄がそばに立っている状態で」は with + 名詞 + ing で表します。兄は自分で立っている側なので standing を使い、stood は不要です。「彼女のそばに」は by her です。",
     "source": "２学期期末Workbook p.52・Plus 分詞・Step 1 3(1)",
@@ -5075,10 +5160,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "I can't sleep （　　　）.",
     "japanese": "こんな騒音がしていては眠れない。",
     "translation": "こんな騒音がしていては眠れない。",
-    "answer": "I can't sleep with this noise going on.",
+    "answer": "with this noise going on.",
     "answerLabel": "I can't sleep with this noise going on.",
     "accepted": [
-      "I can't sleep with this noise going on."
+      "with this noise going on."
     ],
     "explanation": "「こんな騒音がしていては」は with + 名詞 + 分詞 で表します。go on は「続く」で、騒音が「続いている」ので ing の形 going を使います。gone は不要です。",
     "source": "２学期期末Workbook p.52・Plus 分詞・Step 1 3(2)",
@@ -5104,10 +5189,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "My father was listening to music （　　　）.",
     "japanese": "父は目を閉じたまま音楽を聴いていた。",
     "translation": "父は目を閉じたまま音楽を聴いていた。",
-    "answer": "My father was listening to music with his eyes closed.",
+    "answer": "with his eyes closed.",
     "answerLabel": "My father was listening to music with his eyes closed.",
     "accepted": [
-      "My father was listening to music with his eyes closed."
+      "with his eyes closed."
     ],
     "explanation": "「目を閉じたまま」は with + 名詞 + 過去分詞 で表します。目は「閉じられる」側なので closed を使い、closing は不要です。with his eyes closed の順になります。",
     "source": "２学期期末Workbook p.52・Plus 分詞・Step 1 3(3)",
@@ -5129,7 +5214,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,( )に入れなさい。",
-    "sentence": "(　　) were eight players (　　) in the tournament.",
+    "sentence": "(　　) were eight players (　　) in the tournament. [ 指定語: compete ]",
     "japanese": "その大会では8人の選手が競い合っていた。",
     "translation": "その大会では8人の選手が競い合っていた。",
     "answer": "There competing",
@@ -5139,7 +5224,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜がいた」は There were 〜 で表します。選手が「競い合っている」側なので、後ろに ing の形 competing を置いて説明します。eight players が複数なので were になっています。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 1 4(1)",
-    "blankCount": 2
+    "blankCount": 2,
+    "designatedWords": [
+      "compete"
+    ]
   },
   {
     "id": "term2k-wb-p53-plus-s1-4-2",
@@ -5150,7 +5238,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,( )に入れなさい。",
-    "sentence": "(　　) is a piece of cake (　　) in the refrigerator.",
+    "sentence": "(　　) is a piece of cake (　　) in the refrigerator. [ 指定語: leave ]",
     "japanese": "冷蔵庫にケーキが1切れ残っている。",
     "translation": "冷蔵庫にケーキが1切れ残っている。",
     "answer": "There left",
@@ -5160,7 +5248,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜がある」は There is 〜 です。ケーキは「残される」側なので、過去分詞 left を後ろに置きます。leaving だとケーキが何かを残すことになってしまいます。leave の過去分詞は left です。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 1 4(2)",
-    "blankCount": 2
+    "blankCount": 2,
+    "designatedWords": [
+      "leave"
+    ]
   },
   {
     "id": "term2k-wb-p53-plus-s1-4-3",
@@ -5171,7 +5262,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,( )に入れなさい。",
-    "sentence": "Daigo (　　) (　　) on the lake yesterday.",
+    "sentence": "Daigo (　　) (　　) on the lake yesterday. [ 指定語: skate ]",
     "japanese": "ダイゴは昨日,湖にスケートをしに行った。",
     "translation": "ダイゴは昨日,湖にスケートをしに行った。",
     "answer": "went skating",
@@ -5181,7 +5272,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜しに行く」は go + ing です。yesterday があるので過去形 went になります。skate は skating の形にします。skated にしないように注意しましょう。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 1 4(3)",
-    "blankCount": 2
+    "blankCount": 2,
+    "designatedWords": [
+      "skate"
+    ]
   },
   {
     "id": "term2k-wb-p53-plus-s1-4-4",
@@ -5192,7 +5286,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を適切な形にして使って,( )に入れなさい。",
-    "sentence": "Sally is (　　) (　　) as a volunteer.",
+    "sentence": "Sally is (　　) (　　) as a volunteer. [ 指定語: work ]",
     "japanese": "サリーはボランティアとして活動するのに忙しい。",
     "translation": "サリーはボランティアとして活動するのに忙しい。",
     "answer": "busy working",
@@ -5202,7 +5296,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜するのに忙しい」は be busy + ing です。work を ing の形にして working とします。to work にしないように注意しましょう。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 1 4(4)",
-    "blankCount": 2
+    "blankCount": 2,
+    "designatedWords": [
+      "work"
+    ]
   },
   {
     "id": "term2k-wb-p53-plus-s2-1-1",
@@ -5216,10 +5313,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　）, I know the singer got married.",
     "japanese": "ネットのニュースを見たので,私はあの歌手が結婚したことを知っている。",
     "translation": "ネットのニュースを見たので,私はあの歌手が結婚したことを知っている。",
-    "answer": "Having read the news on the Internet, I know the singer got married.",
+    "answer": "Having read the news on the Internet,",
     "answerLabel": "Having read the news on the Internet, I know the singer got married.",
     "accepted": [
-      "Having read the news on the Internet, I know the singer got married."
+      "Having read the news on the Internet,"
     ],
     "explanation": "「見たので」は知っている今より前のことなので、having + 過去分詞 の形 Having read にします。read の過去分詞も read です。had は不要です。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 2 1(1)",
@@ -5245,10 +5342,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　）, do you know how old she is?",
     "japanese": "あの歌手と言えば,彼女が何歳だか知っていますか。",
     "translation": "あの歌手と言えば,彼女が何歳だか知っていますか。",
-    "answer": "Speaking of the singer, do you know how old she is?",
+    "answer": "Speaking of the singer,",
     "answerLabel": "Speaking of the singer, do you know how old she is?",
     "accepted": [
-      "Speaking of the singer, do you know how old she is?"
+      "Speaking of the singer,"
     ],
     "explanation": "「〜と言えば」は speaking of 〜 という決まった言い方です。of の後ろに the singer を続けます。spoken は不要です。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 2 1(2)",
@@ -5273,10 +5370,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "My sister was sitting on the sofa （　　　）.",
     "japanese": "姉は脚を組んでソファーに座っていた。",
     "translation": "姉は脚を組んでソファーに座っていた。",
-    "answer": "My sister was sitting on the sofa with her legs crossed.",
+    "answer": "with her legs crossed.",
     "answerLabel": "My sister was sitting on the sofa with her legs crossed.",
     "accepted": [
-      "My sister was sitting on the sofa with her legs crossed."
+      "with her legs crossed."
     ],
     "explanation": "「脚を組んで」は with + 名詞 + 過去分詞 で表します。脚は「組まれる」側なので crossed を使い、crossing は不要です。with her legs crossed の順です。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 2 1(3)",
@@ -5301,10 +5398,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　）, I stayed up late.",
     "japanese": "金曜の夜なので,私は夜ふかしした。",
     "translation": "金曜の夜なので,私は夜ふかしした。",
-    "answer": "It being Friday night, I stayed up late.",
+    "answer": "It being Friday night,",
     "answerLabel": "It being Friday night, I stayed up late.",
     "accepted": [
-      "It being Friday night, I stayed up late."
+      "It being Friday night,"
     ],
     "explanation": "後ろの文の主語は I で、前の文の主語は it と違うので、分詞の前に it を置きます。「〜なので」は being で表し、It being Friday night になります。been は不要です。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 2 1(4)",
@@ -5329,10 +5426,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　）, I fell into the river.",
     "japanese": "川岸で釣りをしていたとき,私は川に落ちた。",
     "translation": "川岸で釣りをしていたとき,私は川に落ちた。",
-    "answer": "When fishing at the riverside, I fell into the river.",
+    "answer": "When fishing at the riverside",
     "answerLabel": "When fishing at the riverside, I fell into the river.",
     "accepted": [
-      "When fishing at the riverside, I fell into the river."
+      "When fishing at the riverside"
     ],
     "explanation": "「〜しているとき」は接続詞 when を残して、ing の形で表します。主語は後ろの文と同じ I なので省けます。fished は不要です。at the riverside は fishing の後ろです。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 2 1(5)",
@@ -5354,7 +5451,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞",
     "difficulty": "advanced",
     "prompt": "日本語の意味に合うように,[ ] の語を必要に応じて適切な形にして使って,英文を完成させなさい。",
-    "sentence": "Lucy (　　　　　　).",
+    "sentence": "Lucy (　　　　　　). [ 指定語: with / shine ]",
     "japanese": "ルーシーは目を輝かせてその映画を見た。",
     "translation": "ルーシーは目を輝かせてその映画を見た。",
     "answer": "watched the movie with her eyes shining",
@@ -5365,7 +5462,11 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「目を輝かせて」は with + 名詞 + ing で表します。目は自分で「輝いている」側なので shining です。watched the movie（映画を見た）の後ろに with her eyes shining を続けます。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 2 2(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "with",
+      "shine"
+    ]
   },
   {
     "id": "term2k-wb-p53-plus-s2-2-2",
@@ -5376,7 +5477,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を必要に応じて適切な形にして使って,英文を完成させなさい。",
-    "sentence": "(　　　　　　) this movie.",
+    "sentence": "(　　　　　　) this movie. [ 指定語: frankly ]",
     "japanese": "率直に言って,私はこの映画は気に入らなかった。",
     "translation": "率直に言って,私はこの映画は気に入らなかった。",
     "answer": "Frankly speaking, I didn't like",
@@ -5388,7 +5489,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「率直に言って」は frankly speaking という決まり文句です。frankly だけでなく speaking を足します。そのあとに I didn't like を続けます。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 2 2(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "frankly"
+    ]
   },
   {
     "id": "term2k-wb-p53-plus-s2-2-3",
@@ -5399,7 +5503,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を必要に応じて適切な形にして使って,英文を完成させなさい。",
-    "sentence": "(　　　　　　) last winter.",
+    "sentence": "(　　　　　　) last winter. [ 指定語: ski ]",
     "japanese": "私はこの前の冬に,秋田にスキーをしに行った。",
     "translation": "私はこの前の冬に,秋田にスキーをしに行った。",
     "answer": "I went skiing in Akita",
@@ -5409,7 +5513,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜しに行く」は go + ing です。過去のことなので went skiing にします。「秋田に」は場所なので in Akita です。ski は skiing の形にします。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 2 2(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "ski"
+    ]
   },
   {
     "id": "term2k-wb-p53-plus-s2-2-4",
@@ -5420,7 +5527,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "分詞",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように,[ ] の語を必要に応じて適切な形にして使って,英文を完成させなさい。",
-    "sentence": "(　　　　　　) the exam now.",
+    "sentence": "(　　　　　　) the exam now. [ 指定語: prepare ]",
     "japanese": "私の弟は今,試験の準備をするのに忙しい。",
     "translation": "私の弟は今,試験の準備をするのに忙しい。",
     "answer": "My brother is busy preparing for",
@@ -5432,7 +5539,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜するのに忙しい」は be busy + ing です。「準備をする」は prepare for 〜 なので for も必要です。prepare は preparing にします。",
     "source": "２学期期末Workbook p.53・Plus 分詞・Step 2 2(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "prepare"
+    ]
   },
   {
     "id": "term2k-wb-p54-fe-1-1",
@@ -5643,7 +5753,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "準動詞",
     "difficulty": "standard",
     "prompt": "意味の通る英文になるように,[ ] の語を適切な形にして( )に入れなさい。",
-    "sentence": "Alice admitted (　　) a big mistake.",
+    "sentence": "Alice admitted (　　) a big mistake. [ 指定語: make ]",
     "japanese": "",
     "translation": "アリスは大きな間違いをしたことを認めた。",
     "answer": "making",
@@ -5653,7 +5763,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "admit は後ろに ing の形を置いて「〜したことを認める」を表します。to make にはしません。すでにしてしまった間違いを認めているので、making です。",
     "source": "２学期期末Workbook p.54・Further Exercises 準動詞(不定詞・動名詞・分詞)・2(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "make"
+    ]
   },
   {
     "id": "term2k-wb-p54-fe-2-2",
@@ -5663,8 +5776,8 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "準動詞",
     "difficulty": "standard",
-    "prompt": "意味の通る英文になるように,[ ] の語を適切な形にして( )に入れなさい。",
-    "sentence": "I tried (　　) an apple pie, but it was not a success.",
+    "prompt": "日本語の意味に合うように，[ ]の語を適切な形にして( )に入れなさい。",
+    "sentence": "I tried (　　) an apple pie, but it was not a success. [ 指定語: bake ]",
     "japanese": "",
     "translation": "私はアップルパイを焼こうとしたが、成功しなかった。",
     "answer": "to bake",
@@ -5672,9 +5785,12 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "to bake"
     ],
-    "explanation": "「作ろうとしたが成功しなかった」という意味なので try + to 〜（〜しようとする）を使います。try + ing は「試しに〜してみる」で、意味が少し違います。but 以下が「うまくいかなかった」と続いているので to bake です。",
+    "explanation": "try to bake は「焼こうとする」、try baking は「試しに焼いてみる」という意味です。どちらも but 以下と文法上つながるため、but 以下だけから to bake に決めることはできません。この問題では、日本語の「焼こうとした」に合わせて to bake を使います。",
     "source": "２学期期末Workbook p.54・Further Exercises 準動詞(不定詞・動名詞・分詞)・2(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "bake"
+    ]
   },
   {
     "id": "term2k-wb-p54-fe-2-3",
@@ -5685,7 +5801,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "準動詞",
     "difficulty": "standard",
     "prompt": "意味の通る英文になるように,[ ] の語を適切な形にして( )に入れなさい。",
-    "sentence": "Please remain (　　) until the plane has come to a complete stop.",
+    "sentence": "Please remain (　　) until the plane has come to a complete stop. [ 指定語: seat ]",
     "japanese": "",
     "translation": "飛行機が完全に止まるまで、座ったままでいてください。",
     "answer": "seated",
@@ -5695,7 +5811,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "remain + 過去分詞で「〜されたままでいる」です。「座った状態のまま」は seated を使います。seating だと意味が合いません。",
     "source": "２学期期末Workbook p.54・Further Exercises 準動詞(不定詞・動名詞・分詞)・2(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "seat"
+    ]
   },
   {
     "id": "term2k-wb-p54-fe-2-4",
@@ -5706,7 +5825,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "準動詞",
     "difficulty": "standard",
     "prompt": "意味の通る英文になるように,[ ] の語を適切な形にして( )に入れなさい。",
-    "sentence": "Andy kept (　　) about his personal life.",
+    "sentence": "Andy kept (　　) about his personal life. [ 指定語: talk ]",
     "japanese": "",
     "translation": "アンディは自分の私生活についてずっと話し続けた。",
     "answer": "talking",
@@ -5716,7 +5835,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "keep + ing で「〜し続ける」です。アンディが話し続けたので、talking を使います。keep の後ろに to talk は置けません。",
     "source": "２学期期末Workbook p.54・Further Exercises 準動詞(不定詞・動名詞・分詞)・2(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "talk"
+    ]
   },
   {
     "id": "term2k-wb-p54-fe-2-5",
@@ -5727,7 +5849,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "準動詞",
     "difficulty": "standard",
     "prompt": "意味の通る英文になるように,[ ] の語を適切な形にして( )に入れなさい。",
-    "sentence": "Dan couldn't make himself (　　) in Japanese.",
+    "sentence": "Dan couldn't make himself (　　) in Japanese. [ 指定語: understand ]",
     "japanese": "",
     "translation": "ダンは日本語で自分の言うことを分かってもらえなかった。",
     "answer": "understood",
@@ -5737,7 +5859,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "make oneself understood は「自分の考えを理解してもらう」という決まった形です。himself は「理解される」側なので過去分詞 understood を使います。understand のままだと形が合いません。",
     "source": "２学期期末Workbook p.54・Further Exercises 準動詞(不定詞・動名詞・分詞)・2(5)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "understand"
+    ]
   },
   {
     "id": "term2k-wb-p54-fe-3-1",
@@ -5942,7 +6067,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "準動詞",
     "difficulty": "standard",
     "prompt": "各組の英文がほぼ同じ意味になるように,( )に適切な語を入れなさい。",
-    "sentence": "(a) This rice ball is so big that I can't eat it all. (b) This rice ball is (　　) big (　　) me (　　) eat it all.",
+    "sentence": "(a) This rice ball is so big that I can't eat it all. (b) This rice ball is (　　) big (　　) me (　　) eat.",
     "japanese": "",
     "translation": "このおにぎりは大きすぎて、私は全部食べきれない。",
     "answer": "too for to",
@@ -5950,7 +6075,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "too for to"
     ],
-    "explanation": "「大きすぎて食べられない」は too + 形容詞 + to + 動詞の原形 で表します。意味上の主語 me は to の前に for me の形で入れます。too ... to ... には not の意味が含まれているので、can't は使いません。",
+    "explanation": "「大きすぎて食べられない」は too + 形容詞 + to + 動詞の原形 で表します。意味上の主語 me は to の前に for me の形で入れます。(b) では This rice ball が eat の目的語になるので、it を重ねず This rice ball is too big for me to eat. とします。",
     "source": "２学期期末Workbook p.54・Further Exercises 準動詞(不定詞・動名詞・分詞)・4(5)",
     "blankCount": 3
   },
@@ -6033,10 +6158,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "My brother （　　　） with his homework.",
     "japanese": "弟は私に宿題を手伝ってほしいと思っている。",
     "translation": "弟は私に宿題を手伝ってほしいと思っている。",
-    "answer": "My brother wants me to help him with his homework.",
+    "answer": "wants me to help him",
     "answerLabel": "My brother wants me to help him with his homework.",
     "accepted": [
-      "My brother wants me to help him with his homework."
+      "wants me to help him"
     ],
     "explanation": "「〜に…してほしい」は want + 人 + to + 動詞 です。「私に手伝ってほしい」なので wants me to help となり、「彼の宿題を手伝う」ので help him with 〜 です。me と him を入れ替えないようにしましょう。",
     "source": "２学期期末Workbook p.55・Further Exercises 準動詞(不定詞・動名詞・分詞)・6(1)",
@@ -6061,10 +6186,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Tom's parents （　　　） others.",
     "japanese": "トムの両親は彼に,他人に迷惑をかけないように言っている。",
     "translation": "トムの両親は彼に,他人に迷惑をかけないように言っている。",
-    "answer": "Tom's parents tell him not to bother others.",
+    "answer": "tell him not to bother",
     "answerLabel": "Tom's parents tell him not to bother others.",
     "accepted": [
-      "Tom's parents tell him not to bother others."
+      "tell him not to bother"
     ],
     "explanation": "「〜に…するように言う」は tell + 人 + to + 動詞 です。「〜しないように」のときは not を to の前に置いて tell him not to bother にします。not to の語順がポイントです。",
     "source": "２学期期末Workbook p.55・Further Exercises 準動詞(不定詞・動名詞・分詞)・6(2)",
@@ -6089,10 +6214,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "I turned down the music （　　　） my sister up.",
     "japanese": "私は妹を起こさないように音楽の音量を下げた。",
     "translation": "私は妹を起こさないように音楽の音量を下げた。",
-    "answer": "I turned down the music in order not to wake my sister up.",
+    "answer": "in order not to wake",
     "answerLabel": "I turned down the music in order not to wake my sister up.",
     "accepted": [
-      "I turned down the music in order not to wake my sister up."
+      "in order not to wake"
     ],
     "explanation": "「〜するために」は in order to です。「〜しないために」は not を to の直前に置いて、in order not to wake とします。そのあとに my sister up を続けます。",
     "source": "２学期期末Workbook p.55・Further Exercises 準動詞(不定詞・動名詞・分詞)・6(3)",
@@ -6117,10 +6242,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "When I was a little child, I had （　　　）.",
     "japanese": "幼いころ,私にはいっしょに遊ぶ友だちがいなかった。",
     "translation": "幼いころ,私にはいっしょに遊ぶ友だちがいなかった。",
-    "answer": "When I was a little child, I had no friends to play with.",
+    "answer": "no friends to play with.",
     "answerLabel": "When I was a little child, I had no friends to play with.",
     "accepted": [
-      "When I was a little child, I had no friends to play with."
+      "no friends to play with."
     ],
     "explanation": "「いっしょに遊ぶ友だち」は friends to play with です。友だちと「いっしょに」遊ぶので、最後に with が必要です。「いなかった」は no friends で表します。",
     "source": "２学期期末Workbook p.55・Further Exercises 準動詞(不定詞・動名詞・分詞)・6(4)",
@@ -6145,10 +6270,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "You （　　　） for yourself.",
     "japanese": "きみは自分で決断できる年齢だ。",
     "translation": "きみは自分で決断できる年齢だ。",
-    "answer": "You are old enough to decide for yourself.",
+    "answer": "are old enough to decide",
     "answerLabel": "You are old enough to decide for yourself.",
     "accepted": [
-      "You are old enough to decide for yourself."
+      "are old enough to decide"
     ],
     "explanation": "「〜できるほど…だ」は 形容詞 + enough + to + 動詞 です。enough は old の後ろに置いて old enough になります。enough old にしないよう注意しましょう。",
     "source": "２学期期末Workbook p.55・Further Exercises 準動詞(不定詞・動名詞・分詞)・6(5)",
@@ -6173,10 +6298,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Kate （　　　） from the scene of the crime.",
     "japanese": "ケイトは見慣れない人が犯行現場から逃げていくのを見た。",
     "translation": "ケイトは見慣れない人が犯行現場から逃げていくのを見た。",
-    "answer": "Kate saw a stranger running away from the scene of the crime.",
+    "answer": "saw a stranger running away",
     "answerLabel": "Kate saw a stranger running away from the scene of the crime.",
     "accepted": [
-      "Kate saw a stranger running away from the scene of the crime."
+      "saw a stranger running away"
     ],
     "explanation": "see + 目的語 + ing で「〜が…しているのを見る」です。stranger は逃げる側なので、ing の形 running を使い、a stranger running away の順に並べます。away は running の後ろです。",
     "source": "２学期期末Workbook p.55・Further Exercises 準動詞(不定詞・動名詞・分詞)・6(6)",
@@ -6201,10 +6326,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Joe's classmates （　　　）.",
     "japanese": "ジョーのクラスメイトは彼が退学するのを止めた。",
     "translation": "ジョーのクラスメイトは彼が退学するのを止めた。",
-    "answer": "Joe's classmates stopped him from leaving school.",
+    "answer": "stopped him from leaving school.",
     "answerLabel": "Joe's classmates stopped him from leaving school.",
     "accepted": [
-      "Joe's classmates stopped him from leaving school."
+      "stopped him from leaving school."
     ],
     "explanation": "「〜が…するのを止める」は stop + 人 + from + ing です。「退学する」は leave school なので leaving school になります。from の後ろは to ではなく ing の形です。",
     "source": "２学期期末Workbook p.55・Further Exercises 準動詞(不定詞・動名詞・分詞)・6(7)",
@@ -6225,7 +6350,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "準動詞",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "I ran into the classroom <u>only to find</u> nobody there.",
     "japanese": "",
     "translation": "私は教室に駆け込んだが、結局だれもいなかった。",
@@ -6252,7 +6377,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "準動詞",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "We should <u>have</u> this carpet <u>cleaned</u>.",
     "japanese": "",
     "translation": "私たちはこのカーペットをクリーニングしてもらうべきだ。",
@@ -6279,7 +6404,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "準動詞",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "Did you <u>remember to buy</u> some shampoo?",
     "japanese": "",
     "translation": "忘れずにシャンプーを買いましたか。",
@@ -6306,7 +6431,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "準動詞",
     "difficulty": "standard",
-    "prompt": "下線部に注意して,次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "Do you <u>remember</u> meeting me here three months ago?",
     "japanese": "",
     "translation": "3か月前にここで私に会ったことを覚えていますか。",
@@ -6361,9 +6486,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "highest",
     "answerLabel": "highest",
     "accepted": [
-      "highest"
+      "highest",
+      "the highest"
     ],
-    "explanation": "high の最上級は「highest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the highest）。",
+    "explanation": "high の最上級は「highest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the highest）。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (1) high の最上級",
     "blankCount": 1
   },
@@ -6403,9 +6529,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "shortest",
     "answerLabel": "shortest",
     "accepted": [
-      "shortest"
+      "shortest",
+      "the shortest"
     ],
-    "explanation": "short の最上級は「shortest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the shortest）。",
+    "explanation": "short の最上級は「shortest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the shortest）。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (2) short の最上級",
     "blankCount": 1
   },
@@ -6424,9 +6551,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "older",
     "answerLabel": "older",
     "accepted": [
-      "older"
+      "older",
+      "elder"
     ],
-    "explanation": "old は短い語なので「older」のように変化させます。短い語なので語の終わりに er を付けます。",
+    "explanation": "old は短い語なので「older」のように変化させます。短い語なので語の終わりに er を付けます。 old の比較級は通常 older です。elder も比較形ですが、主に家族関係の年齢を表すときに使います。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (3) old の比較級",
     "blankCount": 1
   },
@@ -6445,9 +6573,12 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "oldest",
     "answerLabel": "oldest",
     "accepted": [
-      "oldest"
+      "oldest",
+      "the oldest",
+      "eldest",
+      "the eldest"
     ],
-    "explanation": "old の最上級は「oldest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the oldest）。",
+    "explanation": "old の最上級は「oldest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the oldest）。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。 old の最上級は通常 oldest です。elder の最上級 eldest は主に家族関係で使います。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (3) old の最上級",
     "blankCount": 1
   },
@@ -6487,9 +6618,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "longest",
     "answerLabel": "longest",
     "accepted": [
-      "longest"
+      "longest",
+      "the longest"
     ],
-    "explanation": "long の最上級は「longest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the longest）。",
+    "explanation": "long の最上級は「longest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the longest）。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (4) long の最上級",
     "blankCount": 1
   },
@@ -6529,9 +6661,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "largest",
     "answerLabel": "largest",
     "accepted": [
-      "largest"
+      "largest",
+      "the largest"
     ],
-    "explanation": "large の最上級は「largest」です。st だけを付けます。 最上級には ふつう the を付けます（the largest）。",
+    "explanation": "large の最上級は「largest」です。st だけを付けます。 最上級には ふつう the を付けます（the largest）。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (5) large の最上級",
     "blankCount": 1
   },
@@ -6571,9 +6704,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "smartest",
     "answerLabel": "smartest",
     "accepted": [
-      "smartest"
+      "smartest",
+      "the smartest"
     ],
-    "explanation": "smart の最上級は「smartest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the smartest）。",
+    "explanation": "smart の最上級は「smartest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the smartest）。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (6) smart の最上級",
     "blankCount": 1
   },
@@ -6613,9 +6747,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "earliest",
     "answerLabel": "earliest",
     "accepted": [
-      "earliest"
+      "earliest",
+      "the earliest"
     ],
-    "explanation": "early の最上級は「earliest」です。y を i に変えて est を付けます。 最上級には ふつう the を付けます（the earliest）。",
+    "explanation": "early の最上級は「earliest」です。y を i に変えて est を付けます。 最上級には ふつう the を付けます（the earliest）。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (7) early の最上級",
     "blankCount": 1
   },
@@ -6655,9 +6790,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "coldest",
     "answerLabel": "coldest",
     "accepted": [
-      "coldest"
+      "coldest",
+      "the coldest"
     ],
-    "explanation": "cold の最上級は「coldest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the coldest）。",
+    "explanation": "cold の最上級は「coldest」です。短い語なので語の終わりに est を付けます。 最上級には ふつう the を付けます（the coldest）。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (8) cold の最上級",
     "blankCount": 1
   },
@@ -6697,9 +6833,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "most tired",
     "answerLabel": "most tired",
     "accepted": [
-      "most tired"
+      "most tired",
+      "the most tired"
     ],
-    "explanation": "tired は ed で終わる形容詞なので er は付けず、前に more / most を置きます。 だから最上級は「most tired」です。語の形を変えず、前に付ける言葉だけを変えます。",
+    "explanation": "tired は ed で終わる形容詞なので er は付けず、前に more / most を置きます。 だから最上級は「most tired」です。語の形を変えず、前に付ける言葉だけを変えます。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (9) tired の最上級",
     "blankCount": 1
   },
@@ -6739,9 +6876,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "most surprising",
     "answerLabel": "most surprising",
     "accepted": [
-      "most surprising"
+      "most surprising",
+      "the most surprising"
     ],
-    "explanation": "surprising は ing で終わる長めの語なので more / most を前に置きます。 だから最上級は「most surprising」です。語の形を変えず、前に付ける言葉だけを変えます。",
+    "explanation": "surprising は ing で終わる長めの語なので more / most を前に置きます。 だから最上級は「most surprising」です。語の形を変えず、前に付ける言葉だけを変えます。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (10) surprising の最上級",
     "blankCount": 1
   },
@@ -6781,9 +6919,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "most interested",
     "answerLabel": "most interested",
     "accepted": [
-      "most interested"
+      "most interested",
+      "the most interested"
     ],
-    "explanation": "interested は長めの語なので more / most を前に置きます。 だから最上級は「most interested」です。語の形を変えず、前に付ける言葉だけを変えます。",
+    "explanation": "interested は長めの語なので more / most を前に置きます。 だから最上級は「most interested」です。語の形を変えず、前に付ける言葉だけを変えます。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (11) interested の最上級",
     "blankCount": 1
   },
@@ -6823,9 +6962,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "most quickly",
     "answerLabel": "most quickly",
     "accepted": [
-      "most quickly"
+      "most quickly",
+      "the most quickly"
     ],
-    "explanation": "quickly は ly で終わる副詞なので more / most を前に置きます。 だから最上級は「most quickly」です。語の形を変えず、前に付ける言葉だけを変えます。",
+    "explanation": "quickly は ly で終わる副詞なので more / most を前に置きます。 だから最上級は「most quickly」です。語の形を変えず、前に付ける言葉だけを変えます。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (12) quickly の最上級",
     "blankCount": 1
   },
@@ -6865,9 +7005,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "most famous",
     "answerLabel": "most famous",
     "accepted": [
-      "most famous"
+      "most famous",
+      "the most famous"
     ],
-    "explanation": "famous は ous で終わる語なので more / most を前に置きます。 だから最上級は「most famous」です。語の形を変えず、前に付ける言葉だけを変えます。",
+    "explanation": "famous は ous で終わる語なので more / most を前に置きます。 だから最上級は「most famous」です。語の形を変えず、前に付ける言葉だけを変えます。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (13) famous の最上級",
     "blankCount": 1
   },
@@ -6907,9 +7048,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "most careful",
     "answerLabel": "most careful",
     "accepted": [
-      "most careful"
+      "most careful",
+      "the most careful"
     ],
-    "explanation": "careful は ful で終わる語なので more / most を前に置きます。 だから最上級は「most careful」です。語の形を変えず、前に付ける言葉だけを変えます。",
+    "explanation": "careful の最上級の形は most careful です。最上級を文中で使うときは、通常 the most careful の形になります。ここでは語形そのものを答えるため、most careful を主解答にしています。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (14) careful の最上級",
     "blankCount": 1
   },
@@ -6949,9 +7091,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "best",
     "answerLabel": "best",
     "accepted": [
-      "best"
+      "best",
+      "the best"
     ],
-    "explanation": "good は不規則に変わります。そのまま覚えて「best」と書きます。well と同じ better / best になります。",
+    "explanation": "good は不規則に変わります。そのまま覚えて「best」と書きます。well と同じ better / best になります。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (15) good の最上級",
     "blankCount": 1
   },
@@ -6991,9 +7134,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "most",
     "answerLabel": "most",
     "accepted": [
-      "most"
+      "most",
+      "the most"
     ],
-    "explanation": "many は不規則に変わります。そのまま覚えて「most」と書きます。much と同じ more / most になります（many は数、much は量）。",
+    "explanation": "many は不規則に変わります。そのまま覚えて「most」と書きます。much と同じ more / most になります（many は数、much は量）。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (16) many の最上級",
     "blankCount": 1
   },
@@ -7033,9 +7177,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "best",
     "answerLabel": "best",
     "accepted": [
-      "best"
+      "best",
+      "the best"
     ],
-    "explanation": "well は不規則に変わります。そのまま覚えて「best」と書きます。good と同じ better / best になります。",
+    "explanation": "well は不規則に変わります。そのまま覚えて「best」と書きます。good と同じ better / best になります。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (17) well の最上級",
     "blankCount": 1
   },
@@ -7075,9 +7220,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "most",
     "answerLabel": "most",
     "accepted": [
-      "most"
+      "most",
+      "the most"
     ],
-    "explanation": "much は不規則に変わります。そのまま覚えて「most」と書きます。many と同じ more / most になります。",
+    "explanation": "much は不規則に変わります。そのまま覚えて「most」と書きます。many と同じ more / most になります。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (18) much の最上級",
     "blankCount": 1
   },
@@ -7117,9 +7263,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "worst",
     "answerLabel": "worst",
     "accepted": [
-      "worst"
+      "worst",
+      "the worst"
     ],
-    "explanation": "bad は不規則に変わります。そのまま覚えて「worst」と書きます。bad と同じ変化をする語に ill もあります。",
+    "explanation": "bad は不規則に変わります。そのまま覚えて「worst」と書きます。bad と同じ変化をする語に ill もあります。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (19) bad の最上級",
     "blankCount": 1
   },
@@ -7159,9 +7306,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "answer": "least",
     "answerLabel": "least",
     "accepted": [
-      "least"
+      "least",
+      "the least"
     ],
-    "explanation": "little（少ない）は不規則に変わります。そのまま覚えて「least」と書きます。「少ない」の意味なので less / least で、「小さい」の little とは別に覚えます。",
+    "explanation": "little（少ない）は不規則に変わります。そのまま覚えて「least」と書きます。「少ない」の意味なので less / least で、「小さい」の little とは別に覚えます。 ここは語形を示す問題なので、the を省いた形を基本とします。形容詞が名詞を修飾する最上級には通常 the を付け、副詞の最上級では the を省くことがあります。この語形問題では the を付けた解答も受け付けます。",
     "source": "２学期期末Workbook p.56・Check 比較・1 (20) little の最上級",
     "blankCount": 1
   },
@@ -7174,7 +7322,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして（ ）に入れなさい。",
-    "sentence": "Japan is (　　) (　　) (　　) Germany.",
+    "sentence": "Japan is (　　) (　　) (　　) Germany. [ 指定語: large ]",
     "japanese": "日本はドイツと同じくらいの大きさだ。",
     "translation": "日本はドイツと同じくらいの大きさだ。",
     "answer": "as large as",
@@ -7184,7 +7332,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「同じくらい」なので as ～ as を使います。形容詞はそのまま large を入れます。as の間の形容詞は比べる前の形（原級）です。larger にしないようにしましょう。",
     "source": "２学期期末Workbook p.56・Check 比較・2 (1)",
-    "blankCount": 3
+    "blankCount": 3,
+    "designatedWords": [
+      "large"
+    ]
   },
   {
     "id": "term2k-wb-p56-check-2-2",
@@ -7195,7 +7346,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして（ ）に入れなさい。",
-    "sentence": "Misa is (　　) (　　) (　　) Yumi is.",
+    "sentence": "Misa is (　　) (　　) (　　) Yumi is. [ 指定語: kind ]",
     "japanese": "ミサはユミと同じくらい親切だ。",
     "translation": "ミサはユミと同じくらい親切だ。",
     "answer": "as kind as",
@@ -7205,7 +7356,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「同じくらい」なので as ～ as です。間には kind をそのまま入れます。最後の as の後ろの Yumi is は「ユミが親切である」の is が残った形です。",
     "source": "２学期期末Workbook p.56・Check 比較・2 (2)",
-    "blankCount": 3
+    "blankCount": 3,
+    "designatedWords": [
+      "kind"
+    ]
   },
   {
     "id": "term2k-wb-p56-check-2-3",
@@ -7216,7 +7370,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして（ ）に入れなさい。",
-    "sentence": "My sister walks (　　) (　　) (　　) I do.",
+    "sentence": "My sister walks (　　) (　　) (　　) I do. [ 指定語: slowly ]",
     "japanese": "私の姉は私と同じくらいゆっくり歩く。",
     "translation": "私の姉は私と同じくらいゆっくり歩く。",
     "answer": "as slowly as",
@@ -7226,7 +7380,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「同じくらい」なので as ～ as を使い、間には walks を説明する slowly を入れます。副詞も形は変えずにそのまま使います。",
     "source": "２学期期末Workbook p.56・Check 比較・2 (3)",
-    "blankCount": 3
+    "blankCount": 3,
+    "designatedWords": [
+      "slowly"
+    ]
   },
   {
     "id": "term2k-wb-p56-check-2-4",
@@ -7237,7 +7394,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして（ ）に入れなさい。",
-    "sentence": "David studies (　　) (　　) (　　) Jim.",
+    "sentence": "David studies (　　) (　　) (　　) Jim. [ 指定語: hard ]",
     "japanese": "デイビッドはジムと同じくらい熱心に勉強する。",
     "translation": "デイビッドはジムと同じくらい熱心に勉強する。",
     "answer": "as hard as",
@@ -7247,7 +7404,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「同じくらい熱心に」は as hard as です。hard は「熱心に」という副詞でも形が同じです。hardly（ほとんど〜ない）にしないよう注意します。",
     "source": "２学期期末Workbook p.56・Check 比較・2 (4)",
-    "blankCount": 3
+    "blankCount": 3,
+    "designatedWords": [
+      "hard"
+    ]
   },
   {
     "id": "term2k-wb-p56-check-2-5",
@@ -7258,7 +7418,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして（ ）に入れなさい。",
-    "sentence": "I have (　　) (　　) CDs (　　) Yumi.",
+    "sentence": "I have (　　) (　　) CDs (　　) Yumi. [ 指定語: many ]",
     "japanese": "私はユミと同じくらい多くのCDを持っている。",
     "translation": "私はユミと同じくらい多くのCDを持っている。",
     "answer": "as many as",
@@ -7268,7 +7428,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "CDs は数えられるので many を使い、「同じくらい多くの」は as many ～ as です。many CDs の前後に as を置くところがポイントです。",
     "source": "２学期期末Workbook p.56・Check 比較・2 (5)",
-    "blankCount": 3
+    "blankCount": 3,
+    "designatedWords": [
+      "many"
+    ]
   },
   {
     "id": "term2k-wb-p56-check-2-6",
@@ -7279,7 +7442,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして（ ）に入れなさい。",
-    "sentence": "He ate (　　) (　　) (　　) I did.",
+    "sentence": "He ate (　　) (　　) (　　) I did. [ 指定語: much ]",
     "japanese": "彼は私と同じくらいよく食べた。",
     "translation": "彼は私と同じくらいよく食べた。",
     "answer": "as much as",
@@ -7289,7 +7452,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「食べる量」は量を表す much を使います。as much as で「同じくらいたくさん」という意味になります。",
     "source": "２学期期末Workbook p.56・Check 比較・2 (6)",
-    "blankCount": 3
+    "blankCount": 3,
+    "designatedWords": [
+      "much"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-3-1",
@@ -7300,7 +7466,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "This box is ______ than that one.",
+    "sentence": "This box is ______ than that one. [ 指定語: big ]",
     "japanese": "この箱はあの箱より大きい。",
     "translation": "この箱はあの箱より大きい。",
     "answer": "bigger",
@@ -7310,7 +7476,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "than があるので「〜より大きい」という比較級にします。big は g を重ねて er を付け、bigger になります。biger と書き間違えないよう注意しましょう。",
     "source": "２学期期末Workbook p.57・Check 比較・3 (1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "big"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-3-2",
@@ -7321,7 +7490,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "Soccer is ______ than baseball.",
+    "sentence": "Soccer is ______ than baseball. [ 指定語: exciting ]",
     "japanese": "サッカーは野球よりもわくわくする。",
     "translation": "サッカーは野球よりもわくわくする。",
     "answer": "more exciting",
@@ -7331,7 +7500,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "than があるので比較級です。exciting は ing で終わる長めの語なので、er ではなく前に more を置きます。",
     "source": "２学期期末Workbook p.57・Check 比較・3 (2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "exciting"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-3-3",
@@ -7342,7 +7514,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "John's report is ______ than yours.",
+    "sentence": "John's report is ______ than yours. [ 指定語: interesting ]",
     "japanese": "ジョンの報告書はあなたの報告書よりもおもしろい。",
     "translation": "ジョンの報告書はあなたの報告書よりもおもしろい。",
     "answer": "more interesting",
@@ -7352,7 +7524,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "than があるので比較級です。interesting は長めの語なので more を前に置いて more interesting にします。",
     "source": "２学期期末Workbook p.57・Check 比較・3 (3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "interesting"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-3-4",
@@ -7363,7 +7538,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "Fred was ______ at driving than Paul.",
+    "sentence": "Fred was ______ at driving than Paul. [ 指定語: be good at ]",
     "japanese": "フレッドはポールよりも運転がうまかった。",
     "translation": "フレッドはポールよりも運転がうまかった。",
     "answer": "better",
@@ -7373,7 +7548,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "be good at は「〜がうまい」です。than があるので good の比較級を入れます。good の比較級は不規則で better になります。gooder は誤りです。",
     "source": "２学期期末Workbook p.57・Check 比較・3 (4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "be good at"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-3-5",
@@ -7384,7 +7562,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "I have ______ free time than my brother.",
+    "sentence": "I have ______ free time than my brother. [ 指定語: little ]",
     "japanese": "私は兄よりも自由な時間が少ない。",
     "translation": "私は兄よりも自由な時間が少ない。",
     "answer": "less",
@@ -7394,7 +7572,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "than があるので比較級です。little（少ない）の比較級は不規則で less になります。free time は数えられない名詞なので few ではなく little 系を使います。",
     "source": "２学期期末Workbook p.57・Check 比較・3 (5)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "little"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-4-1",
@@ -7405,7 +7586,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "This information is ______ for us.",
+    "sentence": "This information is ______ for us. [ 指定語: important ]",
     "japanese": "この情報は私たちにとってもっとも重要だ。",
     "translation": "この情報は私たちにとってもっとも重要だ。",
     "answer": "the most important",
@@ -7415,7 +7596,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「もっとも」なので最上級です。important は長めの語なので、most を前に置いて the most important にします。the を忘れないようにしましょう。",
     "source": "２学期期末Workbook p.57・Check 比較・4 (1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "important"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-4-2",
@@ -7426,7 +7610,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "Lake Tazawa is ______ lake in Japan.",
+    "sentence": "Lake Tazawa is ______ lake in Japan. [ 指定語: deep ]",
     "japanese": "田沢湖は日本でもっとも深い湖だ。",
     "translation": "田沢湖は日本でもっとも深い湖だ。",
     "answer": "the deepest",
@@ -7436,7 +7620,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「もっとも深い」は最上級です。deep は短い語なので est を付けて deepest にし、前に the を置きます。",
     "source": "２学期期末Workbook p.57・Check 比較・4 (2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "deep"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-4-3",
@@ -7447,7 +7634,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "She practices the violin ______ of all the students.",
+    "sentence": "She practices the violin ______ of all the students. [ 指定語: hard ]",
     "japanese": "彼女はすべての学生の中でもっとも一生懸命バイオリンを練習する。",
     "translation": "彼女はすべての学生の中でもっとも一生懸命バイオリンを練習する。",
     "answer": "hardest",
@@ -7458,7 +7645,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "practices を説明する「一生懸命に」という語（副詞）の最上級なので hardest です。副詞の最上級では the を付けないことが多いですが、付けても間違いではありません。",
     "source": "２学期期末Workbook p.57・Check 比較・4 (3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "hard"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-4-4",
@@ -7469,7 +7659,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "Andy will be home ______ of the three sons.",
+    "sentence": "Andy will be home ______ of the three sons. [ 指定語: early ]",
     "japanese": "アンディは3人の息子の中でもっとも早く帰宅するだろう。",
     "translation": "アンディは3人の息子の中でもっとも早く帰宅するだろう。",
     "answer": "earliest",
@@ -7480,7 +7670,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「早く」を表す early の最上級です。early は y を i に変えて est を付け、earliest になります。副詞なので the は付けなくても構いません。",
     "source": "２学期期末Workbook p.57・Check 比較・4 (4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "early"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-4-5",
@@ -7491,7 +7684,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，右の語を適切な形にして使って，下線部を補いなさい。",
-    "sentence": "This painting is ______ in his collection.",
+    "sentence": "This painting is ______ in his collection. [ 指定語: valuable ]",
     "japanese": "この絵は彼のコレクションの中でもっとも価値がある。",
     "translation": "この絵は彼のコレクションの中でもっとも価値がある。",
     "answer": "the most valuable",
@@ -7501,7 +7694,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「もっとも価値がある」は最上級です。valuable は長めの語なので、前に most を置き the most valuable にします。",
     "source": "２学期期末Workbook p.57・Check 比較・4 (5)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "valuable"
+    ]
   },
   {
     "id": "term2k-wb-p57-check-1",
@@ -7767,7 +7963,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(1)",
     "difficulty": "starter",
     "prompt": "[ ]の語句を比較級にして使って，英文を完成させなさい。",
-    "sentence": "He can play the trumpet ______ than me.",
+    "sentence": "He can play the trumpet ______ than me. [ 指定語: well ]",
     "japanese": "",
     "translation": "彼は私よりじょうずにトランペットを吹ける。",
     "answer": "better",
@@ -7777,7 +7973,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "than があるので比較級です。well（じょうずに）の比較級は不規則で better になります。",
     "source": "２学期期末Workbook p.58・Lesson 20 比較(1)・Step 1 2❶(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "well"
+    ]
   },
   {
     "id": "term2k-wb-p58-l20-s1-2a-2",
@@ -7788,7 +7987,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(1)",
     "difficulty": "starter",
     "prompt": "[ ]の語句を比較級にして使って，英文を完成させなさい。",
-    "sentence": "Light travels ______ than sound.",
+    "sentence": "Light travels ______ than sound. [ 指定語: fast ]",
     "japanese": "",
     "translation": "光は音より速く進む。",
     "answer": "faster",
@@ -7798,7 +7997,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "than があるので比較級で、fast に er を付けて faster にします。fast は形容詞でも副詞でも同じ形です。",
     "source": "２学期期末Workbook p.58・Lesson 20 比較(1)・Step 1 2❶(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "fast"
+    ]
   },
   {
     "id": "term2k-wb-p58-l20-s1-2a-3",
@@ -7809,7 +8011,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(1)",
     "difficulty": "starter",
     "prompt": "[ ]の語句を比較級にして使って，英文を完成させなさい。",
-    "sentence": "The math test was ______ than I had thought.",
+    "sentence": "The math test was ______ than I had thought. [ 指定語: difficult ]",
     "japanese": "",
     "translation": "数学のテストは私が思っていたより難しかった。",
     "answer": "more difficult",
@@ -7819,7 +8021,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "difficult は長めの語なので、er ではなく前に more を付けて more difficult にします。than I had thought は「思っていたより」の意味です。",
     "source": "２学期期末Workbook p.58・Lesson 20 比較(1)・Step 1 2❶(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "difficult"
+    ]
   },
   {
     "id": "term2k-wb-p58-l20-s1-2a-4",
@@ -7830,7 +8035,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(1)",
     "difficulty": "starter",
     "prompt": "[ ]の語句を比較級にして使って，英文を完成させなさい。",
-    "sentence": "Today is ______ than yesterday.",
+    "sentence": "Today is ______ than yesterday. [ 指定語: not cold ]",
     "japanese": "",
     "translation": "今日は昨日より寒いということはない。",
     "answer": "not colder",
@@ -7840,7 +8045,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "〈not＋比較級＋than〜〉で「〜より…ということはない」です。cold の比較級 colder の前に not を置いて not colder にします。「昨日と同じか暖かい」という意味です。",
     "source": "２学期期末Workbook p.58・Lesson 20 比較(1)・Step 1 2❶(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "not cold"
+    ]
   },
   {
     "id": "term2k-wb-p58-l20-s1-2a-5",
@@ -7851,7 +8059,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(1)",
     "difficulty": "starter",
     "prompt": "[ ]の語句を比較級にして使って，英文を完成させなさい。",
-    "sentence": "This computer is ______ than that one.",
+    "sentence": "This computer is ______ than that one. [ 指定語: not expensive ]",
     "japanese": "",
     "translation": "このコンピュータはあれより高いということはない。",
     "answer": "not more expensive",
@@ -7861,7 +8069,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "〈not＋比較級＋than〜〉の形です。expensive は長めの語なので more expensive にし、前に not を置きます。not expensive than のように比較級にし忘れないようにしましょう。",
     "source": "２学期期末Workbook p.58・Lesson 20 比較(1)・Step 1 2❶(5)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "not expensive"
+    ]
   },
   {
     "id": "term2k-wb-p58-l20-s1-2b-1",
@@ -7875,10 +8086,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Your car is （　　　）.",
     "japanese": "",
     "translation": "あなたの車は私のよりずっと大きい。",
-    "answer": "Your car is much bigger than mine.",
+    "answer": "much bigger than mine.",
     "answerLabel": "Your car is much bigger than mine.",
     "accepted": [
-      "Your car is much bigger than mine."
+      "much bigger than mine."
     ],
     "explanation": "「ずっと」は much を比較級の前に置きます。〈much＋比較級＋than〜〉の語順なので much bigger than mine になります。much を than の後ろに置かないようにしましょう。",
     "source": "２学期期末Workbook p.58・Lesson 20 比較(1)・Step 1 2❷(1)",
@@ -7902,10 +8113,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） the others.",
     "japanese": "",
     "translation": "この歌はほかの歌ほどなじみがない。",
-    "answer": "This song is less familiar than the others.",
+    "answer": "This song is less familiar than",
     "answerLabel": "This song is less familiar than the others.",
     "accepted": [
-      "This song is less familiar than the others."
+      "This song is less familiar than"
     ],
     "explanation": "less があるので〈less＋原級＋than〜〉「〜ほど…ない」の形です。文頭は this song、続けて is less familiar than とします。less の後ろは familiar の元の形なので、more のように変えません。",
     "source": "２学期期末Workbook p.58・Lesson 20 比較(1)・Step 1 2❷(2)",
@@ -7931,10 +8142,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "That sumo wrestler （　　　）.",
     "japanese": "",
     "translation": "あの力士は私の息子より100キロ重そうに見える。",
-    "answer": "That sumo wrestler looks one hundred kilograms heavier than my son.",
+    "answer": "looks one hundred kilograms heavier than my son.",
     "answerLabel": "That sumo wrestler looks one hundred kilograms heavier than my son.",
     "accepted": [
-      "That sumo wrestler looks one hundred kilograms heavier than my son."
+      "looks one hundred kilograms heavier than my son."
     ],
     "explanation": "差を表す「100キロ」は比較級 heavier の前に置きます。「〜に見える」の looks の後ろに〈差＋比較級＋than〜〉を続けて looks one hundred kilograms heavier than my son になります。than my son を先に言うと差の位置が合わなくなります。",
     "source": "２学期期末Workbook p.59・Lesson 20 比較(1)・Step 1 2❷(3)",
@@ -7960,10 +8171,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "His second movie is （　　　）.",
     "japanese": "",
     "translation": "彼の2作目の映画は、最初のものよりはるかにおもしろい。",
-    "answer": "His second movie is far more interesting than his first one.",
+    "answer": "far more interesting than his first one.",
     "answerLabel": "His second movie is far more interesting than his first one.",
     "accepted": [
-      "His second movie is far more interesting than his first one."
+      "far more interesting than his first one."
     ],
     "explanation": "「ずっと」を表す far は比較級の前に置くので far more interesting になります。〈far＋比較級＋than〜〉の形で、than の後ろに his first one（彼の最初の映画）を続けます。",
     "source": "２学期期末Workbook p.59・Lesson 20 比較(1)・Step 1 2❷(4)",
@@ -7989,11 +8200,11 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Tokyo Skytree is （　　　）.",
     "japanese": "",
     "translation": "東京スカイツリーは東京タワーより約300メートル高い。",
-    "answer": "Tokyo Skytree is higher than Tokyo Tower by about 300 meters.",
+    "answer": "higher than Tokyo Tower by about 300 meters.",
     "answerLabel": "Tokyo Skytree is higher than Tokyo Tower by about 300 meters.",
     "accepted": [
-      "Tokyo Skytree is higher than Tokyo Tower by about 300 meters.",
-      "Tokyo Skytree is higher by about 300 meters than Tokyo Tower."
+      "higher than Tokyo Tower by about 300 meters.",
+      "higher by about 300 meters than Tokyo Tower."
     ],
     "explanation": "higher than Tokyo Tower で「東京タワーより高い」です。差は by about 300 meters（約300メートルの差で）で最後に付けます。by は「差の分だけ」を表します。",
     "source": "２学期期末Workbook p.59・Lesson 20 比較(1)・Step 1 2❷(5)",
@@ -8232,7 +8443,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(1)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "This stadium is ______.",
+    "sentence": "This stadium is ______. [ 指定語: large ]",
     "japanese": "このスタジアムは，あのスタジアムの3倍の大きさです。",
     "translation": "このスタジアムは，あのスタジアムの3倍の大きさです。",
     "answer": "three times as large as that stadium",
@@ -8244,7 +8455,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜の3倍」は〈three times as＋原級＋as〜〉です。large はそのままの形で、as large as の前に three times を置きます。「あのスタジアム」は that stadium でも that one でも構いません。",
     "source": "２学期期末Workbook p.59・Lesson 20 比較(1)・Step 2 ❷(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "large"
+    ]
   },
   {
     "id": "term2k-wb-p59-l20-s2-2-2",
@@ -8255,7 +8469,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(1)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "In America, soccer ______ football.",
+    "sentence": "In America, soccer ______ football. [ 指定語: popular ]",
     "japanese": "アメリカでは，サッカーはアメリカンフットボールほど人気ではない。",
     "translation": "アメリカでは，サッカーはアメリカンフットボールほど人気ではない。",
     "answer": "is not as popular as",
@@ -8265,11 +8479,15 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
       "is not so popular as",
       "isn't as popular as",
       "isn't so popular as",
-      "is less popular than American"
+      "is less popular than American",
+      "is less popular than"
     ],
     "explanation": "「〜ほど…ない」は〈not as＋原級＋as〜〉で表します。is not as popular as football となります。less popular than を使った言い方もできます。",
     "source": "２学期期末Workbook p.59・Lesson 20 比較(1)・Step 2 ❷(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "popular"
+    ]
   },
   {
     "id": "term2k-wb-p59-l20-s2-2-3",
@@ -8280,7 +8498,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(1)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "Emi took ______ I did in Sydney.",
+    "sentence": "Emi took ______ I did in Sydney. [ 指定語: many ]",
     "japanese": "エミはシドニーで，私の半分の数の写真を撮ってきた。",
     "translation": "エミはシドニーで，私の半分の数の写真を撮ってきた。",
     "answer": "half as many pictures as",
@@ -8291,7 +8509,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜の半分の数」は〈half as many＋名詞＋as〜〉です。数えられる名詞なので many を使い、half as many pictures as とします。pictures の代わりに photos も使えます。",
     "source": "２学期期末Workbook p.59・Lesson 20 比較(1)・Step 2 ❷(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "many"
+    ]
   },
   {
     "id": "term2k-wb-p59-l20-s2-2-4",
@@ -8302,7 +8523,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(1)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "The climate of Onomichi ______ that of Sapporo.",
+    "sentence": "The climate of Onomichi ______ that of Sapporo. [ 指定語: mild ]",
     "japanese": "尾道の気候は，札幌よりもずっと温暖だ。",
     "translation": "尾道の気候は，札幌よりもずっと温暖だ。",
     "answer": "is much milder than",
@@ -8314,7 +8535,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「ずっと」を表す much を比較級の前に置きます。mild は er を付けて milder になり、is much milder than になります。that of Sapporo の that は climate のくり返しを避ける言い方です。",
     "source": "２学期期末Workbook p.59・Lesson 20 比較(1)・Step 2 ❷(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "mild"
+    ]
   },
   {
     "id": "term2k-wb-p60-l21-s1-1-1",
@@ -8451,7 +8675,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "This is ______ news in recent years.",
+    "sentence": "This is ______ news in recent years. [ 指定語: much / bad ]",
     "japanese": "これは近年で飛び抜けて最悪のニュースだ。",
     "translation": "これは近年で飛び抜けて最悪のニュースだ。",
     "answer": "much the worst",
@@ -8463,7 +8687,11 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "最上級を強調するときは、最上級の前に much や by far を置きます。bad の最上級は不規則で worst なので、much the worst になります。much worst のように the を忘れないようにしましょう。",
     "source": "２学期期末Workbook p.60・Lesson 21 比較(2)・Step 1 2(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "much",
+      "bad"
+    ]
   },
   {
     "id": "term2k-wb-p60-l21-s1-2-2",
@@ -8474,7 +8702,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "Takashi is ______ students in this school.",
+    "sentence": "Takashi is ______ students in this school. [ 指定語: funny ]",
     "japanese": "タカシはこの学校でもっともおもしろい生徒の1人だ。",
     "translation": "タカシはこの学校でもっともおもしろい生徒の1人だ。",
     "answer": "one of the funniest",
@@ -8484,7 +8712,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜の1人」は〈one of the＋最上級＋複数形の名詞〉です。funny は y を i に変えて funniest にします。students と複数形になっているので、one of the funniest の後ろは複数形です。",
     "source": "２学期期末Workbook p.60・Lesson 21 比較(2)・Step 1 2(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "funny"
+    ]
   },
   {
     "id": "term2k-wb-p60-l21-s1-2-3",
@@ -8495,7 +8726,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "Monaco is ______ country in the world.",
+    "sentence": "Monaco is ______ country in the world. [ 指定語: small ]",
     "japanese": "モナコは世界で2番目に小さい国です。",
     "translation": "モナコは世界で2番目に小さい国です。",
     "answer": "the second smallest",
@@ -8505,7 +8736,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「2番目に〜な」は〈the second＋最上級＋単数形の名詞〉です。small の最上級 smallest の前に the second を置きます。country は単数形のままです。",
     "source": "２学期期末Workbook p.60・Lesson 21 比較(2)・Step 1 2(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "small"
+    ]
   },
   {
     "id": "term2k-wb-p60-l21-s1-2-4",
@@ -8516,7 +8750,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(2)",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "Which is ______ hotel in this area?",
+    "sentence": "Which is ______ hotel in this area? [ 指定語: expensive ]",
     "japanese": "この地域ではどれがもっとも安いホテルですか。",
     "translation": "この地域ではどれがもっとも安いホテルですか。",
     "answer": "the least expensive",
@@ -8527,7 +8761,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「もっとも〜でない」は〈the least＋原級〉です。「安い」を expensive の反対の意味で表すので the least expensive になります。the cheapest でも意味は同じです。",
     "source": "２学期期末Workbook p.60・Lesson 21 比較(2)・Step 1 2(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "expensive"
+    ]
   },
   {
     "id": "term2k-wb-p61-l21-s1-3-1",
@@ -8687,10 +8924,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "He said （　　　） the party.",
     "japanese": "彼が言うには，私はそのパーティーでもっとも興奮していない人だった。",
     "translation": "彼が言うには，私はそのパーティーでもっとも興奮していない人だった。",
-    "answer": "He said I was the least excited person at the party.",
+    "answer": "I was the least excited person at",
     "answerLabel": "He said I was the least excited person at the party.",
     "accepted": [
-      "He said I was the least excited person at the party."
+      "I was the least excited person at"
     ],
     "explanation": "「もっとも〜でない」は〈the least＋原級〉です。I was the least excited person で「いちばん興奮していない人」になり、at the party が場所を表します。He said の後ろは I was の語順のままです。",
     "source": "２学期期末Workbook p.61・Lesson 21 比較(2)・Step 2 ❶(3)",
@@ -8717,10 +8954,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "*Ramen* （　　　） among students.",
     "japanese": "ラーメンは生徒のあいだでほかのどの食べ物よりも人気だ。",
     "translation": "ラーメンは生徒のあいだでほかのどの食べ物よりも人気だ。",
-    "answer": "Ramen is more popular than any other food among students.",
+    "answer": "is more popular than any other food",
     "answerLabel": "Ramen is more popular than any other food among students.",
     "accepted": [
-      "Ramen is more popular than any other food among students."
+      "is more popular than any other food"
     ],
     "explanation": "〈比較級＋than any other＋単数形の名詞〉で「ほかのどの〜よりも…」を表します。Ramen is more popular than any other food の順に並べます。any other の後ろの food は単数形です。",
     "source": "２学期期末Workbook p.61・Lesson 21 比較(2)・Step 2 ❶(4)",
@@ -8806,7 +9043,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(2)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "The first question was ______.",
+    "sentence": "The first question was ______. [ 指定語: difficult ]",
     "japanese": "最初の質問がすべての中でもっとも難しかった。",
     "translation": "最初の質問がすべての中でもっとも難しかった。",
     "answer": "the most difficult of all",
@@ -8818,7 +9055,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「もっとも難しい」は最上級です。difficult は長めの語なので the most difficult にします。「すべての中で」は of all で表します。",
     "source": "２学期期末Workbook p.61・Lesson 21 比較(2)・Step 2 ❷(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "difficult"
+    ]
   },
   {
     "id": "term2k-wb-p61-l21-s2-2-2",
@@ -8829,7 +9069,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(2)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "This is ______ this year.",
+    "sentence": "This is ______ this year. [ 指定語: successful ]",
     "japanese": "これは今年もっとも成功した映画の1つだ。",
     "translation": "これは今年もっとも成功した映画の1つだ。",
     "answer": "one of the most successful movies",
@@ -8840,7 +9080,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜の1つ」は〈one of the＋最上級＋複数形の名詞〉です。successful は長めの語なので the most successful にし、後ろの名詞は movies と複数形にします。",
     "source": "２学期期末Workbook p.61・Lesson 21 比較(2)・Step 2 ❷(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "successful"
+    ]
   },
   {
     "id": "term2k-wb-p61-l21-s2-2-3",
@@ -8851,7 +9094,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(2)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "______ than a good book.",
+    "sentence": "______ than a good book. [ 指定語: nothing ]",
     "japanese": "よい本よりもよいものはほかにはない。",
     "translation": "よい本よりもよいものはほかにはない。",
     "answer": "Nothing is better",
@@ -8861,7 +9104,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「〜より…なものはない」は〈Nothing is＋比較級＋than〜〉です。good の比較級は不規則で better になります。more better や gooder は誤りです。",
     "source": "２学期期末Workbook p.61・Lesson 21 比較(2)・Step 2 ❷(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "nothing"
+    ]
   },
   {
     "id": "term2k-wb-p61-l21-s2-2-4",
@@ -8872,7 +9118,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較(2)",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "Lake Saroma is ______.",
+    "sentence": "Lake Saroma is ______. [ 指定語: large ]",
     "japanese": "サロマ湖は日本で3番目に大きな湖だ。",
     "translation": "サロマ湖は日本で3番目に大きな湖だ。",
     "answer": "the third largest lake in Japan",
@@ -8883,7 +9129,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「3番目に〜な」は〈the third＋最上級＋単数形の名詞〉です。large の最上級 largest の前に the third を置き、lake は単数形のままにします。最後に in Japan を付けます。",
     "source": "２学期期末Workbook p.61・Lesson 21 比較(2)・Step 2 ❷(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "large"
+    ]
   },
   {
     "id": "term2k-wb-p62-plus-s1-1-1",
@@ -8894,13 +9143,14 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "starter",
     "prompt": "日本語の意味に合うように，（ ）に適切な語を入れなさい。",
-    "sentence": "Alice ate (　　) (　　) (　　) the two pieces of cakes.",
-    "japanese": "アリスは2つのケーキのうち大きいほうを食べた。",
-    "translation": "アリスは2つのケーキのうち大きいほうを食べた。",
+    "sentence": "Alice ate (　　) (　　) (　　) the two pieces of cake.",
+    "japanese": "アリスは2切れのケーキのうち大きいほうを食べた。",
+    "translation": "アリスは2切れのケーキのうち大きいほうを食べた。",
     "answer": "the larger of",
     "answerLabel": "the larger of",
     "accepted": [
-      "the larger of"
+      "the larger of",
+      "the bigger of"
     ],
     "explanation": "「2つのうちで，より…なほう」は〈the＋比較級＋of the two〉です。大きいほうなので the larger of とします。2つを比べるので最上級 largest ではなく比較級を使います。",
     "source": "２学期期末Workbook p.62・Plus 比較・Step 1 1❶(1)",
@@ -8977,7 +9227,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "比較",
     "difficulty": "starter",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "The news was <u>more</u> shocking <u>than</u> interesting.",
     "japanese": "",
     "translation": "そのニュースは興味深いというよりむしろ衝撃的だった。",
@@ -9004,7 +9254,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "比較",
     "difficulty": "starter",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "The weather is getting <u>cooler and cooler</u> these days.",
     "japanese": "",
     "translation": "最近、天気はだんだん涼しくなってきている。",
@@ -9031,7 +9281,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "PLUS",
     "topic": "比較",
     "difficulty": "starter",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "<u>The more</u> you practice the piano, <u>the better</u> you will become.",
     "japanese": "",
     "translation": "ピアノを練習すればするほど、ますます上手になるでしょう。",
@@ -9062,10 +9312,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Today's test was （　　　）.",
     "japanese": "",
     "translation": "今日のテストは昨日のテストと同じくらいしか難しくなかった。",
-    "answer": "Today's test was no more difficult than yesterday's.",
+    "answer": "no more difficult than yesterday's.",
     "answerLabel": "Today's test was no more difficult than yesterday's.",
     "accepted": [
-      "Today's test was no more difficult than yesterday's."
+      "no more difficult than yesterday's."
     ],
     "explanation": "〈A no＋比較級＋than B〉は「AはBと同じ程度にしか…でない」の意味です。no more difficult than yesterday's で「昨日のテストと同じくらいしか難しくない」になります。no more ... than の形を1かたまりで覚えましょう。",
     "source": "２学期期末Workbook p.62・Plus 比較・Step 1 2❶(1)",
@@ -9090,10 +9340,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） working hard.",
     "japanese": "",
     "translation": "十分な休息をとることは、一生懸命働くことに劣らず大切だ。",
-    "answer": "Getting enough rest is no less important than working hard.",
+    "answer": "Getting enough rest is no less important than",
     "answerLabel": "Getting enough rest is no less important than working hard.",
     "accepted": [
-      "Getting enough rest is no less important than working hard."
+      "Getting enough rest is no less important than"
     ],
     "explanation": "〈no less ... than B〉は「Bに劣らず…である」の意味です。Getting enough rest が主語で、is no less important than working hard と続けます。no と less の順番は no less です。",
     "source": "２学期期末Workbook p.62・Plus 比較・Step 1 2❶(2)",
@@ -9119,10 +9369,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "This tablet PC （　　　）.",
     "japanese": "",
     "translation": "このタブレットPCは雑誌と同じ程度にしか重くない（雑誌くらい軽い）。",
-    "answer": "This tablet PC is no heavier than a magazine.",
+    "answer": "is no heavier than a magazine.",
     "answerLabel": "This tablet PC is no heavier than a magazine.",
     "accepted": [
-      "This tablet PC is no heavier than a magazine."
+      "is no heavier than a magazine."
     ],
     "explanation": "〈no＋比較級＋than B〉は「Bと同じ程度にしか…でない」です。is no heavier than a magazine で「雑誌と同じ程度にしか重くない」、つまり「雑誌くらい軽い」という意味になります。",
     "source": "２学期期末Workbook p.62・Plus 比較・Step 1 2❶(3)",
@@ -9231,10 +9481,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Bob is （　　　）.",
     "japanese": "ボブは歌手というより詩人だ。",
     "translation": "ボブは歌手というより詩人だ。",
-    "answer": "Bob is not so much a singer as a poet.",
+    "answer": "not so much a singer as a poet.",
     "answerLabel": "Bob is not so much a singer as a poet.",
     "accepted": [
-      "Bob is not so much a singer as a poet."
+      "not so much a singer as a poet."
     ],
     "explanation": "「AというよりむしろB」は not so much A as B です。A が a singer、B が a poet なので、not so much a singer as a poet の順に並べます。A と B を逆にしないよう注意します。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❶(1)",
@@ -9260,10 +9510,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Jimmy's behavior （　　　）.",
     "japanese": "ジミーのふるまいは悪いというより子どもじみていた。",
     "translation": "ジミーのふるまいは悪いというより子どもじみていた。",
-    "answer": "Jimmy's behavior was more childish than bad.",
+    "answer": "was more childish than bad.",
     "answerLabel": "Jimmy's behavior was more childish than bad.",
     "accepted": [
-      "Jimmy's behavior was more childish than bad."
+      "was more childish than bad."
     ],
     "explanation": "「AというよりむしろB」は more B than A でも表せます。B が childish、A が bad なので more childish than bad になります。言いたいほう（childish）が前に来ます。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❶(2)",
@@ -9288,10 +9538,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） in sound quality.",
     "japanese": "この携帯電話はあの携帯電話より音質が劣っている。",
     "translation": "この携帯電話はあの携帯電話より音質が劣っている。",
-    "answer": "This cell phone is inferior to that one in sound quality.",
+    "answer": "This cell phone is inferior to that one",
     "answerLabel": "This cell phone is inferior to that one in sound quality.",
     "accepted": [
-      "This cell phone is inferior to that one in sound quality."
+      "This cell phone is inferior to that one"
     ],
     "explanation": "「〜より劣った」は inferior to 〜 です。than ではなく to を使います。this cell phone を主語にして is inferior to that one と並べ、その後ろに in sound quality を置きます。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❶(3)",
@@ -9316,10 +9566,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "（　　　） he is.",
     "japanese": "私は，彼と同じように，英語が流ちょうではない。",
     "translation": "私は，彼と同じように，英語が流ちょうではない。",
-    "answer": "I am no more fluent in English than he is.",
+    "answer": "I am no more fluent in English than",
     "answerLabel": "I am no more fluent in English than he is.",
     "accepted": [
-      "I am no more fluent in English than he is."
+      "I am no more fluent in English than"
     ],
     "explanation": "〈A no more ... than B〉は「AはBと同じように…でない」です。I am no more fluent in English than he is で「彼が流ちょうでないのと同じように私も流ちょうでない」という意味になります。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❶(4)",
@@ -9346,10 +9596,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Keita spent （　　　） last month.",
     "japanese": "ケイタは先月，服に50,000円も使った。",
     "translation": "ケイタは先月，服に50,000円も使った。",
-    "answer": "Keita spent no less than 50,000 yen for clothes last month.",
+    "answer": "no less than 50,000 yen for clothes",
     "answerLabel": "Keita spent no less than 50,000 yen for clothes last month.",
     "accepted": [
-      "Keita spent no less than 50,000 yen for clothes last month."
+      "no less than 50,000 yen for clothes"
     ],
     "explanation": "「〜ほども多く」は no less than＋数で表し、no less than 50,000 yen で「5万円も」になります。「服に」は for clothes で、数の後ろに置きます。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❶(5)",
@@ -9375,10 +9625,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "I drink （　　　） every day.",
     "japanese": "私は毎日，少なくとも3杯コーヒーを飲む。",
     "translation": "私は毎日，少なくとも3杯コーヒーを飲む。",
-    "answer": "I drink not less than three cups of coffee every day.",
+    "answer": "not less than three cups of coffee",
     "answerLabel": "I drink not less than three cups of coffee every day.",
     "accepted": [
-      "I drink not less than three cups of coffee every day."
+      "not less than three cups of coffee"
     ],
     "explanation": "「少なくとも」は not less than＋数です。not less than three cups で「少なくとも3杯」、cups of coffee で「コーヒー（の杯）」になります。「3杯のコーヒー」は three cups of coffee の語順です。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❶(6)",
@@ -9402,7 +9652,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "The wind is ______.",
+    "sentence": "The wind is ______. [ 指定語: blow / hard ]",
     "japanese": "風がますます激しく吹いてきている。",
     "translation": "風がますます激しく吹いてきている。",
     "answer": "blowing harder and harder",
@@ -9412,7 +9662,11 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「ますます…」は〈比較級＋and＋比較級〉です。「吹いてきている」は進行形の is blowing で、hard の比較級を重ねて harder and harder にします。blow は ing を付けた blowing の形にします。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❷(1)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "blow",
+      "hard"
+    ]
   },
   {
     "id": "term2k-wb-p63-plus-s2-2-2",
@@ -9423,7 +9677,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "______ the fare is.",
+    "sentence": "______ the fare is. [ 指定語: you / book / cheap ]",
     "japanese": "予約するのが早ければ早いほど，それだけ料金は安くなる。",
     "translation": "予約するのが早ければ早いほど，それだけ料金は安くなる。",
     "answer": "The earlier you book, the cheaper",
@@ -9434,7 +9688,12 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「…すればするほど、ますます〜」は〈the＋比較級 S V, the＋比較級 S V〉です。「早ければ」は early の比較級 earlier で表し、the earlier you book と the cheaper を並べます。cheap の比較級は cheaper です。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❷(2)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "you",
+      "book",
+      "cheap"
+    ]
   },
   {
     "id": "term2k-wb-p63-plus-s2-2-3",
@@ -9445,7 +9704,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "Reina is ______.",
+    "sentence": "Reina is ______. [ 指定語: no / less / diligent ]",
     "japanese": "レイナは他の生徒に劣らず勤勉だ。",
     "translation": "レイナは他の生徒に劣らず勤勉だ。",
     "answer": "no less diligent than the other students",
@@ -9457,7 +9716,12 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "〈A no less ... than B〉は「AはBに劣らず…である」です。no less diligent than で「〜に劣らず勤勉」になります。「他の生徒」は the other students で表します。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❷(3)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "no",
+      "less",
+      "diligent"
+    ]
   },
   {
     "id": "term2k-wb-p63-plus-s2-2-4",
@@ -9468,7 +9732,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "topic": "比較",
     "difficulty": "standard",
     "prompt": "日本語の意味に合うように，[ ]の語を必要に応じて適切な形にして使って，英文を完成させなさい。",
-    "sentence": "I bought ______ for my son.",
+    "sentence": "I bought ______ for my son. [ 指定語: expensive / coat ]",
     "japanese": "私は息子に2つのコートのうち高いほうを買ってあげた。",
     "translation": "私は息子に2つのコートのうち高いほうを買ってあげた。",
     "answer": "the more expensive of the two coats",
@@ -9479,7 +9743,11 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     ],
     "explanation": "「2つのうちで，より…なほう」は〈the＋比較級＋of the two〉です。expensive は長めの語なので the more expensive にし、of the two coats を続けます。2つの比較なので most ではなく more を使います。",
     "source": "２学期期末Workbook p.63・Plus 比較・Step 2 ❷(4)",
-    "blankCount": 1
+    "blankCount": 1,
+    "designatedWords": [
+      "expensive",
+      "coat"
+    ]
   },
   {
     "id": "term2k-wb-p64-fe-1-1",
@@ -9498,7 +9766,6 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "cannot as well as",
       "can't as well as",
-      "can not as well as",
       "cannot so well as",
       "can't so well as"
     ],
@@ -9761,8 +10028,6 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "accepted": [
       "No other lake in Japan is as large as Lake Biwa.",
       "No lake in Japan is as large as Lake Biwa.",
-      "No other lake in Japan is so large as Lake Biwa.",
-      "No lake in Japan is so large as Lake Biwa.",
       "No other lake in Japan is as big as Lake Biwa.",
       "No lake in Japan is as big as Lake Biwa."
     ],
@@ -9891,10 +10156,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "My grandmother （　　　） my mother.",
     "japanese": "祖母は母と同じくらいお茶を飲む。",
     "translation": "祖母は母と同じくらいお茶を飲む。",
-    "answer": "My grandmother drinks as much tea as my mother.",
+    "answer": "drinks as much tea as",
     "answerLabel": "My grandmother drinks as much tea as my mother.",
     "accepted": [
-      "My grandmother drinks as much tea as my mother."
+      "drinks as much tea as"
     ],
     "explanation": "「同じくらい」は〈as＋原級＋as〜〉です。tea は量で数える名詞なので as much tea as とし、drinks の後ろに続けます。much の前に as を置くのを忘れないようにしましょう。",
     "source": "２学期期末Workbook p.65・Further Exercises 比較・❹(1)",
@@ -9919,10 +10184,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Richie has grown up, and he （　　　） he used to be.",
     "japanese": "リッチーは成長して，以前の彼ほど無邪気ではない。",
     "translation": "リッチーは成長して，以前の彼ほど無邪気ではない。",
-    "answer": "Richie has grown up, and he is not as innocent as he used to be.",
+    "answer": "is not as innocent as",
     "answerLabel": "Richie has grown up, and he is not as innocent as he used to be.",
     "accepted": [
-      "Richie has grown up, and he is not as innocent as he used to be."
+      "is not as innocent as"
     ],
     "explanation": "「〜ほど…ない」は〈not as＋原級＋as〜〉です。he is not as innocent as he used to be の順に並べます。he used to be は「以前の彼」を表します。",
     "source": "２学期期末Workbook p.65・Further Exercises 比較・❹(2)",
@@ -9947,10 +10212,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "Children there eat only （　　　） they need.",
     "japanese": "そこの子どもたちは必要な量の半分しか食料を食べていない。",
     "translation": "そこの子どもたちは必要な量の半分しか食料を食べていない。",
-    "answer": "Children there eat only half as much food as they need.",
+    "answer": "half as much food as",
     "answerLabel": "Children there eat only half as much food as they need.",
     "accepted": [
-      "Children there eat only half as much food as they need."
+      "half as much food as"
     ],
     "explanation": "「半分」は〈half as＋原級＋as〜〉で表します。food は量で数える名詞なので half as much food as になります。half が as much の前に来る点が大切です。",
     "source": "２学期期末Workbook p.65・Further Exercises 比較・❹(3)",
@@ -9975,10 +10240,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "The younger you are, （　　　） learn a foreign language.",
     "japanese": "若ければ若いほど，外国語を習得するのは簡単だ。",
     "translation": "若ければ若いほど，外国語を習得するのは簡単だ。",
-    "answer": "The younger you are, the easier it is to learn a foreign language.",
+    "answer": "the easier it is to",
     "answerLabel": "The younger you are, the easier it is to learn a foreign language.",
     "accepted": [
-      "The younger you are, the easier it is to learn a foreign language."
+      "the easier it is to"
     ],
     "explanation": "〈the＋比較級 S V, the＋比較級 S V〉で「…すればするほど、ますます〜」です。後半は the easier it is to learn a foreign language となり、it は後ろの to learn（習得すること）を指す形だけの主語です。",
     "source": "２学期期末Workbook p.65・Further Exercises 比較・❹(4)",
@@ -10003,10 +10268,10 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "sentence": "This bike is （　　　）.",
     "japanese": "こちらの自転車が，2台のうちで安いほうです。",
     "translation": "こちらの自転車が，2台のうちで安いほうです。",
-    "answer": "This bike is the cheaper of the two.",
+    "answer": "the cheaper of the two.",
     "answerLabel": "This bike is the cheaper of the two.",
     "accepted": [
-      "This bike is the cheaper of the two."
+      "the cheaper of the two."
     ],
     "explanation": "「2つのうちで，より…なほう」は〈the＋比較級＋of the two〉です。the cheaper of the two の順に並べます。2つを比べるので cheapest ではなく cheaper を使います。",
     "source": "２学期期末Workbook p.65・Further Exercises 比較・❹(5)",
@@ -10027,7 +10292,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "比較",
     "difficulty": "standard",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "Our school is <u>not older than</u> yours.",
     "japanese": "",
     "translation": "私たちの学校はあなたの学校より古いということはない。",
@@ -10054,7 +10319,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "比較",
     "difficulty": "standard",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "Ann enjoyed talking to people <u>twice as old as</u> she was.",
     "japanese": "",
     "translation": "アンは自分の2倍の年齢の人たちと話すのを楽しんだ。",
@@ -10068,7 +10333,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "choices": [
       "アンは自分の2倍の年齢の人たちと話すのを楽しんだ。",
       "アンは自分より2歳年上の人たちと話すのを楽しんだ。",
-      "アンは自分の2倍の年齢の人たちに話しかけるのを楽しんだ。",
+      "アンは自分の半分の年齢の人たちと話すのを楽しんだ。",
       "アンは自分と同じ年齢の人たちと話すのを楽しんだ。"
     ],
     "blankCount": 0
@@ -10081,7 +10346,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "比較",
     "difficulty": "standard",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "I <u>prefer</u> coffee <u>to</u> tea.",
     "japanese": "",
     "translation": "私は紅茶よりコーヒーのほうが好きだ。",
@@ -10108,7 +10373,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "比較",
     "difficulty": "standard",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "The world is getting <u>smaller and smaller</u>.",
     "japanese": "",
     "translation": "世界はますます小さくなってきている。",
@@ -10135,7 +10400,7 @@ export const REGULAR_2KIMATSU_QUESTIONS = [
     "lesson": "FE",
     "topic": "比較",
     "difficulty": "standard",
-    "prompt": "下線部に注意して，次の英文を日本語に直しなさい。",
+    "prompt": "下線部に注意して、次の英文の意味として最も適切な日本語を選びなさい。",
     "sentence": "His behavior* <u>wasn't so much</u> fun <u>as</u> foolish.",
     "japanese": "",
     "translation": "彼のふるまいは楽しいというよりむしろ愚かだった。",

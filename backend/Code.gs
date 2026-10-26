@@ -3085,7 +3085,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "chasing"
+      "chasing",
+      "chase"
     ]
   },
   "term2k-eg-p53-ex19-2-1": {
@@ -3752,15 +3753,14 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "I am no more busy than you are."
+      "I am no more busy than"
     ]
   },
   "term2k-eg-p63-explus-4-3": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "no less valuable than our own lives are",
-          "The lives of animals are no less valuable than our own lives are."
+      "no less valuable than our own lives are"
     ]
   },
   "term2k-eg-p64-fe-1-1": {
@@ -4160,14 +4160,14 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "The price of the camera remained unchanged for a long time."
+      "The price of the camera remained unchanged for"
     ]
   },
   "term2k-wb-p49-l18-s2-2-2": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "They stood looking at each other for a moment."
+      "They stood looking at each other"
     ]
   },
   "term2k-wb-p49-l18-s2-2-3": {
@@ -4182,7 +4182,7 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "I was satisfied with the special dinner prepared by my mother."
+      "I was satisfied with the special dinner prepared"
     ]
   },
   "term2k-wb-p49-l18-s2-2-5": {
@@ -4374,8 +4374,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "I often leave my music playing while I'm reading.",
-          "Often I leave my music playing while I'm reading."
+      "I often leave my music playing while",
+      "Often I leave my music playing while"
     ]
   },
   "term2k-wb-p51-l19-s2-2-2": {
@@ -4389,14 +4389,14 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "He had his leg broken in the game."
+      "He had his leg broken in"
     ]
   },
   "term2k-wb-p51-l19-s2-2-4": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "In the noisy room, I was not able to make myself heard."
+      "I was not able to make myself heard."
     ]
   },
   "term2k-wb-p51-l19-s2-3-1": {
@@ -4488,21 +4488,21 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "She felt secure with her brother standing by her."
+      "with her brother standing by her."
     ]
   },
   "term2k-wb-p52-plus-s1-3-2": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "I can't sleep with this noise going on."
+      "with this noise going on."
     ]
   },
   "term2k-wb-p52-plus-s1-3-3": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "My father was listening to music with his eyes closed."
+      "with his eyes closed."
     ]
   },
   "term2k-wb-p53-plus-s1-4-1": {
@@ -4537,35 +4537,35 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Having read the news on the Internet, I know the singer got married."
+      "Having read the news on the Internet,"
     ]
   },
   "term2k-wb-p53-plus-s2-1-2": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Speaking of the singer, do you know how old she is?"
+      "Speaking of the singer,"
     ]
   },
   "term2k-wb-p53-plus-s2-1-3": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "My sister was sitting on the sofa with her legs crossed."
+      "with her legs crossed."
     ]
   },
   "term2k-wb-p53-plus-s2-1-4": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "It being Friday night, I stayed up late."
+      "It being Friday night,"
     ]
   },
   "term2k-wb-p53-plus-s2-1-5": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "When fishing at the riverside, I fell into the river."
+          "When fishing at the riverside"
     ]
   },
   "term2k-wb-p53-plus-s2-2-1": {
@@ -4796,49 +4796,49 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "My brother wants me to help him with his homework."
+      "wants me to help him"
     ]
   },
   "term2k-wb-p55-fe-6-2": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Tom's parents tell him not to bother others."
+      "tell him not to bother"
     ]
   },
   "term2k-wb-p55-fe-6-3": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "I turned down the music in order not to wake my sister up."
+      "in order not to wake"
     ]
   },
   "term2k-wb-p55-fe-6-4": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "When I was a little child, I had no friends to play with."
+      "no friends to play with."
     ]
   },
   "term2k-wb-p55-fe-6-5": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "You are old enough to decide for yourself."
+      "are old enough to decide"
     ]
   },
   "term2k-wb-p55-fe-6-6": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Kate saw a stranger running away from the scene of the crime."
+      "saw a stranger running away"
     ]
   },
   "term2k-wb-p55-fe-6-7": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Joe's classmates stopped him from leaving school."
+      "stopped him from leaving school."
     ]
   },
   "term2k-wb-p55-fe-7-1": {
@@ -4880,7 +4880,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "highest"
+      "highest",
+      "the highest"
     ]
   },
   "term2k-wb-p56-check-1-2c": {
@@ -4894,21 +4895,26 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "shortest"
+      "shortest",
+      "the shortest"
     ]
   },
   "term2k-wb-p56-check-1-3c": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "older"
+      "older",
+      "elder"
     ]
   },
   "term2k-wb-p56-check-1-3s": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "oldest"
+      "oldest",
+      "the oldest",
+      "eldest",
+      "the eldest"
     ]
   },
   "term2k-wb-p56-check-1-4c": {
@@ -4922,7 +4928,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "longest"
+      "longest",
+      "the longest"
     ]
   },
   "term2k-wb-p56-check-1-5c": {
@@ -4936,7 +4943,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "largest"
+      "largest",
+      "the largest"
     ]
   },
   "term2k-wb-p56-check-1-6c": {
@@ -4950,7 +4958,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "smartest"
+      "smartest",
+      "the smartest"
     ]
   },
   "term2k-wb-p56-check-1-7c": {
@@ -4964,7 +4973,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "earliest"
+      "earliest",
+      "the earliest"
     ]
   },
   "term2k-wb-p56-check-1-8c": {
@@ -4978,7 +4988,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "coldest"
+      "coldest",
+      "the coldest"
     ]
   },
   "term2k-wb-p56-check-1-9c": {
@@ -4992,7 +5003,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "most tired"
+      "most tired",
+      "the most tired"
     ]
   },
   "term2k-wb-p56-check-1-10c": {
@@ -5006,7 +5018,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "most surprising"
+      "most surprising",
+      "the most surprising"
     ]
   },
   "term2k-wb-p56-check-1-11c": {
@@ -5020,7 +5033,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "most interested"
+      "most interested",
+      "the most interested"
     ]
   },
   "term2k-wb-p56-check-1-12c": {
@@ -5034,7 +5048,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "most quickly"
+      "most quickly",
+      "the most quickly"
     ]
   },
   "term2k-wb-p56-check-1-13c": {
@@ -5048,7 +5063,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "most famous"
+      "most famous",
+      "the most famous"
     ]
   },
   "term2k-wb-p56-check-1-14c": {
@@ -5062,7 +5078,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "most careful"
+          "most careful",
+          "the most careful"
     ]
   },
   "term2k-wb-p56-check-1-15c": {
@@ -5076,7 +5093,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "best"
+      "best",
+      "the best"
     ]
   },
   "term2k-wb-p56-check-1-16c": {
@@ -5090,7 +5108,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "most"
+      "most",
+      "the most"
     ]
   },
   "term2k-wb-p56-check-1-17c": {
@@ -5104,7 +5123,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "best"
+      "best",
+      "the best"
     ]
   },
   "term2k-wb-p56-check-1-18c": {
@@ -5118,7 +5138,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "most"
+      "most",
+      "the most"
     ]
   },
   "term2k-wb-p56-check-1-19c": {
@@ -5132,7 +5153,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "worst"
+      "worst",
+      "the worst"
     ]
   },
   "term2k-wb-p56-check-1-20c": {
@@ -5146,7 +5168,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "least"
+      "least",
+      "the least"
     ]
   },
   "term2k-wb-p56-check-2-1": {
@@ -5389,36 +5412,36 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Your car is much bigger than mine."
+      "much bigger than mine."
     ]
   },
   "term2k-wb-p58-l20-s1-2b-2": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "This song is less familiar than the others."
+      "This song is less familiar than"
     ]
   },
   "term2k-wb-p59-l20-s1-2b-3": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "That sumo wrestler looks one hundred kilograms heavier than my son."
+      "looks one hundred kilograms heavier than my son."
     ]
   },
   "term2k-wb-p59-l20-s1-2b-4": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "His second movie is far more interesting than his first one."
+      "far more interesting than his first one."
     ]
   },
   "term2k-wb-p59-l20-s1-2b-5": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Tokyo Skytree is higher than Tokyo Tower by about 300 meters.",
-          "Tokyo Skytree is higher by about 300 meters than Tokyo Tower."
+      "higher than Tokyo Tower by about 300 meters.",
+      "higher by about 300 meters than Tokyo Tower."
     ]
   },
   "term2k-wb-p59-l20-s2-1-1": {
@@ -5487,11 +5510,12 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "is not as popular as",
-          "is not so popular as",
-          "isn't as popular as",
-          "isn't so popular as",
-          "is less popular than American"
+      "is not as popular as",
+      "is not so popular as",
+      "isn't as popular as",
+      "isn't so popular as",
+      "is less popular than American",
+      "is less popular than"
     ]
   },
   "term2k-wb-p59-l20-s2-2-3": {
@@ -5631,14 +5655,14 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "He said I was the least excited person at the party."
+      "I was the least excited person at"
     ]
   },
   "term2k-wb-p61-l21-s2-1-4": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Ramen is more popular than any other food among students."
+      "is more popular than any other food"
     ]
   },
   "term2k-wb-p61-l21-s2-1-5": {
@@ -5692,7 +5716,8 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "starter",
     "accepted": [
-          "the larger of"
+      "the larger of",
+      "the bigger of"
     ]
   },
   "term2k-wb-p62-plus-s1-1-2": {
@@ -5741,21 +5766,21 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Today's test was no more difficult than yesterday's."
+      "no more difficult than yesterday's."
     ]
   },
   "term2k-wb-p62-plus-s1-2a-2": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Getting enough rest is no less important than working hard."
+      "Getting enough rest is no less important than"
     ]
   },
   "term2k-wb-p62-plus-s1-2a-3": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "This tablet PC is no heavier than a magazine."
+      "is no heavier than a magazine."
     ]
   },
   "term2k-wb-p63-plus-s1-2b-1": {
@@ -5790,42 +5815,42 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Bob is not so much a singer as a poet."
+      "not so much a singer as a poet."
     ]
   },
   "term2k-wb-p63-plus-s2-1-2": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Jimmy's behavior was more childish than bad."
+      "was more childish than bad."
     ]
   },
   "term2k-wb-p63-plus-s2-1-3": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "This cell phone is inferior to that one in sound quality."
+      "This cell phone is inferior to that one"
     ]
   },
   "term2k-wb-p63-plus-s2-1-4": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "I am no more fluent in English than he is."
+      "I am no more fluent in English than"
     ]
   },
   "term2k-wb-p63-plus-s2-1-5": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Keita spent no less than 50,000 yen for clothes last month."
+      "no less than 50,000 yen for clothes"
     ]
   },
   "term2k-wb-p63-plus-s2-1-6": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "I drink not less than three cups of coffee every day."
+      "not less than three cups of coffee"
     ]
   },
   "term2k-wb-p63-plus-s2-2-1": {
@@ -5864,11 +5889,10 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "cannot as well as",
-          "can't as well as",
-          "can not as well as",
-          "cannot so well as",
-          "can't so well as"
+      "cannot as well as",
+      "can't as well as",
+      "cannot so well as",
+      "can't so well as"
     ]
   },
   "term2k-wb-p64-fe-1-2": {
@@ -5959,12 +5983,10 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "No other lake in Japan is as large as Lake Biwa.",
-          "No lake in Japan is as large as Lake Biwa.",
-          "No other lake in Japan is so large as Lake Biwa.",
-          "No lake in Japan is so large as Lake Biwa.",
-          "No other lake in Japan is as big as Lake Biwa.",
-          "No lake in Japan is as big as Lake Biwa."
+      "No other lake in Japan is as large as Lake Biwa.",
+      "No lake in Japan is as large as Lake Biwa.",
+      "No other lake in Japan is as big as Lake Biwa.",
+      "No lake in Japan is as big as Lake Biwa."
     ]
   },
   "term2k-wb-p64-fe-3-2": {
@@ -6010,35 +6032,35 @@ const QUESTION_REGISTRY = {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "My grandmother drinks as much tea as my mother."
+      "drinks as much tea as"
     ]
   },
   "term2k-wb-p65-fe-4-2": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Richie has grown up, and he is not as innocent as he used to be."
+      "is not as innocent as"
     ]
   },
   "term2k-wb-p65-fe-4-3": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "Children there eat only half as much food as they need."
+      "half as much food as"
     ]
   },
   "term2k-wb-p65-fe-4-4": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "The younger you are, the easier it is to learn a foreign language."
+      "the easier it is to"
     ]
   },
   "term2k-wb-p65-fe-4-5": {
     "course": "regular-english-practice-2kimatsu",
     "difficulty": "standard",
     "accepted": [
-          "This bike is the cheaper of the two."
+      "the cheaper of the two."
     ]
   },
   "term2k-wb-p65-fe-5-1": {
@@ -7125,8 +7147,9 @@ function isAnswerCorrect_(question, submittedAnswer) {
 function normalizeAnswer_(value) {
   return String(value || '').trim().toLowerCase()
     .replace(/[’']/g, "'")
-    .replace(/[。．,，!！?？、「」]/g, '')
+    .replace(/[.。．,，!！?？、「」]/g, '')
     .replace(/\s+/g, ' ')
+    .trim()
 }
 
 function cleanPinHash_(value) {
