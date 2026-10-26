@@ -1214,7 +1214,7 @@ function App() {
           setAuthName(identity.name)
           setAuthGrade(result.grade || '')
           setAuthClassName(result.className || '')
-          setAuthFoundationMember(Boolean(result.foundationMember))
+          setAuthFoundationMember(Boolean(result.foundationMember || result.needsPlacement))
           setAuthClubId('')
           setNotice('所属部活を選択してください。学年・クラスの登録内容は引き継がれています。')
           setView('landing')
