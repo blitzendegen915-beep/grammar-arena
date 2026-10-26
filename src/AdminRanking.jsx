@@ -4,7 +4,7 @@ const CLASSES = 'ABCDEFGHIJKLM'.split('')
 const UPDATED_TIME = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit' })
 
 export default function AdminRanking({ name, authToken, adminToken, initialCourse, request, onReauthenticate, onDelete }) {
-  const [filters, setFilters] = useState(() => ({ course: initialCourse, grade: '', className: '', query: '' }))
+  const [filters, setFilters] = useState(() => ({ course: ['overall', 'foundation-course', 'regular-english-practice', 'regular-english-practice-2kimatsu'].includes(initialCourse) ? initialCourse : 'foundation-course', grade: '', className: '', query: '' }))
   const [draftQuery, setDraftQuery] = useState('')
   const [page, setPage] = useState(1)
   const [revision, setRevision] = useState(0)
@@ -59,12 +59,12 @@ export default function AdminRanking({ name, authToken, adminToken, initialCours
 
   return <section className="teacher-ranking" aria-labelledby="teacher-ranking-title">
     <div className="teacher-ranking-heading">
-      <div><h3 id="teacher-ranking-title">講座別・全体ランキング</h3><p>検索・絞り込み後も、選択した講座の全体順位を表示します。</p></div>
+      <div><h3 id="teacher-ranking-title">{filters.course === 'overall' ? '総合' : '講座別'}・全体ランキング</h3><p>検索・絞り込み後も、選択した集計の全体順位を表示します。</p></div>
       <button type="button" className="secondary-button" disabled={loading} onClick={() => setRevision((value) => value + 1)}>再読み込み</button>
     </div>
     <form className="teacher-ranking-filters" onSubmit={search}>
       <label>講座<select value={filters.course} onChange={(event) => updateFilters({ course: event.target.value })}>
-        <option value="foundation-course">基礎講座</option><option value="regular-english-practice">平常授業</option><option value="regular-english-practice-2kimatsu">英語演習・2学期期末</option>
+        <option value="overall">総合</option><option value="foundation-course">基礎講座</option><option value="regular-english-practice">平常授業</option><option value="regular-english-practice-2kimatsu">英語演習・2学期期末</option>
       </select></label>
       <label>学年<select value={filters.grade} onChange={(event) => updateFilters({ grade: event.target.value })}>
         <option value="">全学年</option>{['1', '2', '3'].map((grade) => <option key={grade} value={grade}>{grade}年</option>)}<option value="unassigned">未登録</option>
@@ -89,7 +89,7 @@ export default function AdminRanking({ name, authToken, adminToken, initialCours
           <thead><tr><th scope="col">全体順位</th><th scope="col">学年</th><th scope="col">クラス</th><th scope="col">ユーザー名</th><th scope="col">レート</th><th scope="col">操作</th></tr></thead>
           <tbody>{data.students.length ? data.students.map((student) => <tr key={student.name}>
             <td className="teacher-rank">{student.rank === null ? '—' : `${student.rank.toLocaleString()}位`}</td>
-            <td>{student.grade ? `${student.grade}年` : '未登録'}</td><td>{student.className ? `${student.className}組` : '未登録'}</td>
+            <td>{student.grade ? `${student.grade}年` : '未登録'}</td><td>{student.className ? `${student.className}組` : '未登録'}{student.clubLabel && <small className="teacher-member-badge">{student.clubLabel}</small>}</td>
             <th scope="row">{student.name}{student.foundationMember && <small className="teacher-member-badge">基礎講座受講</small>}</th>
             <td className="teacher-rate">{student.rating === null ? <span className="teacher-unranked">未参加</span> : <><strong>{student.rating.toLocaleString()}</strong><small>{student.ratingPoolId === 'foundation' ? '基礎講座プール' : student.ratingPoolId === 'legacy' ? '旧講座記録' : student.ratingPoolId}</small></>}</td>
             <td><button type="button" className="admin-delete-trigger" disabled={student.name.trim().toLowerCase() === 'おとめ座'} aria-label={`${student.name}のアカウントを削除`} onClick={() => onDelete(student.name)}>削除</button></td>

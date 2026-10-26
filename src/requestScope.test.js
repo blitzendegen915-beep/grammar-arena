@@ -29,6 +29,11 @@ test('allows a response when name, token, course, and pool are unchanged', () =>
   assert.equal(isSameRequestScope(accountA, { ...accountA }), true)
 })
 
+test('compares metric when either request scope specifies one', () => {
+  assert.equal(isSameRequestScope({ ...accountA, metric: 'overall' }, { ...accountA, metric: 'course' }), false)
+  assert.equal(isSameRequestScope(accountA, { ...accountA, metric: 'overall' }), false)
+})
+
 test('requires both name and token to be nonempty', () => {
   assert.equal(isSameRequestScope({ ...accountA, name: '' }, accountA), false)
   assert.equal(isSameRequestScope({ ...accountA, token: '' }, accountA), false)

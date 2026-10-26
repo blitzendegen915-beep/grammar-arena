@@ -1,0 +1,38 @@
+.club-metric-select,
+.club-login-select {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  color: inherit;
+  font-size: 0.88rem;
+}
+
+.club-settings-select {
+  display: grid;
+  gap: 0.45rem;
+  color: inherit;
+}
+
+.club-metric-select select,
+.club-login-select select,
+.landing-form #landing-club,
+.club-settings-select select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #8c8375;
+  border-radius: 0.65rem;
+  color: #171717;
+  background-color: #fff8e8;
+  color-scheme: light;
+  font: inherit;
+}
+
+.landing-form label[for="landing-club"] { color: inherit; }
+.landing-form #landing-club { margin: 0 0 0.8rem; }
+.club-metric-select { max-width: 17rem; }
+
+@media (max-width: 700px) {
+  .leaderboard-page-head { align-items: flex-start; }
+  .club-metric-select { max-width: none; }
+}

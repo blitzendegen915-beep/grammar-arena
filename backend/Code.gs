@@ -1,6 +1,6 @@
 const COURSE_NAME = 'foundation-course'
 const RATING_MIN = 800
-const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash', 'grade', 'className', 'foundationMember', 'unlockedThemes', 'deletedAt', 'deletedBy', 'deleteReason', 'deleteOperationId']
+const PLAYER_HEADERS = ['playerKey', 'name', 'rating', 'answered', 'updatedAt', 'pinSecret', 'tokenHash', 'grade', 'className', 'foundationMember', 'unlockedThemes', 'deletedAt', 'deletedBy', 'deleteReason', 'deleteOperationId', 'clubId']
 const THEME_UNLOCKS = ['moon', 'crystallium', 'dignity', 'archive', 'eclipse', 'verdant', 'ember', 'aurora']
 const ANSWER_HEADERS = ['playerKey', 'course', 'questionId', 'correct', 'delta', 'answeredAt', 'answerId']
 const COURSE_PROFILE_HEADERS = ['playerKey', 'course', 'rating', 'answered', 'updatedAt']
@@ -12,6 +12,22 @@ const ALLOWED_COURSES = ['foundation-course', 'regular-english-practice', 'regul
 const ALLOWED_GRADES = ['1', '2', '3']
 const ALLOWED_CLASSES = 'ABCDEFGHIJKLM'.split('')
 const FOUNDATION_POOL_ID = 'foundation'
+// School's official club list, checked 2026-10-26:
+// https://www.komazawa.net/about/campusguide/club/
+const CLUB_LABELS = {
+  'iaido': '居合道部', 'kendo': '剣道部', 'golf': 'ゴルフ部', 'soccer': 'サッカー部',
+  'judo': '柔道部', 'softball': 'ソフトボール部', 'cheer': 'チアリーディング部',
+  'soft-tennis-boys': 'ソフトテニス部（男子）', 'soft-tennis-girls': 'ソフトテニス部（女子）',
+  'gymnastics': '体操競技部', 'table-tennis': '卓球部', 'tennis': '硬式テニス部', 'handball': 'ハンドボール部',
+  'basketball-boys': '男子バスケットボール部', 'basketball-girls': '女子バスケットボール部',
+  'badminton': 'バドミントン部', 'volleyball-boys': '男子バレーボール部', 'volleyball-girls': '女子バレーボール部',
+  'baseball': '野球部', 'rugby': 'ラグビー部', 'track': '陸上競技部', 'track-distance': '陸上競技部（長距離）',
+  'wandervogel': 'ワンダーフォーゲル部', 'dance': 'ダンス部',
+  'brass-band': '吹奏楽部', 'music': '音楽部', 'home-economics': '家庭研究部', 'drama': '演劇部',
+  'art': '美術部', 'english': '英語部', 'broadcasting': '放送部', 'calligraphy': '書道部',
+  'photography': '写真部', 'science': '科学研究部', 'history': '歴史研究部', 'literature': '文芸部',
+  'flower-arrangement': '華道部', 'none': '無所属',
+}
 const JAPANESE_INAPPROPRIATE_PATTERNS = [
   /(?:死ね|しね|消えろ|きえろ|殺す|ころす|殺せ|ころせ|だまれ|黙れ|うるせえ|レイプ|れいぷ|強姦|ごうかん|ちんこ|ちんぽ|ちんちん|まんこ|おっぱい|ぱいおつ|セックス|せっくす|えっち|エッチ|エロ|えろ|オナニー|おなにー|自慰|じい|射精|しゃせい|精子|せいし|ペニス|ぺにす|ヴァギナ|ばぎな|アナル|あなる|肛門|こうもん|フェラ|ふぇら|裸|はだか|全裸|ぜんら|乳首|ちくび|パンツ|ぱんつ|うんこ|うんち|ばか(?!り)|馬鹿|バカ(?!り)|アホ|あほ|ブス|ぶす|デブ|でぶ|ハゲ|はげ|チビ|ちび|クズ|くず|ゴミ|ごみ|カス|かす|無能|むのう|キモい|きもい|キショい|きしょい|うざい|ウザい|陰キャ|いんきゃ|チー牛|ちーぎゅう|ガイジ|がいじ|キチガイ|きちがい|池沼|ちしょう|老害|ろうがい|雑魚|ざこ|負け犬|まけいぬ|役立たず|やくたたず|下手くそ|へたくそ)/i,
 ]
@@ -6139,7 +6155,7 @@ const QUESTION_REGISTRY = {
 function doGet(e) {
   const params = e && e.parameter ? e.parameter : {}
   if ((params.action || 'leaderboard') !== 'leaderboard') return json_({ ok: false, reason: 'post-required' }, params.callback)
-  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
+  return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, params.poolId, params.name, params.authToken, params.callback, params.metric)
 }
 
 function doPost(e) {
@@ -6150,6 +6166,7 @@ function doPost(e) {
     if (action === 'login') return loginPlayer_(params)
     if (action === 'session') return sessionPlayer_(params)
     if (action === 'update-profile') return updatePlayerProfile_(params)
+    if (action === 'update-club') return updateClub_(params)
     if (action === 'unlock-theme') return unlockTheme_(params)
     if (action === 'answer') return recordAnswer_(params)
     if (action === 'admin-auth') return adminAuth_(params)
@@ -6158,7 +6175,7 @@ function doPost(e) {
     if (action === 'admin-delete-preview') return adminDeletePreview_(params)
     if (action === 'admin-delete-account') return adminDeleteAccount_(params)
     if (action === 'admin-set-rating') return adminSetRating_(params)
-    return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, cleanPoolId_(params.poolId), params.name, params.authToken, params.callback)
+    return getLeaderboard_(cleanCourse_(params.course) || COURSE_NAME, params.poolId, params.name, params.authToken, params.callback, params.metric)
   } catch (error) {
     const message = String(error && error.message || error || '')
     const retryable = isTransientBackendError_(message)
@@ -6278,7 +6295,7 @@ function adminSearch_(params) {
 function adminRanking_(params) {
   const { players, courseProfiles, poolProfiles } = getRuntimeSheets_(getBook_())
   if (!authenticatedAdmin_(players, params)) return json_({ ok: false, reason: 'admin-session-required', students: [] }, params.callback)
-  const course = cleanCourse_(params.course)
+  const course = params.course === 'overall' ? 'overall' : cleanCourse_(params.course)
   const grade = String(params.grade || '')
   const className = String(params.className || '')
   const query = String(params.query || '').normalize('NFKC').trim().toLowerCase()
@@ -6292,6 +6309,9 @@ function adminRanking_(params) {
 
   const poolRatings = new Map()
   const legacyRatings = new Map()
+  const overallSummaries = course === 'overall'
+    ? buildRatingSummaryIndex_(players.getDataRange().getValues(), courseProfiles.getDataRange().getValues(), poolProfiles.getDataRange().getValues())
+    : null
   const addProfile = (map, key, rawCourse, rawRating) => {
     if (cleanCourse_(rawCourse) !== course || rawRating === '' || rawRating == null) return
     const rating = Number(rawRating)
@@ -6316,15 +6336,15 @@ function adminRanking_(params) {
     const pools = playerPools_(row)
     // Regular classes use the student's own class first; foundation courses use
     // the foundation pool first. A second membership is a fallback, never a sum.
-    const orderedPools = course === 'regular-english-practice'
-      ? [...pools.filter((id) => id !== FOUNDATION_POOL_ID), ...pools.filter((id) => id === FOUNDATION_POOL_ID)]
-      : pools
+    const orderedPools = preferredRatingPools_(row, course)
     const ratingPoolId = orderedPools.find((id) => poolRatings.has(playerKey + '\u0000' + id)) || ''
     const profile = ratingPoolId ? poolRatings.get(playerKey + '\u0000' + ratingPoolId) : legacyRatings.get(playerKey)
     return {
       name: String(row[1]), grade: cleanGrade_(row[7]), className: cleanClassName_(row[8]),
       foundationMember: String(row[9] || '').toLowerCase() === 'true',
-      rating: profile ? profile.rating : null, ratingPoolId: ratingPoolId || (profile ? 'legacy' : ''), rank: null,
+      clubId: cleanClubId_(row[15]), clubLabel: clubLabel_(row[15]),
+      rating: overallSummaries ? overallSummaries.get(playerKey)?.overallRating ?? 1240 : profile ? profile.rating : null,
+      ratingPoolId: overallSummaries ? 'overall' : ratingPoolId || (profile ? 'legacy' : ''), rank: null,
     }
   }).sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1) || a.name.localeCompare(b.name, 'ja'))
   let previousRating = null
@@ -6341,7 +6361,7 @@ function adminRanking_(params) {
     if (grade === 'unassigned' ? student.grade : grade && student.grade !== grade) return false
     if (className === 'unassigned' ? student.className : className && student.className !== className) return false
     const haystack = [student.name, student.grade, student.className, student.grade + '-' + student.className,
-      student.grade + '年' + student.className + '組'].join(' ').normalize('NFKC').toLowerCase()
+      student.grade + '年' + student.className + '組', student.clubLabel].join(' ').normalize('NFKC').toLowerCase()
     return terms.every((term) => haystack.includes(term))
   })
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
@@ -6356,7 +6376,7 @@ function adminRanking_(params) {
 function adminDeleteFingerprint_(row) {
   // Ignore answers/rating changes while confirmation is open, but reject an
   // account replacement, a fresh login, or a changed name/class placement.
-  return digest_(JSON.stringify([row[0], row[1], row[5], row[6], row[7], row[8], row[9]]))
+  return digest_(JSON.stringify([row[0], row[1], row[5], row[6], row[7], row[8], row[9], row[15]]))
 }
 
 function adminDeletePreview_(params) {
@@ -6413,7 +6433,7 @@ function adminDeleteAccount_(params) {
     // and visibility are removed; no rows in other students' history are moved.
     const headers = players.getRange(1, 12, 1, 4).getValues()[0]
     if (headers.some((header, offset) => header && header !== PLAYER_HEADERS[11 + offset])) return json_({ ok: false, reason: 'deletion-columns-conflict' }, params.callback)
-    players.getRange(1, 12, 1, 4).setValues([PLAYER_HEADERS.slice(11)])
+    players.getRange(1, 12, 1, 4).setValues([PLAYER_HEADERS.slice(11, 15)])
     const now = new Date()
     const safeText = (value) => /^[=+@-]/.test(value) ? "'" + value : value
     // Record intent before changing access. The row's deletion metadata is the
@@ -6444,7 +6464,7 @@ function adminSetRating_(params) {
   const reason = String(params.reason || '').trim().slice(0, 240)
   const ratingText = String(params.rating || '').trim()
   const rating = /^\d{1,7}$/.test(ratingText) ? Number(ratingText) : NaN
-  if (!name || !targetName || !course || !poolId || !reason || !Number.isInteger(rating) || rating < RATING_MIN || rating > 1000000) {
+  if (!name || !targetName || !course || !poolId || poolId.startsWith('club:') || !reason || !Number.isInteger(rating) || rating < RATING_MIN || rating > 1000000) {
     return json_({ ok: false, reason: 'invalid-input' }, params.callback)
   }
 
@@ -6602,6 +6622,90 @@ function repairRatingsFromAnswers() {
   }
 }
 
+function cleanClubId_(value) {
+  const id = String(value || '').trim().toLowerCase()
+  return Object.prototype.hasOwnProperty.call(CLUB_LABELS, id) ? id : ''
+}
+
+function clubLabel_(value) {
+  return CLUB_LABELS[cleanClubId_(value)] || ''
+}
+
+function baseRatingPools_(row) {
+  return playerPools_(row).filter((poolId) => !poolId.startsWith('club:'))
+}
+
+function preferredRatingPools_(row, course) {
+  const pools = baseRatingPools_(row)
+  return course === 'foundation-course'
+    ? [...pools.filter((id) => id === FOUNDATION_POOL_ID), ...pools.filter((id) => id !== FOUNDATION_POOL_ID)]
+    : [...pools.filter((id) => id !== FOUNDATION_POOL_ID), ...pools.filter((id) => id === FOUNDATION_POOL_ID)]
+}
+
+// A pool is a view of a student's score, never an extra contribution to the total.
+// Index the three small profile tables once; no Answers/attempt-history scan here.
+function buildRatingSummaryIndex_(playerRows, courseRows, poolRows) {
+  const courses = new Map()
+  const pools = new Map()
+  const recordedPlayers = new Set()
+  const add = (index, row, isPool) => {
+    const playerKey = String(row[0] || '')
+    const course = cleanCourse_(row[1])
+    const rawRating = row[isPool ? 3 : 2]
+    const rating = Number(rawRating)
+    if (!playerKey || !course || rawRating === '' || rawRating == null || !Number.isFinite(rating) || rating < RATING_MIN) return
+    recordedPlayers.add(playerKey)
+    const key = playerKey + '\u0000' + course + (isPool ? '\u0000' + String(row[2]) : '')
+    const canonical = String(row[1]) === course
+    const previous = index.get(key)
+    if (previous?.canonical && !canonical) return
+    index.set(key, { rating, answered: Math.max(0, Number(row[isPool ? 4 : 3]) || 0), canonical })
+  }
+  courseRows.forEach((row) => add(courses, row, false))
+  poolRows.forEach((row) => add(pools, row, true))
+  const summaries = new Map()
+  playerRows.forEach((row) => {
+    const playerKey = String(row[0] || '')
+    if (!playerKey || playerKey === 'playerKey' || !row[1] || row[11] || summaries.has(playerKey)) return
+    const courseRatings = {}
+    const courseAnswered = {}
+    ALLOWED_COURSES.forEach((course) => {
+      const prefix = playerKey + '\u0000' + course
+      let profile
+      for (const poolId of preferredRatingPools_(row, course)) {
+        profile = pools.get(prefix + '\u0000' + poolId)
+        if (profile) break
+      }
+      profile = profile || courses.get(prefix)
+      if (!profile && course === 'foundation-course' && !recordedPlayers.has(playerKey)) {
+        profile = { rating: Number(row[2]) || 1240, answered: Number(row[3]) || 0 }
+      }
+      courseRatings[course] = profile?.rating ?? 1240
+      courseAnswered[course] = profile?.answered ?? 0
+    })
+    const overallRating = 1240 + Object.values(courseRatings).reduce((sum, rating) => sum + Math.max(0, rating - 1240), 0)
+    summaries.set(playerKey, { courseRatings, overallRating, courseAnswered })
+  })
+  return summaries
+}
+
+function ratingSummaryFor_(players, courseProfiles, poolProfiles, playerKey) {
+  const summary = buildRatingSummaryIndex_(players.getDataRange().getValues(), courseProfiles.getDataRange().getValues(), poolProfiles.getDataRange().getValues()).get(playerKey)
+  return summary
+    ? { courseRatings: summary.courseRatings, overallRating: summary.overallRating }
+    : { courseRatings: Object.fromEntries(ALLOWED_COURSES.map((course) => [course, 1240])), overallRating: 1240 }
+}
+
+// Promote an original pre-course account before a different course is opened.
+// This copies its existing record, without awarding any new points.
+function ensureLegacyFoundationRecord_(courseProfiles, poolProfiles, playerKey, row) {
+  const hasProfile = courseProfiles.getDataRange().getValues().some((profile) => String(profile[0]) === playerKey && cleanCourse_(profile[1])) ||
+    poolProfiles.getDataRange().getValues().some((profile) => String(profile[0]) === playerKey && cleanCourse_(profile[1]))
+  if (!hasProfile && ((Number(row[2]) || 1240) !== 1240 || Number(row[3]) > 0)) {
+    ensureCourseProfile_(courseProfiles, playerKey, 'foundation-course', Number(row[2]) || 1240, Number(row[3]) || 0)
+  }
+}
+
 function getBook_() {
   const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID')
   if (!id) {
@@ -6615,6 +6719,7 @@ function getOrCreateSheet_(book, name, headers) {
   const sheet = book.getSheetByName(name) || book.insertSheet(name)
   if (sheet.getLastRow() === 0) sheet.getRange(1, 1, 1, headers.length).setValues([headers])
   const currentHeaders = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), headers.length)).getValues()[0]
+  if (name === 'Players' && currentHeaders[15] && currentHeaders[15] !== 'clubId') throw new Error('club-column-conflict')
   headers.forEach((header, index) => {
     if (String(currentHeaders[index] || '') !== header) sheet.getRange(1, index + 1).setValue(header)
   })
@@ -6628,6 +6733,9 @@ function getRuntimeSheets_(book) {
   const get = (name, headers) => book.getSheetByName(name) || getOrCreateSheet_(book, name, headers)
   const players = get('Players', PLAYER_HEADERS)
   if (String(players.getRange(1, 11).getValue() || '') !== 'unlockedThemes') players.getRange(1, 11).setValue('unlockedThemes')
+  const clubHeader = String(players.getRange(1, 16).getValue() || '')
+  if (clubHeader && clubHeader !== 'clubId') throw new Error('club-column-conflict')
+  if (!clubHeader) players.getRange(1, 16).setValue('clubId')
   return {
     players,
     answers: get('Answers', ANSWER_HEADERS),
@@ -6644,6 +6752,9 @@ function registerPlayer_(params) {
   const grade = cleanGrade_(params.grade)
   const className = cleanClassName_(params.className)
   const foundationMember = cleanBoolean_(params.foundationMember)
+  const hasClubSelection = params.clubId != null && String(params.clubId).trim() !== ''
+  const clubId = cleanClubId_(params.clubId)
+  if (hasClubSelection && !clubId) return json_({ ok: false, reason: 'invalid-club' }, params.callback)
   if (!name || !playerKey || !pinHash) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
   if (isInappropriateContent_(name)) return json_({ ok: false, reason: 'inappropriate-content' }, params.callback)
   if (!grade || !className) return json_({ ok: false, reason: 'placement-required' }, params.callback)
@@ -6672,9 +6783,10 @@ function registerPlayer_(params) {
       const rating = Number(rows[playerIndex][2]) || 1240
       const answered = Number(rows[playerIndex][3]) || 0
       players.getRange(playerIndex + 1, 2, 1, 9).setValues([[name, rating, answered, now, pinSecret, tokenHashFor_(token, playerKey), grade, className, foundationMember]])
+      if (hasClubSelection) players.getRange(playerIndex + 1, 16).setValue(clubId)
       return json_(profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false, includeAnsweredIds: true }), params.callback)
     }
-    players.appendRow([playerKey, name, 1240, 0, now, pinSecret, tokenHashFor_(token, playerKey), grade, className, foundationMember])
+    players.appendRow([playerKey, name, 1240, 0, now, pinSecret, tokenHashFor_(token, playerKey), grade, className, foundationMember, '[]', '', '', '', '', clubId])
     const newIndex = players.getLastRow() - 1
     return json_(profile_(players, answers, courseProfiles, poolProfiles, newIndex, playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false, includeAnsweredIds: false }), params.callback)
   } finally {
@@ -6687,6 +6799,9 @@ function loginPlayer_(params) {
   const playerKey = keyFor_(name)
   const pinHash = cleanPinHash_(params.pinHash)
   const course = cleanCourse_(params.course) || COURSE_NAME
+  const hasClubSelection = params.clubId != null && String(params.clubId).trim() !== ''
+  const clubId = cleanClubId_(params.clubId)
+  if (hasClubSelection && !clubId) return json_({ ok: false, reason: 'invalid-club' }, params.callback)
   if (!name || !playerKey || !pinHash) return json_({ ok: false, reason: 'invalid-input' }, params.callback)
   if (isInappropriateContent_(name)) return json_({ ok: false, reason: 'inappropriate-content' }, params.callback)
 
@@ -6706,6 +6821,7 @@ function loginPlayer_(params) {
     const now = new Date()
     players.getRange(playerIndex + 1, 5).setValue(now)
     players.getRange(playerIndex + 1, 7).setValue(tokenHashFor_(token, playerKey))
+    if (hasClubSelection) players.getRange(playerIndex + 1, 16).setValue(clubId)
     return json_(profile_(players, answers, courseProfiles, poolProfiles, playerIndex, playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false }), params.callback)
   } finally {
     lock.releaseLock()
@@ -6831,12 +6947,23 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
   const includeAnsweredIds = options.includeAnsweredIds !== false
   const row = players.getDataRange().getValues()[playerIndex]
   const answerRows = Array.isArray(options.answerRows) ? options.answerRows : answers.getDataRange().getValues()
-  const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey, answerRows)
+  const unlockedThemes = options.readOnly
+    ? themeUnlocksFromRow_(row)
+    : eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey, answerRows)
   const poolIds = playerPools_(row)
-  const profiles = poolIds.map((poolId) => ({
+  if (!options.readOnly) ensureLegacyFoundationRecord_(courseProfiles, poolProfiles, playerKey, row)
+  const readSummary = options.readOnly ? ratingSummaryFor_(players, courseProfiles, poolProfiles, playerKey) : null
+  const storedPools = options.readOnly ? poolProfiles.getDataRange().getValues().slice(1) : []
+  const profiles = baseRatingPools_(row).map((poolId) => ({
     poolId,
-    ...ensurePoolProfile_(poolProfiles, courseProfiles, playerKey, course, poolId, Number(row[2]) || 1240, Number(row[3]) || 0),
+    ...(options.readOnly ? (() => {
+      const stored = storedPools.find((profile) => String(profile[0]) === playerKey && String(profile[1]) === course && String(profile[2]) === poolId)
+      return { rating: stored ? Number(stored[3]) || 1240 : readSummary.courseRatings[course] ?? 1240, answered: stored ? Number(stored[4]) || 0 : 0 }
+    })() : ensurePoolProfile_(poolProfiles, courseProfiles, playerKey, course, poolId, Number(row[2]) || 1240, Number(row[3]) || 0)),
   }))
+  const summary = readSummary || ratingSummaryFor_(players, courseProfiles, poolProfiles, playerKey)
+  const clubId = cleanClubId_(row[15])
+  if (clubId && poolIds.includes('club:' + clubId)) profiles.push({ poolId: 'club:' + clubId, rating: summary.courseRatings[course] ?? 1240, answered: profiles.find((profile) => profile.poolId === preferredRatingPools_(row, course)[0])?.answered || 0 })
   const activePool = poolIds.includes(requestedPool) ? requestedPool : poolIds[0] || ''
   const activeProfile = profiles.find((profile) => profile.poolId === activePool) || profiles[0] || {
     rating: Number(row[2]) || 1240,
@@ -6853,6 +6980,10 @@ function profile_(players, answers, courseProfiles, poolProfiles, playerIndex, p
     grade: cleanGrade_(row[7]),
     className: cleanClassName_(row[8]),
     foundationMember: String(row[9] || '').toLowerCase() === 'true',
+    clubId,
+    clubLabel: clubLabel_(clubId),
+    needsClubSelection: !clubId,
+    ...summary,
     unlockedThemes,
     needsPlacement: !cleanGrade_(row[7]) || !cleanClassName_(row[8]),
     poolId: activePool,
@@ -6867,6 +6998,9 @@ function updatePlayerProfile_(params) {
   const token = String(params.authToken || '')
   const grade = cleanGrade_(params.grade)
   const className = cleanClassName_(params.className)
+  const hasClubSelection = params.clubId != null && String(params.clubId).trim() !== ''
+  const clubId = cleanClubId_(params.clubId)
+  if (hasClubSelection && !clubId) return json_({ ok: false, reason: 'invalid-club' }, params.callback)
   if (!name || !token || !grade || !className) return json_({ ok: false, reason: 'placement-required' }, params.callback)
   if (isInappropriateContent_(name)) return json_({ ok: false, reason: 'inappropriate-content' }, params.callback)
 
@@ -6879,11 +7013,30 @@ function updatePlayerProfile_(params) {
     if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
     const foundationMember = cleanBoolean_(params.foundationMember)
     players.getRange(auth.playerIndex + 1, 8, 1, 3).setValues([[grade, className, foundationMember]])
+    if (hasClubSelection) players.getRange(auth.playerIndex + 1, 16).setValue(clubId)
     const course = cleanCourse_(params.course) || COURSE_NAME
     return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey, course, token, cleanPoolId_(params.poolId), { includePlayers: false }), params.callback)
   } finally {
     lock.releaseLock()
   }
+}
+
+function updateClub_(params) {
+  const name = cleanName_(params.name)
+  const token = String(params.authToken || '')
+  const clubId = cleanClubId_(params.clubId)
+  if (!name || !token) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
+  if (!clubId) return json_({ ok: false, reason: 'invalid-club' }, params.callback)
+  const lock = LockService.getScriptLock()
+  lock.waitLock(10000)
+  try {
+    const { players, answers, courseProfiles, poolProfiles } = getRuntimeSheets_(getBook_())
+    const auth = authenticate_(players, name, token)
+    if (!auth) return json_({ ok: false, reason: 'invalid-session' }, params.callback)
+    players.getRange(auth.playerIndex + 1, 16).setValue(clubId)
+    return json_(profile_(players, answers, courseProfiles, poolProfiles, auth.playerIndex, auth.playerKey,
+      cleanCourse_(params.course) || COURSE_NAME, token, cleanPoolId_(params.poolId), { includePlayers: false, readOnly: true }), params.callback)
+  } finally { lock.releaseLock() }
 }
 
 function rankingCourses_(course) {
@@ -6898,8 +7051,9 @@ function playerPools_(row) {
   const className = cleanClassName_(row[8])
   const classPool = grade && className ? grade + '-' + className : ''
   const foundationMember = String(row[9] || '').toLowerCase() === 'true'
-  if (foundationMember) return classPool ? [FOUNDATION_POOL_ID, classPool] : [FOUNDATION_POOL_ID]
-  return classPool ? [classPool] : []
+  const pools = foundationMember ? (classPool ? [FOUNDATION_POOL_ID, classPool] : [FOUNDATION_POOL_ID]) : (classPool ? [classPool] : [])
+  const clubId = row[15] ? cleanClubId_(row[15]) : ''
+  return pools.length && clubId ? [...pools, 'club:' + clubId] : pools
 }
 
 function ensurePoolProfile_(poolSheet, legacySheet, playerKey, course, poolId, fallbackRating, fallbackAnswered) {
@@ -6914,8 +7068,8 @@ function ensurePoolProfile_(poolSheet, legacySheet, playerKey, course, poolId, f
   }
   const legacyRows = legacySheet.getDataRange().getValues()
   const legacy = legacyRows.find((row, index) => index > 0 && row[0] === playerKey && row[1] === course)
-  const rating = legacy ? Number(legacy[2]) || 1240 : Number(fallbackRating) || 1240
-  const answered = legacy ? Number(legacy[3]) || 0 : Number(fallbackAnswered) || 0
+  const rating = legacy ? Number(legacy[2]) || 1240 : course === 'foundation-course' ? Number(fallbackRating) || 1240 : 1240
+  const answered = legacy ? Number(legacy[3]) || 0 : course === 'foundation-course' ? Number(fallbackAnswered) || 0 : 0
   poolSheet.appendRow([playerKey, course, poolId, rating, answered, new Date()])
   return { sheetRow: poolSheet.getLastRow(), rating, answered }
 }
@@ -6966,14 +7120,18 @@ function recordAnswer_(params) {
     const playerRow = playerRows[playerIndex]
     const poolIds = playerPools_(playerRow)
     if (!poolIds.length) return json_({ ok: false, reason: 'placement-required' }, params.callback)
-    const profiles = poolIds.map((poolId) => ({
+    ensureLegacyFoundationRecord_(courseProfiles, poolProfiles, playerKey, playerRow)
+    const profiles = baseRatingPools_(playerRow).map((poolId) => ({
       poolId,
       ...ensurePoolProfile_(poolProfiles, courseProfiles, playerKey, course, poolId, Number(playerRow[2]) || 1240, Number(playerRow[3]) || 0),
     }))
     const activePool = poolIds.includes(requestedPool) ? requestedPool : poolIds[0]
-    const activeProfile = profiles.find((profile) => profile.poolId === activePool) || profiles[0]
+    const referencePool = preferredRatingPools_(playerRow, course)[0]
+    const clubId = cleanClubId_(playerRow[15])
+    const clubPool = clubId ? 'club:' + clubId : ''
+    const activeProfile = profiles.find((profile) => profile.poolId === activePool) || profiles.find((profile) => profile.poolId === referencePool) || profiles[0]
     const submittedAnswer = String(params.answer || '')
-    if (isInappropriateContent_(submittedAnswer)) return json_({ ok: false, reason: 'inappropriate-content', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles) }, params.callback)
+    if (isInappropriateContent_(submittedAnswer)) return json_({ ok: false, reason: 'inappropriate-content', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles, clubPool, referencePool) }, params.callback)
     const rows = answers.getDataRange().getValues()
     const duplicate = rows.slice(1).some((row) => {
       const sameQuestion = row[0] === playerKey && rankingCourses_(course).includes(String(row[1])) && row[2] === questionId
@@ -6986,7 +7144,7 @@ function recordAnswer_(params) {
     // A retry may follow a lost response. Return the authoritative rating without scoring twice.
     if (duplicate) {
       const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey, rows)
-      return json_({ ok: false, reason: 'already-answered', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles), unlockedThemes }, params.callback)
+      return json_({ ok: false, reason: 'already-answered', rating: activeProfile.rating, delta: 0, poolId: activePool, ratings: ratingsFromProfiles_(profiles, clubPool, referencePool), unlockedThemes, ...ratingSummaryFor_(players, courseProfiles, poolProfiles, playerKey) }, params.callback)
     }
     // New clients send the answer text. Older queued answers only have the
     // browser's result, so retain a temporary compatibility path for them.
@@ -7004,16 +7162,16 @@ function recordAnswer_(params) {
       poolProfiles.getRange(profile.sheetRow, 4, 1, 3).setValues([[rating, profile.answered + 1, now]])
       return { ...profile, rating, answered: profile.answered + 1 }
     })
-    const foundationProfile = updatedProfiles.find((profile) => profile.poolId === FOUNDATION_POOL_ID)
+    const canonicalProfile = updatedProfiles.find((profile) => profile.poolId === referencePool) || updatedProfiles[0]
     const legacyProfile = ensureCourseProfile_(courseProfiles, playerKey, course, Number(playerRow[2]) || 1240, Number(playerRow[3]) || 0)
-    if (foundationProfile) courseProfiles.getRange(legacyProfile.sheetRow, 3, 1, 3).setValues([[foundationProfile.rating, foundationProfile.answered, now]])
+    courseProfiles.getRange(legacyProfile.sheetRow, 3, 1, 3).setValues([[canonicalProfile.rating, canonicalProfile.answered, now]])
     players.getRange(playerIndex + 1, 2).setValue(name)
     const primaryProfile = updatedProfiles[0]
     players.getRange(playerIndex + 1, 3, 1, 2).setValues([[primaryProfile.rating, primaryProfile.answered]])
     players.getRange(playerIndex + 1, 5).setValue(now)
-    const activeUpdated = updatedProfiles.find((profile) => profile.poolId === activePool) || primaryProfile
+    const activeUpdated = updatedProfiles.find((profile) => profile.poolId === activePool) || canonicalProfile
     const unlockedThemes = eligibleThemeUnlocks_(players, courseProfiles, poolProfiles, playerIndex, playerKey, rows)
-    const result = { ok: true, rating: activeUpdated.rating, delta: safeDelta, correct, serverValidated, poolId: activePool, ratings: ratingsFromProfiles_(updatedProfiles), unlockedThemes }
+    const result = { ok: true, rating: activeUpdated.rating, delta: safeDelta, correct, serverValidated, poolId: activePool, ratings: ratingsFromProfiles_(updatedProfiles, clubPool, referencePool), unlockedThemes, ...ratingSummaryFor_(players, courseProfiles, poolProfiles, playerKey) }
     if (String(params.compact) !== 'true') result.players = leaderboard_(players, courseProfiles, poolProfiles, course, activePool, playerKey)
     return json_(result, params.callback)
   } finally {
@@ -7021,28 +7179,45 @@ function recordAnswer_(params) {
   }
 }
 
-function getLeaderboard_(course, poolId, name, authToken, callback) {
+function getLeaderboard_(course, poolId, name, authToken, callback, metric = 'course') {
   course = cleanCourse_(course) || COURSE_NAME
+  metric = metric || 'course'
+  if (!['course', 'overall'].includes(metric)) return json_({ ok: false, reason: 'invalid-metric', players: [] }, callback)
   const book = getBook_()
   const { players, courseProfiles, poolProfiles } = getRuntimeSheets_(book)
   const auth = authenticate_(players, cleanName_(name), String(authToken || ''))
   if (!auth) return json_({ ok: false, reason: 'auth-required', players: [] }, callback)
   const memberPools = playerPools_(players.getDataRange().getValues()[auth.playerIndex])
   const activePool = cleanPoolId_(poolId) || memberPools[0] || ''
-  if (!activePool || !memberPools.includes(activePool)) return json_({ ok: false, reason: 'pool-forbidden', poolId: activePool, allowedPoolId: memberPools[0] || '', players: [] }, callback)
-  return json_({ ok: true, course, poolId: activePool, players: leaderboard_(players, courseProfiles, poolProfiles, course, activePool, auth.playerKey) }, callback)
+  if ((poolId && !cleanPoolId_(poolId)) || !activePool || !memberPools.includes(activePool)) return json_({ ok: false, reason: 'pool-forbidden', poolId: activePool, allowedPoolId: memberPools[0] || '', players: [] }, callback)
+  return json_({ ok: true, course, metric, poolId: activePool, ...ratingSummaryFor_(players, courseProfiles, poolProfiles, auth.playerKey), players: leaderboard_(players, courseProfiles, poolProfiles, course, activePool, auth.playerKey, metric) }, callback)
 }
 
-function ratingsFromProfiles_(profiles) {
-  return Object.fromEntries(profiles.map((profile) => [profile.poolId, { rating: profile.rating, answered: profile.answered }]))
+function ratingsFromProfiles_(profiles, clubPool = '', referencePool = '') {
+  const ratings = Object.fromEntries(profiles.map((profile) => [profile.poolId, { rating: profile.rating, answered: profile.answered }]))
+  const reference = ratings[referencePool] || ratings[profiles[0]?.poolId]
+  if (clubPool && reference) ratings[clubPool] = { ...reference }
+  return ratings
 }
 
-function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, course, poolId = 'all', viewerPlayerKey = '') {
+function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, course, poolId = 'all', viewerPlayerKey = '', metric = 'course') {
   const playerRows = playersSheet.getDataRange().getValues().slice(1).filter((row) => row[0] && row[1] && !row[11])
+  const courseRows = courseProfilesSheet.getDataRange().getValues()
+  const poolRows = poolProfilesSheet.getDataRange().getValues()
+  if (metric === 'overall' || String(poolId).startsWith('club:')) {
+    const summaries = buildRatingSummaryIndex_(playerRows, courseRows, poolRows)
+    return playerRows.filter((row) => poolId === 'all' || playerPools_(row).includes(poolId)).map((row) => {
+      const key = String(row[0])
+      const summary = summaries.get(key)
+      const player = { name: String(row[1]), rating: metric === 'overall' ? summary.overallRating : summary.courseRatings[course] ?? 1240 }
+      if (key === String(viewerPlayerKey || '')) player.answered = summary.courseAnswered[course] || 0
+      return player
+    }).sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name, 'ja'))
+  }
   const rankingCourses = rankingCourses_(course)
   if (poolId === 'all') {
     const names = new Map(playerRows.map((row) => [String(row[0]), String(row[1])]))
-    const profileRows = courseProfilesSheet.getDataRange().getValues().slice(1)
+    const profileRows = courseRows.slice(1)
       .filter((row) => row[0] && rankingCourses.includes(String(row[1])) && names.has(String(row[0])))
     return profileRows.map((row) => {
       const playerKey = String(row[0])
@@ -7051,7 +7226,7 @@ function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, cour
       return player
     }).sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name, 'ja'))
   }
-  const profileRows = poolProfilesSheet.getDataRange().getValues().slice(1)
+  const profileRows = poolRows.slice(1)
     .filter((row) => row[0] && rankingCourses.includes(String(row[1])) && String(row[2]) === poolId)
   const profiles = new Map(profileRows.map((row) => [String(row[0]), { rating: Number(row[3]) || 1240, answered: Number(row[4]) || 0 }]))
   const ranked = playerRows
@@ -7059,8 +7234,9 @@ function leaderboard_(playersSheet, courseProfilesSheet, poolProfilesSheet, cour
     .map((row) => {
       const profile = profiles.get(String(row[0]))
       const playerKey = String(row[0])
-      const player = { name: String(row[1]), rating: profile?.rating ?? (poolId === FOUNDATION_POOL_ID ? Number(row[2]) || 1240 : 1240) }
-      if (playerKey === String(viewerPlayerKey || '')) player.answered = profile?.answered ?? (poolId === FOUNDATION_POOL_ID ? Number(row[3]) || 0 : 0)
+      const legacyFoundation = poolId === FOUNDATION_POOL_ID && course === 'foundation-course'
+      const player = { name: String(row[1]), rating: profile?.rating ?? (legacyFoundation ? Number(row[2]) || 1240 : 1240) }
+      if (playerKey === String(viewerPlayerKey || '')) player.answered = profile?.answered ?? (legacyFoundation ? Number(row[3]) || 0 : 0)
       return player
     })
   return ranked
@@ -7126,6 +7302,10 @@ function cleanClassName_(value) {
 function cleanPoolId_(value) {
   const poolId = String(value || '').trim().toLowerCase()
   if (poolId === FOUNDATION_POOL_ID || poolId === 'all') return poolId
+  if (poolId.startsWith('club:')) {
+    const clubId = cleanClubId_(poolId.slice(5))
+    return clubId ? 'club:' + clubId : ''
+  }
   const match = poolId.match(/^([1-3])-([a-m])$/)
   return match ? match[1] + '-' + match[2].toUpperCase() : ''
 }

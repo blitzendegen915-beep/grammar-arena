@@ -207,7 +207,7 @@ test('teacher ranking is read-only, course-scoped, one row per account, and retu
   assert.equal(result.total, 3)
   assert.equal(result.rankedTotal, 2)
   assert.deepEqual(Array.from(result.students, (student) => [student.name, student.rating, student.rank]), [['Bob', 1300, 1], ['Alice', 1240, 2], ['おとめ座', null, null]])
-  assert.deepEqual(Object.keys(result.students[0]).sort(), ['className', 'foundationMember', 'grade', 'name', 'rank', 'rating', 'ratingPoolId'])
+  assert.deepEqual(Object.keys(result.students[0]).sort(), ['className', 'clubId', 'clubLabel', 'foundationMember', 'grade', 'name', 'rank', 'rating', 'ratingPoolId'])
   assert.equal(JSON.stringify([players.rows, poolProfiles.rows, courseProfiles.rows]), before)
   assert.equal(audit.size, 0)
   const regular = backend.adminRanking_({ ...params, course: 'regular-english-practice' })

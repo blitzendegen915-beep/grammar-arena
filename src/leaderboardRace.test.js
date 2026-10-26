@@ -9,13 +9,13 @@ const handler = source.match(/const refreshLeaderboard = async \(\) => \{([\s\S]
 
 function harness() {
   let state = { studentName: 'A', authToken: 'token-A', poolIds: ['1-A'], publicLeaderboard: [] }
-  const activeRef = { current: { name: 'A', token: 'token-A', course: 'course', poolId: '1-A' } }
+  const activeRef = { current: { name: 'A', token: 'token-A', course: 'course', poolId: '1-A', metric: 'course' } }
   const leaderboardInFlightRef = { current: null }
   const leaderboardRequestRef = { current: 0 }
   const requests = []
   const notices = []
   const refresh = () => Function('context', `with(context) { return (async () => {${handler}})() }`)({
-    hasSession: Boolean(state.authToken), persisted: state, rankingPoolId: activeRef.current.poolId,
+    hasSession: Boolean(state.authToken), persisted: state, rankingPoolId: activeRef.current.poolId, rankingMetric: activeRef.current.metric,
     modeId: 'course', SCORE_API_URL: 'local-mock', getRankingCourseId: (id) => id,
     activeRef, leaderboardInFlightRef, leaderboardRequestRef, isSameRequestScope,
     setPersisted: (update) => { state = update(state) }, setNotice: (notice) => notices.push(notice),
@@ -23,12 +23,26 @@ function harness() {
   })
   return {
     refresh, requests, notices, state: () => state,
+    update: (patch) => { state = { ...state, ...patch } },
+    metric: (metric) => { activeRef.current.metric = metric },
     switchTo(name, token, poolId) {
-      activeRef.current = { name, token, course: 'course', poolId }
+      activeRef.current = { name, token, course: 'course', poolId, metric: 'course' }
       state = { studentName: name, authToken: token, poolIds: [poolId], publicLeaderboard: [] }
     },
   }
 }
+
+test('a ranking read started before answer confirmation cannot roll back the summary or self rank', async () => {
+  const h = harness()
+  h.metric('overall')
+  h.update({ overallRating: 1500 })
+  const pending = h.refresh()
+  h.update({ overallRating: 1600, courseRatings: { 'foundation-course': 1600 } })
+  h.requests[0].resolve({ ok: true, overallRating: 1500, players: [{ name: 'peer', rating: 1550 }, { name: 'A', rating: 1500 }] })
+  await pending
+  assert.equal(h.state().overallRating, 1600)
+  assert.deepEqual(h.state().publicLeaderboard, [{ name: 'A', rating: 1600 }, { name: 'peer', rating: 1550 }])
+})
 
 test('late account A roster cannot appear after account B login', async () => {
   const h = harness()
