@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { createPortal, flushSync } from 'react-dom'
 import { shouldResetThemeSelection } from './themeAccess.js'
 import { isCorrectAnswer } from './answerGrading.js'
+import { COURSE_MODES, DEFAULT_MODE_ID, restoreActiveCourseProfile } from './courseCatalog.js'
 import './styles.css'
 import { FOUNDATION_TRANSLATIONS } from './foundationTranslations'
 import { loadQuestionBank } from './questionBankLoader'
@@ -34,7 +35,6 @@ const STORAGE_KEY = 'grammar-arena-v1'
 const SCORE_API_URL = import.meta.env.VITE_SCORE_API_URL || 'https://script.google.com/macros/s/AKfycbw0HAcZcaqv8vRsU4uz02rKB7-jdsWM-xZrNwlHTlEyGOEdCSTWnaDBlqCuCv4Ho8AelQ/exec'
 const DEFAULT_RATING = 1240
 const SESSION_LENGTH = 10
-const DEFAULT_MODE_ID = 'foundation-infinitive'
 const DEFAULT_THEME_ID = 'ascention'
 const ThemeUnlockContext = createContext(null)
 const AdminRanking = lazy(() => import('./AdminRanking.jsx'))
@@ -245,14 +245,6 @@ const STUDENTS = [
   { id: 'suzuki-hana', name: '鈴木 はな', grade: '高2' },
 ]
 
-const COURSE_MODES = [
-  { id: 'foundation-infinitive', label: '基礎講座 - 不定詞', available: true },
-  { id: 'foundation-gerund', label: '基礎講座 - 動名詞', available: true },
-  { id: 'foundation-participles', label: '基礎講座 - 分詞', available: true },
-  { id: 'regular-english-practice', label: '英語演習 - 平常授業', available: true },
-  { id: 'regular-english-practice-2kimatsu', label: '英語演習 - 2学期期末', available: true },
-]
-
 const FOUNDATION_QUESTIONS = QUESTIONS.map((question) => withBlankCount({
   ...question,
   japanese: question.japanese || '',
@@ -275,7 +267,7 @@ const RANKING_POOL_OPTIONS = [
 ]
 
 function getCourseDetails(modeId) {
-  return COURSE_DETAILS[modeId] || COURSE_DETAILS['foundation-infinitive']
+  return COURSE_DETAILS[modeId] || COURSE_DETAILS[DEFAULT_MODE_ID]
 }
 
 function getRankingCourseId(modeId) {
@@ -309,13 +301,13 @@ function readPersisted() {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return { ...DEFAULT_PERSISTED }
     const parsed = JSON.parse(raw)
-    const restored = { ...DEFAULT_PERSISTED, ...parsed }
+    const restored = { ...DEFAULT_PERSISTED, ...parsed, modeId: parsed.modeId || 'foundation-infinitive' }
     const restoredPoolIds = restored.grade && restored.className ? preferredPoolIds(restored) : []
     const restoredPoolId = restoredPoolIds.includes(restored.rankingPoolId)
       ? restored.rankingPoolId
       : restoredPoolIds[0] || 'foundation'
     return {
-      ...restored,
+      ...restoreActiveCourseProfile(restored, restoredPoolId),
       // Never render a cached name list before the authenticated pool is re-read.
       publicLeaderboard: [],
       poolIds: restoredPoolIds,
@@ -486,7 +478,7 @@ function App() {
   })
   const [modeId, setModeId] = useState(() => {
     const initial = readPersisted()
-    return COURSE_DETAILS[initial.modeId] ? initial.modeId : DEFAULT_MODE_ID
+    return COURSE_MODES.some(({ id }) => id === initial.modeId) ? initial.modeId : DEFAULT_MODE_ID
   })
   const [themeId, setThemeId] = useState(() => normalizeThemeId(readPersisted().themeId))
   const [rankingPoolId, setRankingPoolId] = useState(() => {
@@ -494,13 +486,10 @@ function App() {
     return initial.rankingPoolId || preferredPoolId(initial)
   })
   const [filter, setFilter] = useState('all')
-  const [queue, setQueue] = useState(() => {
-    const initial = readPersisted()
-    return buildQueue('all', initial.answeredIds, FOUNDATION_QUESTIONS)
-  })
-  const [questionBank, setQuestionBank] = useState(() => FOUNDATION_QUESTIONS)
-  const [loadedBankModeId, setLoadedBankModeId] = useState(DEFAULT_MODE_ID)
-  const [bankLoading, setBankLoading] = useState(false)
+  const [queue, setQueue] = useState([])
+  const [questionBank, setQuestionBank] = useState([])
+  const [loadedBankModeId, setLoadedBankModeId] = useState('')
+  const [bankLoading, setBankLoading] = useState(true)
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState('')
   const [tokens, setTokens] = useState([])
