@@ -528,8 +528,8 @@ function App() {
   const [authMode, setAuthMode] = useState('login')
   const [authName, setAuthName] = useState(() => readPersisted().studentName || '')
   const [authPin, setAuthPin] = useState('')
-  const [authGrade, setAuthGrade] = useState(() => readPersisted().grade || '1')
-  const [authClassName, setAuthClassName] = useState(() => readPersisted().className || 'A')
+  const [authGrade, setAuthGrade] = useState(() => readPersisted().grade || '')
+  const [authClassName, setAuthClassName] = useState(() => readPersisted().className || '')
   const [authFoundationMember, setAuthFoundationMember] = useState(() => Boolean(readPersisted().foundationMember))
   const [authClubId, setAuthClubId] = useState(() => readPersisted().clubId || '')
   const [placementSetup, setPlacementSetup] = useState(null)
@@ -562,6 +562,16 @@ function App() {
   } : null
   const answerSyncKey = answerSyncIdentity ? getSyncKey(answerSyncIdentity) : ''
   const answerSyncSummary = getAnswerSyncSummary(persisted.answerSyncQueue, answerSyncKey)
+  const unsavedAnswers = (persisted.answerSyncQueue || []).filter((entry) => entry.status !== 'synced')
+  const accountUnsavedAnswers = unsavedAnswers.filter((entry) => entry.authToken === persisted.authToken && entry.name?.trim().toLowerCase() === persisted.studentName?.trim().toLowerCase())
+  const accountUnsavedCount = accountUnsavedAnswers.length
+  const accountUnsavedErrors = accountUnsavedAnswers.filter((entry) => entry.status === 'error' || entry.status === 'blocked').length
+  useEffect(() => {
+    if (!unsavedAnswers.length) return undefined
+    const warnUnsaved = (event) => { event.preventDefault(); event.returnValue = '' }
+    window.addEventListener('beforeunload', warnUnsaved)
+    return () => window.removeEventListener('beforeunload', warnUnsaved)
+  }, [unsavedAnswers.length])
   const authoritativeRating = hasSession ? getAuthoritativeRating(persisted, answerSyncKey, rankingPoolId) : DEFAULT_RATING
   const provisionalDelta = hasSession ? persisted.rating - authoritativeRating : 0
   const overallPending = (persisted.answerSyncQueue || []).filter((entry) => entry.authToken === persisted.authToken && entry.name?.trim().toLowerCase() === persisted.studentName?.trim().toLowerCase() && !['synced', 'duplicate', 'synced-unconfirmed', 'duplicate-unconfirmed'].includes(entry.status)).map((entry) => ({ course: entry.course, delta: entry.delta }))
@@ -858,6 +868,7 @@ function App() {
           'not-found': '登録されていない生徒名です。初回登録を選んでください。',
           'not-registered': 'この生徒名には暗証番号が設定されていません。初回登録を選んでください。',
           'wrong-pin': '暗証番号が一致しません。',
+          'pin-rate-limited': '暗証番号を続けて間違えたため、しばらく待ってから再試行してください。',
           'placement-required': '学年とクラスを選択してください。',
           'invalid-club': '部活の選択内容を確認してください。',
           'invalid-session': '登録情報を確認できませんでした。もう一度ログインしてください。',
@@ -1069,7 +1080,10 @@ function App() {
   }
 
   const logout = () => {
-    if (hasActivePractice && !window.confirm('進行中のセッションを破棄してログアウトしますか？')) return
+    const warnings = []
+    if (hasActivePractice) warnings.push('進行中のセッションは終了します。')
+    if (accountUnsavedCount) warnings.push('保存待ちの回答があります。同じ端末で再ログインすると再送されます。')
+    if (warnings.length && !window.confirm(`${warnings.join('\n')}\nログアウトしますか？`)) return
     setPersisted((current) => ({
       ...current,
       studentName: '',
@@ -1506,7 +1520,7 @@ function App() {
 
       <main className="main-area">
         <header className="topbar">
-          <div className="top-stat"><Icon name="chart" size={28} /><div className="rating-stack"><span>総合レート</span><strong>{hasSession ? overallRating.toLocaleString() : '—'}</strong><small>{hasSession ? `現在講座 ${authoritativeRating.toLocaleString()}` : 'ログインしてください'}</small>{hasSession && answerSyncSummary.total > 0 && <small>講座別の暫定レート {persisted.rating.toLocaleString()}（{provisionalDelta >= 0 ? '+' : ''}{provisionalDelta}）</small>}</div>{hasSession && submitted && <span className={`rating-delta ${submitted.delta >= 0 ? 'positive' : ''}`}>{`${submitted.delta >= 0 ? '▲ +' : '▼ '}${submitted.delta}`}</span>}</div>
+          <div className="top-stat"><Icon name="chart" size={28} /><div className="rating-stack"><span>総合レート</span><strong>{hasSession ? overallRating.toLocaleString() : '—'}</strong><small>{hasSession ? `現在講座 ${authoritativeRating.toLocaleString()}` : 'ログインしてください'}</small>{hasSession && answerSyncSummary.total > 0 && <small>講座別の暫定レート {persisted.rating.toLocaleString()}（{provisionalDelta >= 0 ? '+' : ''}{provisionalDelta}）</small>}{hasSession && accountUnsavedCount > 0 && <small role="status">{accountUnsavedErrors ? `保存に問題あり ${accountUnsavedErrors}問` : `保存待ち ${accountUnsavedCount}問`}</small>}</div>{hasSession && submitted && <span className={`rating-delta ${submitted.delta >= 0 ? 'positive' : ''}`}>{`${submitted.delta >= 0 ? '▲ +' : '▼ '}${submitted.delta}`}</span>}</div>
           <div className="top-divider" />
           <div className="top-stat streak-stat"><Icon name="streak" size={27} /><div><span>連続正解</span><strong>{persisted.streak}</strong></div></div>
           <div className="topbar-spacer" />
@@ -1521,7 +1535,7 @@ function App() {
           {view === 'landing' && <LandingView {...{ course: getCourseDetails(modeId), authMode, setAuthMode, authName, setAuthName, authPin, setAuthPin, authGrade, setAuthGrade, authClassName, setAuthClassName, authFoundationMember, setAuthFoundationMember, authClubId, setAuthClubId, placementSetup, submitAuth, authBusy, notice, setNotice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId }} />}
           {view === 'lobby' && <LobbyView course={getCourseDetails(modeId)} studentName={persisted.studentName} rating={authoritativeRating} overallRating={overallRating} leaderboard={hasSession ? persisted.publicLeaderboard : []} rankingPoolId={rankingPoolId} rankingMetric={rankingMetric} startPractice={startPractice} openLeaderboard={() => setView('leaderboard')} />}
           {view === 'practice' && <PracticeView {...{ course: getCourseDetails(modeId), question, queue, index, filter, setFilter: restart, submitted, submit, nextQuestion, selected, setSelected, tokens, useWord, removeWord, inputParts, setInputParts, answerPreview, isComplete, bankLoading, restart, sessionScore, sessionAnswers, sessionRatingStart, sessionCompletedAt, rating: persisted.rating, authoritativeRating, history: persisted.history, todayCorrect, todayAnswered, todaySeconds, submitting, notice, leaderboard: hasSession ? persisted.publicLeaderboard : [], rankingPoolId, rankingMetric, studentName: persisted.studentName, openLeaderboard: () => setView('leaderboard'), answerSyncSummary, retryAnswer, retryFailedAnswers }} />}
-          {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={hasSession ? persisted.publicLeaderboard : []} rating={rankingMetric === 'overall' ? overallRating : authoritativeRating} studentName={persisted.studentName} rankingPoolId={rankingPoolId} refresh={() => refreshLeaderboard(rankingMetric)} notice={notice} metric={rankingMetric} setMetric={(value) => { setPersisted((current) => ({ ...current, publicLeaderboard: [] })); setRankingMetric(value) }} />}
+          {view === 'leaderboard' && <LeaderboardView course={getCourseDetails(modeId)} players={hasSession ? persisted.publicLeaderboard : []} rating={rankingMetric === 'overall' ? overallRating : authoritativeRating} studentName={persisted.studentName} hasSession={hasSession} goToLogin={() => setView('landing')} rankingPoolId={rankingPoolId} refresh={() => refreshLeaderboard(rankingMetric)} notice={notice} metric={rankingMetric} setMetric={(value) => { setPersisted((current) => ({ ...current, publicLeaderboard: [] })); setRankingMetric(value) }} />}
           {view === 'history' && <HistoryView history={persisted.history} rating={authoritativeRating} />}
           {view === 'settings' && <SettingsView filter={filter} setFilter={restart} autoExplanation={persisted.autoExplanation} setAutoExplanation={(value) => setPersisted((current) => ({ ...current, autoExplanation: value }))} themeId={themeId} setThemeId={setThemeId} hasSession={hasSession} unlockedThemes={persisted.unlockedThemes} clubId={persisted.clubId || ''} changeClub={changeClub} authBusy={authBusy} />}
         </div>
@@ -1555,12 +1569,12 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
         <p className="landing-copy">{placementSetup ? '所属クラスを登録してください。既存のレートや解答履歴はそのまま引き継がれます。' : `表示名と暗証番号で確認してから、${course.label}・${course.name}の10問対戦を始められます。`}</p>
         {!placementSetup && <div className="auth-tabs" role="tablist" aria-label="アカウント操作">
           <button type="button" className={authMode === 'login' ? 'selected' : ''} onClick={() => { setAuthMode('login'); setNotice('') }}>ログイン</button>
-          <button type="button" className={authMode === 'register' ? 'selected' : ''} onClick={() => { setAuthMode('register'); setNotice('') }}>初回登録</button>
+          <button type="button" className={authMode === 'register' ? 'selected' : ''} onClick={() => { setAuthMode('register'); setAuthGrade(''); setAuthClassName(''); setNotice('') }}>初回登録</button>
         </div>}
         <form className="landing-form" onSubmit={(event) => { event.preventDefault(); submitAuth() }}>
           {!placementSetup && <>
             <label htmlFor="landing-student-name">表示名（ランキングに表示）</label>
-            <input id="landing-student-name" value={authName} onChange={(event) => { if (event.target.value !== authName) setAuthClubId(''); setAuthName(event.target.value) }} placeholder="例：山田 太郎" maxLength={20} autoComplete="username" />
+            <input id="landing-student-name" value={authName} onChange={(event) => { if (event.target.value !== authName) setAuthClubId(''); setAuthName(event.target.value) }} placeholder="例：ニックネーム" maxLength={20} autoComplete="username" />
             <label htmlFor="landing-pin">暗証番号（4〜8桁）</label>
             <input id="landing-pin" type="password" inputMode="numeric" value={authPin} onChange={(event) => setAuthPin(event.target.value.replace(/\D/g, '').slice(0, 8))} placeholder="数字のみ" maxLength={8} autoComplete={authMode === 'login' ? 'current-password' : 'new-password'} />
           </>}
@@ -1583,7 +1597,7 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
           {!placementSetup && <p className="landing-note">本名ではなく、授業で使うニックネームや出席番号の利用を推奨します。暗証番号は画面に表示されず、照合用の情報だけを保存します。</p>}
         </form>
       </section>
-      <PublicLeaderboard players={leaderboard} currentName={authName} courseLabel={course.label} poolLabel={poolLabel(rankingPoolId)} metric="overall" limit={5} />
+      <section className="leaderboard-card"><h2>みんなのレート</h2><p className="leaderboard-copy">ログインすると、自分の所属先のランキングを確認できます。</p></section>
     </div>
     <VocabularyArenaCard />
     <div className="landing-footer"><span>NOW PLAYING</span><strong>{course.label} - {course.name}</strong><span className="landing-footer-muted">講座と所属別にランキングが分かれます</span></div>
@@ -1820,10 +1834,12 @@ function PublicLeaderboard({ players = [], currentName = '', courseLabel = '基�
   return <section className="leaderboard-card"><div className="leaderboard-head"><div><span className="section-kicker">PUBLIC RATE / {rankingLabel}</span><h2>みんなのレート</h2></div><span className="leaderboard-live">LIVE</span></div><p className="leaderboard-copy">{metricLabel}・{rankingLabel}に参加している生徒のレート</p><div className="leaderboard-list">{visiblePlayers.map((player, index) => <div className={`leaderboard-row ${player.name === currentName ? 'current' : ''}`} key={`${player.name}-${index}`}><span className="leaderboard-rank">{String(index + 1).padStart(2, '0')}</span><span className="leaderboard-name">{player.name}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div>{onOpen && <button type="button" className="leaderboard-link" onClick={onOpen}>全体ランキングを見る <Icon name="arrow" size={16} /></button>}</section>
 }
 
-function LeaderboardView({ course, players = [], rating, studentName, rankingPoolId, refresh, notice, metric, setMetric }) {
+function LeaderboardView({ course, players = [], rating, studentName, hasSession, goToLogin, rankingPoolId, refresh, notice, metric, setMetric }) {
+  if (!hasSession) return <div className="leaderboard-page"><div className="leaderboard-page-head"><div><p className="section-kicker">RANKING</p><h1>ランキング</h1><p className="subcopy">ログインすると、自分の所属先のランキングを確認できます。</p></div></div><button type="button" className="primary-button" onClick={goToLogin}>ログインへ</button></div>
   return <div className="leaderboard-page">
     <div className="leaderboard-page-head"><div><p className="section-kicker">PUBLIC RATEBOARD / {poolLabel(rankingPoolId)}</p><h1>{metric === 'overall' ? '総合' : course.label}・{poolLabel(rankingPoolId)}のランキング</h1><p className="subcopy">講座別レートと総合レートを切り替えて確認できます。</p><label className="club-metric-select">集計<select value={metric} onChange={(event) => setMetric(event.target.value)}><option value="overall">総合レート</option><option value="course">現在の講座別レート</option></select></label></div><button type="button" className="secondary-button leaderboard-refresh" onClick={refresh}><Icon name="history" size={18} />ランキングを更新</button></div>
     {notice && <div className="app-notice" role="status">{notice}</div>}
+    <details className="leaderboard-rule"><summary>総合レートの計算方法</summary><p>総合レートは1,240に、各講座で1,240を超えた分を加えたものです。講座別レートが1,240未満の間は、正答しても総合レートが変わらないことがあります。</p></details>
     <div className="leaderboard-overview"><div className="leaderboard-you"><span>YOUR RATE</span><strong>{rating.toLocaleString()}</strong><small>{studentName ? `${studentName} の現在レート` : '名前を入力すると参加できます'}</small></div><div className="leaderboard-rule"><span>RANKING RULE</span><strong>正答で上昇 / 不正解で下降</strong><small>同じ問題も、解答するたびにレートへ反映されます。</small></div></div>
     <section className="leaderboard-table-card"><div className="leaderboard-table-head"><h2>参加者一覧</h2><span>{players.length ? `${players.length}人` : '共有データなし'}</span></div>{players.length ? <div className="leaderboard-table"><div className="leaderboard-table-row leaderboard-table-label"><span>RANK</span><span>PLAYER</span><span>ANSWERED（自分のみ）</span><span>RATE</span></div>{players.map((player, index) => <div className={`leaderboard-table-row ${player.name === studentName ? 'current' : ''}`} key={`${player.name}-${index}`}><strong>{String(index + 1).padStart(2, '0')}</strong><span>{player.name}</span><span>{player.name === studentName && Number.isFinite(Number(player.answered)) ? player.answered : '—'}</span><strong>{typeof player.rating === 'number' ? player.rating.toLocaleString() : player.rating}</strong></div>)}</div> : <div className="leaderboard-empty"><Icon name="leaderboard" size={34} /><h3>まだ共有ランキングがありません。</h3><p>共有サーバーに接続すると、所属プールのレートがここに表示されます。</p></div>}</section>
   </div>
@@ -2026,7 +2042,7 @@ function SettingsView({ filter, setFilter, autoExplanation, setAutoExplanation, 
       <section className="settings-panel"><h2>テーマ変更</h2><p>演習画面の色と雰囲気を切り替えます。解放したテーマはこのアカウントに保存されます。</p>
         <div className="theme-options" role="radiogroup" aria-label="テーマ変更">{availableThemes.map((theme) => <button type="button" role="radio" aria-checked={theme.id === themeId} key={theme.id} className={`theme-option theme-option-${theme.id} ${theme.id === themeId ? 'selected' : ''}`} onClick={() => setThemeId(theme.id)}><span className="theme-preview" aria-hidden="true"><span /></span><span className="theme-option-copy"><strong>{theme.label}</strong><small>{theme.description}</small></span><span className="theme-radio" aria-hidden="true" /></button>)}</div>
       </section>
-      <section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? 'Lesson 13〜15・Plus' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section>
+      <section className="settings-panel"><h2>出題レベル</h2><p>演習画面のタブからいつでも変更できます。</p><div className="settings-options">{Object.entries(DIFFICULTY).map(([key, value]) => <button type="button" key={key} className={`setting-option ${filter === key ? 'selected' : ''}`} onClick={() => setFilter(key)}><span className="setting-radio" /> <span><strong>{value.label}</strong><small>{key === 'all' ? '選択中の講座の全範囲' : key === 'starter' ? 'まずは基本から' : key === 'standard' ? '使い分けを練習' : '一歩進んだ表現'}</small></span></button>)}</div></section>
       <section className="settings-panel settings-panel-display"><h2>学習の表示</h2><p>解答後の画面の見え方を設定します。</p><label className="toggle-row"><span><strong>解説を自動で表示</strong><small>正誤判定のあとに解説を開きます</small></span><button type="button" className={`toggle ${autoExplanation ? 'on' : ''}`} aria-pressed={autoExplanation} onClick={() => setAutoExplanation(!autoExplanation)}><span /></button></label><div className="rule-note"><Icon name="document" size={19} /><span>正答数に応じてレートが変動し、履歴に保存されます。</span></div></section>
       <section className="settings-panel"><h2>ほかの学習アリーナ</h2><p>英単語・熟語の練習はこちらから。</p><VocabularyArenaCard compact /></section>
     </div>

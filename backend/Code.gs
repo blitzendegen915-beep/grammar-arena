@@ -6744,6 +6744,25 @@ function getRuntimeSheets_(book) {
   }
 }
 
+// Called under the script lock, shared by login and registration retries.
+function pinAttempts_(playerKey, succeeded) {
+  const properties = PropertiesService.getScriptProperties()
+  const key = 'pin-attempts:' + digest_(playerKey)
+  const raw = properties.getProperty(key)
+  let state = raw ? JSON.parse(raw) : { count: 0, until: 0 }
+  if (!Number.isInteger(state.count) || !Number.isFinite(state.until)) throw new Error('invalid-pin-attempt-state')
+  const now = Date.now()
+  if (state.count >= 5 && state.until > now) return false
+  if (state.until && state.until <= now) state = { count: 0, until: 0 }
+  if (succeeded === true && raw) properties.deleteProperty(key)
+  if (succeeded === false) {
+    state.count += 1
+    if (!state.until || state.count >= 5) state.until = now + 60000
+    properties.setProperty(key, JSON.stringify(state))
+  }
+  return true
+}
+
 function registerPlayer_(params) {
   const name = cleanName_(params.name)
   const playerKey = keyFor_(name)
@@ -6772,7 +6791,12 @@ function registerPlayer_(params) {
     if (playerIndex >= 0) {
       if (rows[playerIndex][11]) return json_({ ok: false, reason: 'account-deleted' }, params.callback)
       if (String(rows[playerIndex][5] || '')) {
-        if (String(rows[playerIndex][5]) !== pinSecret) return json_({ ok: false, reason: 'already-registered' }, params.callback)
+        if (!pinAttempts_(playerKey)) return json_({ ok: false, reason: 'pin-rate-limited' }, params.callback)
+        if (String(rows[playerIndex][5]) !== pinSecret) {
+          pinAttempts_(playerKey, false)
+          return json_({ ok: false, reason: 'already-registered' }, params.callback)
+        }
+        pinAttempts_(playerKey, true)
         // A lost response can make a successful registration look failed in
         // the browser. Treat the same name + PIN as an idempotent reconnect,
         // but preserve the stored class/pool placement.
@@ -6815,7 +6839,12 @@ function loginPlayer_(params) {
     if (playerIndex < 0) return json_({ ok: false, reason: 'not-found' }, params.callback)
     if (rows[playerIndex][11]) return json_({ ok: false, reason: 'account-deleted' }, params.callback)
     if (!String(rows[playerIndex][5] || '')) return json_({ ok: false, reason: 'not-registered' }, params.callback)
-    if (String(rows[playerIndex][5]) !== pinSecretFor_(pinHash, playerKey)) return json_({ ok: false, reason: 'wrong-pin' }, params.callback)
+    if (!pinAttempts_(playerKey)) return json_({ ok: false, reason: 'pin-rate-limited' }, params.callback)
+    if (String(rows[playerIndex][5]) !== pinSecretFor_(pinHash, playerKey)) {
+      pinAttempts_(playerKey, false)
+      return json_({ ok: false, reason: 'wrong-pin' }, params.callback)
+    }
+    pinAttempts_(playerKey, true)
 
     const token = Utilities.getUuid()
     const now = new Date()

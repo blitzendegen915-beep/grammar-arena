@@ -89,6 +89,12 @@ function configuredBackend({ players: playerRows, courseProfiles: courseRows, po
     insertSheet(name) { const created = sheet(); bookSheets.set(name, created); return created },
   }
   let id = 0
+  const properties = new Map()
+  backend.PropertiesService = { getScriptProperties: () => ({
+    getProperty: (key) => properties.get(key) || null,
+    setProperty: (key, value) => properties.set(key, String(value)),
+    deleteProperty: (key) => properties.delete(key),
+  }) }
   backend.LockService = { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) }
   backend.Utilities = {
     DigestAlgorithm: { SHA_256: 'SHA_256' },
@@ -103,8 +109,23 @@ function configuredBackend({ players: playerRows, courseProfiles: courseRows, po
     row[5] = backend.pinSecretFor_('a'.repeat(64), row[0])
     row[6] = backend.tokenHashFor_(`auth:${row[0]}`, row[0])
   }
-  return { backend, players, answers, courseProfiles, poolProfiles, book }
+  return { backend, players, answers, courseProfiles, poolProfiles, book, properties }
 }
+
+test('failed PINs are limited across login and repeated registration without affecting other accounts', () => {
+  const { backend, properties } = configuredBackend()
+  const bad = 'b'.repeat(64), valid = 'a'.repeat(64)
+  const registration = { name: 'alice', pinHash: bad, grade: '1', className: 'A' }
+  for (let i = 0; i < 4; i++) assert.equal(backend.loginPlayer_({ name: 'alice', pinHash: bad }).reason, 'wrong-pin')
+  assert.equal(backend.registerPlayer_(registration).reason, 'already-registered')
+  assert.equal(backend.loginPlayer_({ name: 'alice', pinHash: valid }).reason, 'pin-rate-limited')
+  assert.equal(backend.registerPlayer_({ ...registration, pinHash: valid }).reason, 'pin-rate-limited')
+  assert.equal(backend.loginPlayer_({ name: 'bob', pinHash: valid }).ok, true)
+  const key = 'pin-attempts:' + backend.digest_('alice')
+  properties.set(key, JSON.stringify({ count: 5, until: Date.now() - 1 }))
+  assert.equal(backend.loginPlayer_({ name: 'alice', pinHash: valid }).ok, true)
+  assert.equal(properties.has(key), false)
+})
 
 test('club IDs are normalized against the complete allowlist; blank and explicit none remain distinct', () => {
   const { backend } = configuredBackend()
