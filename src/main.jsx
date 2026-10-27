@@ -1586,8 +1586,8 @@ function LandingView({ course, authMode, setAuthMode, authName, setAuthName, aut
               {['体育局', '文化局', 'その他'].map((group) => <optgroup key={group} label={group}>{CLUB_OPTIONS.filter((club) => club.group === group).map((club) => <option key={club.id} value={club.id}>{club.label}</option>)}</optgroup>)}
             </select>
             <div className="placement-grid">
-              <div><label htmlFor="landing-grade">学年</label><select id="landing-grade" value={authGrade} onChange={(event) => setAuthGrade(event.target.value)}><option value="">選択してください</option>{GRADE_OPTIONS.map((grade) => <option key={grade} value={grade}>{grade}年</option>)}</select></div>
-              <div><label htmlFor="landing-class">クラス</label><select id="landing-class" value={authClassName} onChange={(event) => setAuthClassName(event.target.value)}><option value="">選択してください</option>{CLASS_OPTIONS.map((className) => <option key={className} value={className}>{className}組</option>)}</select></div>
+              <div><label htmlFor="landing-grade">学年</label><select id="landing-grade" value={authGrade} onChange={(event) => setAuthGrade(event.target.value)}><option value="">選択する</option>{GRADE_OPTIONS.map((grade) => <option key={grade} value={grade}>{grade}年</option>)}</select></div>
+              <div><label htmlFor="landing-class">クラス</label><select id="landing-class" value={authClassName} onChange={(event) => setAuthClassName(event.target.value)}><option value="">選択する</option>{CLASS_OPTIONS.map((className) => <option key={className} value={className}>{className}組</option>)}</select></div>
             </div>
             <label className="placement-check"><input type="checkbox" checked={authFoundationMember} onChange={(event) => setAuthFoundationMember(event.target.checked)} /><span>基礎講座受講中</span></label>
             <p className="placement-help">従来から基礎講座を受講している生徒はチェックを入れたままにしてください。所属クラスと基礎講座の両方のランキングを切り替えて見られます。</p>
